@@ -15,6 +15,7 @@
           "Hangfire.InMemory": "1.0.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "7.0.10",
           "Microsoft.Data.SqlClient": "6.1.3",
+          "Microsoft.NET.ILLink.Tasks": "8.0.22",
           "Newtonsoft.Json": "13.0.4",
           "Select.HtmlToPdf.NetCore": "25.2.0",
           "Serilog.AspNetCore": "8.0.0",
@@ -142,50 +143,6 @@
             "assemblyVersion": "1.8.22.0",
             "fileVersion": "1.8.22.0"
           }
-        },
-        "resources": {
-          "lib/netstandard2.0/ca/Hangfire.Core.resources.dll": {
-            "locale": "ca"
-          },
-          "lib/netstandard2.0/de/Hangfire.Core.resources.dll": {
-            "locale": "de"
-          },
-          "lib/netstandard2.0/es/Hangfire.Core.resources.dll": {
-            "locale": "es"
-          },
-          "lib/netstandard2.0/fa/Hangfire.Core.resources.dll": {
-            "locale": "fa"
-          },
-          "lib/netstandard2.0/fr/Hangfire.Core.resources.dll": {
-            "locale": "fr"
-          },
-          "lib/netstandard2.0/nb/Hangfire.Core.resources.dll": {
-            "locale": "nb"
-          },
-          "lib/netstandard2.0/nl/Hangfire.Core.resources.dll": {
-            "locale": "nl"
-          },
-          "lib/netstandard2.0/pt-BR/Hangfire.Core.resources.dll": {
-            "locale": "pt-BR"
-          },
-          "lib/netstandard2.0/pt-PT/Hangfire.Core.resources.dll": {
-            "locale": "pt-PT"
-          },
-          "lib/netstandard2.0/pt/Hangfire.Core.resources.dll": {
-            "locale": "pt"
-          },
-          "lib/netstandard2.0/sv/Hangfire.Core.resources.dll": {
-            "locale": "sv"
-          },
-          "lib/netstandard2.0/tr-TR/Hangfire.Core.resources.dll": {
-            "locale": "tr-TR"
-          },
-          "lib/netstandard2.0/zh-TW/Hangfire.Core.resources.dll": {
-            "locale": "zh-TW"
-          },
-          "lib/netstandard2.0/zh/Hangfire.Core.resources.dll": {
-            "locale": "zh"
-          }
         }
       },
       "Hangfire.InMemory/1.0.0": {
@@ -258,47 +215,6 @@
           "lib/net8.0/Microsoft.Data.SqlClient.dll": {
             "assemblyVersion": "6.0.0.0",
             "fileVersion": "6.13.25316.3"
-          }
-        },
-        "resources": {
-          "lib/net8.0/cs/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "cs"
-          },
-          "lib/net8.0/de/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "de"
-          },
-          "lib/net8.0/es/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "es"
-          },
-          "lib/net8.0/fr/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "fr"
-          },
-          "lib/net8.0/it/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "it"
-          },
-          "lib/net8.0/ja/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "ja"
-          },
-          "lib/net8.0/ko/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "ko"
-          },
-          "lib/net8.0/pl/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "pl"
-          },
-          "lib/net8.0/pt-BR/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "pt-BR"
-          },
-          "lib/net8.0/ru/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "ru"
-          },
-          "lib/net8.0/tr/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "tr"
-          },
-          "lib/net8.0/zh-Hans/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "zh-Hans"
-          },
-          "lib/net8.0/zh-Hant/Microsoft.Data.SqlClient.resources.dll": {
-            "locale": "zh-Hant"
           }
         },
         "runtimeTargets": {
@@ -531,6 +447,7 @@
           }
         }
       },
+      "Microsoft.NET.ILLink.Tasks/8.0.22": {},
       "Microsoft.NETCore.Platforms/3.1.9": {},
       "Microsoft.OpenApi/1.6.14": {
         "runtime": {
@@ -1178,6 +1095,13 @@
       "sha512": "sha512-fQ0VVCba75lknUHGldi3iTKAYUQqbzp1Un8+d9cm9nON0Gs8NAkXddNg8iaUB0qi/ybtAmNWizTR4avdkCJ9pQ==",
       "path": "microsoft.identitymodel.tokens/7.7.1",
       "hashPath": "microsoft.identitymodel.tokens.7.7.1.nupkg.sha512"
+    },
+    "Microsoft.NET.ILLink.Tasks/8.0.22": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-MhcMithKEiyyNkD2ZfbDZPmcOdi0GheGfg8saEIIEfD/fol3iHmcV8TsZkD4ZYz5gdUuoX4YtlVySUU7Sxl9SQ==",
+      "path": "microsoft.net.illink.tasks/8.0.22",
+      "hashPath": "microsoft.net.illink.tasks.8.0.22.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/3.1.9": {
       "type": "package",
