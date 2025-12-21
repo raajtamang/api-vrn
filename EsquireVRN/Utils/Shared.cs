@@ -1407,8 +1407,8 @@ namespace EsquireVRN.Utils
             SearchProductResult spr = new()
             {
                 Products = returnProducts,
-                Brands = brands,
-                SubCategories = sub_categories
+                Brands = [.. brands.DistinctBy(x=>x.Id)],
+                SubCategories = [.. sub_categories.DistinctBy(x => x.Id)]
             };
             return spr;
         }

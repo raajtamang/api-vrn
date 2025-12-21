@@ -153,9 +153,9 @@ namespace EsquireVRN.Controllers
         {
 
             List<Product_View> Products = Shared.GetMostViewedProducts();
-            List<SubCategory> SubCategories = new();
-            List<Brand> Brands = new();
-            if (Products != null && Products.Any())
+            List<SubCategory> SubCategories = [];
+            List<Brand> Brands = [];
+            if (Products != null && Products.Count > 0)
             {
                 string subcategories = string.Join(',', Products.Where(x => x.GroupName != null).Select(y => new { x = "N'" + y.GroupName.Replace("\'", "\'\'") + "'" }).Select(x => x.x).Distinct());
                 string brandIds = string.Join(',', Products.Where(x => x.ManufacturerName != null).Select(x => new { y = "N'" + x.ManufacturerName.Replace("\'", "\'\'") + "'" }).Select(x => x.y).Distinct());
@@ -178,9 +178,9 @@ namespace EsquireVRN.Controllers
         public IActionResult GetTrendingProducts()
         {
             List<Product_View> Products = Shared.GetTrendingProducts();
-            List<SubCategory> SubCategories = new();
-            List<Brand> Brands = new();
-            if (Products != null && Products.Any())
+            List<SubCategory> SubCategories = [];
+            List<Brand> Brands = [];
+            if (Products != null && Products.Count>0)
             {
                 string subcategories = string.Join(',', Products.Where(x => x.GroupName != null).Select(y => new { x = "N'" + y.GroupName.Replace("\'", "\'\'") + "'" }).Select(x => x.x).Distinct());
                 string brandIds = string.Join(',', Products.Where(x => x.ManufacturerName != null).Select(x => new { y = "N'" + x.ManufacturerName.Replace("\'", "\'\'") + "'" }).Select(x => x.y).Distinct());
@@ -190,8 +190,8 @@ namespace EsquireVRN.Controllers
                     var result = db.QueryMultiple(strBrandQuery, commandTimeout: 60);
                     if (result != null)
                     {
-                        Brands = result.Read<Brand>().DistinctBy(x => x.Name).ToList();
-                        SubCategories = result.Read<SubCategory>().DistinctBy(x => x.Title).ToList();
+                        Brands = [.. result.Read<Brand>().DistinctBy(x => x.Name)];
+                        SubCategories = [.. result.Read<SubCategory>().DistinctBy(x => x.Title)];
                     }
                 }
             }
@@ -204,9 +204,9 @@ namespace EsquireVRN.Controllers
         {
             List<Product_View> Products = Shared.GetBestSellerProducts();
 
-            List<SubCategory> SubCategories = new();
-            List<Brand> Brands = new();
-            if (Products != null && Products.Any())
+            List<SubCategory> SubCategories = [];
+            List<Brand> Brands = [];
+            if (Products != null && Products.Count > 0)
             {
                 string subcategories = string.Join(',', Products.Where(x => x.GroupName != null).Select(y => new { x = "N'" + y.GroupName.Replace("\'", "\'\'") + "'" }).Select(x => x.x).Distinct());
                 string brandIds = string.Join(',', Products.Where(x => x.ManufacturerName != null).Select(x => new { y = "N'" + x.ManufacturerName.Replace("\'", "\'\'") + "'" }).Select(x => x.y).Distinct());
@@ -216,8 +216,8 @@ namespace EsquireVRN.Controllers
                     var result = db.QueryMultiple(strBrandQuery, commandTimeout: 60);
                     if (result != null)
                     {
-                        Brands = result.Read<Brand>().DistinctBy(x => x.Name).ToList();
-                        SubCategories = result.Read<SubCategory>().DistinctBy(x => x.Title).ToList();
+                        Brands = [.. result.Read<Brand>().DistinctBy(x => x.Name)];
+                        SubCategories = [.. result.Read<SubCategory>().DistinctBy(x => x.Title)];
                     }
                 }
             }
@@ -230,9 +230,9 @@ namespace EsquireVRN.Controllers
         {
             List<Product_View> Products = Shared.GetFeaturedProducts();
 
-            List<SubCategory> SubCategories = new();
-            List<Brand> Brands = new();
-            if (Products != null && Products.Any())
+            List<SubCategory> SubCategories = [];
+            List<Brand> Brands = [];
+            if (Products != null && Products.Count > 0)
             {
                 string subcategories = string.Join(',', Products.Where(x => x.GroupName != null).Select(y => new { x = "N'" + y.GroupName.Replace("\'", "\'\'") + "'" }).Select(x => x.x).Distinct());
                 string brandIds = string.Join(',', Products.Where(x => x.ManufacturerName != null).Select(x => new { y = "N'" + x.ManufacturerName.Replace("\'", "\'\'") + "'" }).Select(x => x.y).Distinct());
@@ -242,8 +242,8 @@ namespace EsquireVRN.Controllers
                     var result = db.QueryMultiple(strBrandQuery, commandTimeout: 60);
                     if (result != null)
                     {
-                        Brands = result.Read<Brand>().DistinctBy(x => x.Name).ToList();
-                        SubCategories = result.Read<SubCategory>().DistinctBy(x => x.Title).ToList();
+                        Brands = [.. result.Read<Brand>().DistinctBy(x => x.Name)];
+                        SubCategories = [.. result.Read<SubCategory>().DistinctBy(x => x.Title)];
                     }
                 }
             }
@@ -256,9 +256,9 @@ namespace EsquireVRN.Controllers
         {
             List<SpecialPageProduct> Products = Shared.GetSpecialFeaturedProducts();
 
-            List<SubCategory> SubCategories = new();
-            List<Brand> Brands = new();
-            if (Products != null && Products.Any())
+            List<SubCategory> SubCategories = [];
+            List<Brand> Brands = [];
+            if (Products != null && Products.Count > 0)
             {
                 string subcategories = string.Join(',', Products.Where(x => x.SubCategory != null).Select(y => new { x = "N'" + y.SubCategory.Replace("\'", "\'\'") + "'" }).Select(x => x.x).Distinct());
                 string brandIds = string.Join(',', Products.Where(x => x.Brand != null).Select(x => new { y = "N'" + x.Brand.Replace("\'", "\'\'") + "'" }).Select(x => x.y).Distinct());
@@ -268,8 +268,8 @@ namespace EsquireVRN.Controllers
                     var result = db.QueryMultiple(strBrandQuery, commandTimeout: 60);
                     if (result != null)
                     {
-                        Brands = result.Read<Brand>().DistinctBy(x => x.Name).ToList();
-                        SubCategories = result.Read<SubCategory>().DistinctBy(x => x.Title).ToList();
+                        Brands = [.. result.Read<Brand>().DistinctBy(x => x.Name)];
+                        SubCategories = [.. result.Read<SubCategory>().DistinctBy(x => x.Title)];
                     }
                 }
             }
