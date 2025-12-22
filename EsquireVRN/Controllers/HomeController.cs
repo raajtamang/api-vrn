@@ -211,7 +211,7 @@ namespace EsquireVRN.Controllers
         }
 
         [HttpGet]
-        [Route("GetHomepageSetup")]
+        [Route("/api/GetHomepageSetup")]
         public IActionResult GetHomepageSetup()
         {
             List<HomepageSetup> setups = Shared.GetHomepageSetups();

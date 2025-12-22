@@ -3406,7 +3406,7 @@ namespace EsquireVRN.Utils
 
         internal static List<HomepageSetup> GetHomepageSetups()
         {
-            string query = "Select * from HomePageSetup Where OrgId=" + GetOrgID() + " Order By Position";
+            string query = "Select * From HomePageSetup Where OrgId="+GetOrgID()+" Order By Position";
             List<HomepageSetup> homepageSetups = [];
             using (var db = new SqlConnection(connString))
             {
@@ -3417,7 +3417,7 @@ namespace EsquireVRN.Utils
 
         internal static List<Banner> GetBanners(List<long> list)
         {
-            string query = "Select * from Banners Where Id In (" + string.Join(',', list) +") Order By Position";
+            string query = "Select * from Banners Where Id In (" + string.Join(',', list) +")";
             List<Banner> banners = [];
             using (var db = new SqlConnection(connString))
             {

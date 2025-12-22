@@ -293,7 +293,7 @@
         }
       }
     },
-    "/GetHomepageSetup": {
+    "/api/GetHomepageSetup": {
       "get": {
         "tags": [
           "Home"

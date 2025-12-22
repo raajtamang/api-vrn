@@ -163,6 +163,16 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "GetHomepageSetup",
+    "RelativePath": "api/GetHomepageSetup",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
     "Method": "Login",
     "RelativePath": "api/login",
     "HttpMethod": "POST",
@@ -1255,16 +1265,6 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.HomeController",
-    "Method": "GetHomepageSetup",
-    "RelativePath": "GetHomepageSetup",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
     "ReturnTypes": []
   }
 ]
