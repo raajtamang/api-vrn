@@ -3515,7 +3515,7 @@ namespace EsquireVRN.Utils
             double margin = 0;
             using (var db = new SqlConnection(connString))
             {
-                margin = db.Query<double>(query).FirstOrDefault();
+                margin = (db.Query<double?>(query).FirstOrDefault()??0);
             }
             margin = 1 + (margin/100);
             return margin;
