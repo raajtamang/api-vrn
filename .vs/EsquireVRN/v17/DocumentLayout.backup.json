@@ -116,7 +116,7 @@
               "RelativeDocumentMoniker": "EsquireVRN\\Utils\\Shared.cs",
               "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
               "RelativeToolTip": "EsquireVRN\\Utils\\Shared.cs",
-              "ViewState": "AgIAALINAAAAAAAAAAAuwL0NAABGAAAAAAAAAA==",
+              "ViewState": "AgIAAOIFAAAAAAAAAAAawPEFAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-10T07:18:46.999Z",
               "EditorCaption": ""
@@ -131,8 +131,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\ProductController.cs",
               "ViewState": "AgIAACUBAAAAAAAAAAAAwBgBAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-10T08:13:16.147Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-10T08:13:16.147Z"
             },
             {
               "$type": "Document",
@@ -276,7 +275,8 @@
               "RelativeToolTip": "EsquireVRN\\Utils\\WebOrder.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-10T08:30:35.548Z"
+              "WhenOpened": "2025-12-10T08:30:35.548Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
