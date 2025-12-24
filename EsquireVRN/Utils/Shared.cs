@@ -3554,30 +3554,30 @@ namespace EsquireVRN.Utils
             return margin;
         }
 
-        internal static List<Product_View> GetDealsOfTheDay()
+        internal static List<SpecialPageProduct> GetDealsOfTheDay()
         {
             Pricing prices = GetPriceUsed(null);
             double margin = GetMargin();
             string strWEBPriceUsed = Val(prices.UsePriceNumber.ToString());
             string query = "Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + " as OldPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as SpecialPrice,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName as SubCategory,m.ManufacturerName as Brand,p.ImgURL,p.Description,p.Active,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID In (94,380,932,546) and spp.StartDate<=GETDATE() and spp.EndDate>=(SELECT DATEADD(day, 1, GETDATE()))";
-            List<Product_View> products = [];
+            List<SpecialPageProduct> products = [];
             using (var db = new SqlConnection(connString))
             {
-                products = [.. db.Query<Product_View>(query)];
+                products = [.. db.Query<SpecialPageProduct>(query)];
             }
             return products;
         }
 
-        internal static List<Product_View> GetDealsOfTheDayHomepage()
+        internal static List<SpecialPageProduct> GetDealsOfTheDayHomepage()
         {
             Pricing prices = GetPriceUsed(null);
             double margin = GetMargin();
             string strWEBPriceUsed = Val(prices.UsePriceNumber.ToString());
             string query = "With  x as (Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + " as OldPrice,(spp.SpecialPrice*1.15*" + margin + ") as SpecialPrice,((p.PriceExclVat" + strWEBPriceUsed + "-spp.SpecialPrice)*1.15*" + margin + ") as Discount,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName as SubCategory,m.ManufacturerName as Brand,p.ImgURL,p.Description,p.Active,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID In (94,380,932,546) and spp.StartDate<=GETDATE() and spp.EndDate>=(SELECT DATEADD(day, 1, GETDATE()))) SELECT TOP 5 * FROM X  Order by Discount Desc";
-            List<Product_View> products = [];
+            List<SpecialPageProduct> products = [];
             using (var db = new SqlConnection(connString))
             {
-                products = [.. db.Query<Product_View>(query)];
+                products = [.. db.Query<SpecialPageProduct>(query)];
             }
             return products;
         }
