@@ -1209,6 +1209,30 @@
         }
       }
     },
+    "/api/Product/GetDealsOfTheDay": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Product/GetAllDealsOfTheDay": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Product/TopSales": {
       "get": {
         "tags": [

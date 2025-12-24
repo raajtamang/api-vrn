@@ -675,6 +675,26 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.ProductController",
+    "Method": "GetAllDealsOfTheDay",
+    "RelativePath": "api/Product/GetAllDealsOfTheDay",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.ProductController",
+    "Method": "GetDealsOfTheDay",
+    "RelativePath": "api/Product/GetDealsOfTheDay",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.ProductController",
     "Method": "GetProductByProductCode",
     "RelativePath": "api/Product/GetProductByProductCode/{id}",
     "HttpMethod": "GET",

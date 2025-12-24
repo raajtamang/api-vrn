@@ -305,7 +305,25 @@ namespace EsquireVRN.Controllers
             return Ok(product);
 
         }
-       
+
+        [HttpGet]
+        [Route("GetDealsOfTheDay")]
+        public IActionResult GetDealsOfTheDay()
+        {
+            var products= Shared.GetDealsOfTheDayHomepage();
+            return Ok(products);
+
+        }
+
+        [HttpGet]
+        [Route("GetAllDealsOfTheDay")]
+        public IActionResult GetAllDealsOfTheDay()
+        {
+            var products = Shared.GetDealsOfTheDay();
+            return Ok(products);
+
+        }
+
         [HttpGet]
         [Route("TopSales")]
         public IActionResult GetTopSalesProducts()
