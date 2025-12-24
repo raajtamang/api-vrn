@@ -317,9 +317,11 @@ namespace EsquireVRN.Controllers
 
         [HttpGet]
         [Route("GetAllDealsOfTheDay")]
-        public IActionResult GetAllDealsOfTheDay()
+        public IActionResult GetAllDealsOfTheDay(int? page_number,int? page_size)
         {
-            var products = Shared.GetDealsOfTheDay();
+            int pNum = (page_number ?? 1);
+            int pSize = (page_size ?? 16);
+            var products = Shared.GetDealsOfTheDay(pNum,pSize);
             return Ok(products);
 
         }
