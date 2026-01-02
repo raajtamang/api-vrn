@@ -24,5 +24,6 @@ namespace EsquireVRN.Models
         public string? ProductName { get; set; }
         public bool? Active { get; set; }
         public string? Notes{ get; set; }
+        public decimal? Rating { get; set; }
     }
 }

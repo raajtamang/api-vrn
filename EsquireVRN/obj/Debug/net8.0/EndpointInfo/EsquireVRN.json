@@ -1263,6 +1263,179 @@
         }
       }
     },
+    "/api/PromotionSpecialPage": {
+      "get": {
+        "tags": [
+          "PromotionSpecialPage"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSpecialPage"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSpecialPage"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSpecialPage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/PromotionSpecialPage/{id}": {
+      "get": {
+        "tags": [
+          "PromotionSpecialPage"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/PromotionSpecialPage/Customer": {
+      "get": {
+        "tags": [
+          "PromotionSpecialPage"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/PromotionSpecialPage/Reseller": {
+      "get": {
+        "tags": [
+          "PromotionSpecialPage"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/PromotionSpecialPage/ByMetaTitle": {
+      "get": {
+        "tags": [
+          "PromotionSpecialPage"
+        ],
+        "parameters": [
+          {
+            "name": "meta_title",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/PromotionSpecialPage/GetProducts": {
+      "get": {
+        "tags": [
+          "PromotionSpecialPage"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/PromotionSpecialPage/ProductDetail/{id}": {
+      "get": {
+        "tags": [
+          "PromotionSpecialPage"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/PromotionSpecialPage/PriceByProductCode/{id}": {
+      "get": {
+        "tags": [
+          "PromotionSpecialPage"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Shop/GetCartItems": {
       "get": {
         "tags": [
@@ -2890,6 +3063,57 @@
           },
           "productName": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PromotionSpecialPage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "shortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "pageType": {
+            "type": "string",
+            "nullable": true
+          },
+          "metaDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "metaTitle": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "demo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "expired": {
+            "type": "boolean",
             "nullable": true
           }
         },
