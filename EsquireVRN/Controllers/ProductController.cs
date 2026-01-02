@@ -260,8 +260,8 @@ namespace EsquireVRN.Controllers
             List<Brand> Brands = [];
             if (Products != null && Products.Count > 0)
             {
-                string subcategories = string.Join(',', Products.Where(x => x.SubCategory != null).Select(y => new { x = "N'" + y.SubCategory.Replace("\'", "\'\'") + "'" }).Select(x => x.x).Distinct());
-                string brandIds = string.Join(',', Products.Where(x => x.Brand != null).Select(x => new { y = "N'" + x.Brand.Replace("\'", "\'\'") + "'" }).Select(x => x.y).Distinct());
+                string subcategories = string.Join(',', Products.Where(x => x.GroupName != null).Select(y => new { x = "N'" + y.GroupName.Replace("\'", "\'\'") + "'" }).Select(x => x.x).Distinct());
+                string brandIds = string.Join(',', Products.Where(x => x.ManufacturerName != null).Select(x => new { y = "N'" + x.ManufacturerName.Replace("\'", "\'\'") + "'" }).Select(x => x.y).Distinct());
                 string strBrandQuery = "Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo],[ManufURL] as Link,[MetaTitle],[MetaDescription],[Description] from [dbo].[Manufacturers] WHERE [ManufacturerName] IN (" + brandIds + ");SELECT sCategory.ProdGroupID as Id,sCategory.GroupName as Title,link.GroupHeadID as Category_Id,sCategory.MetaTitle,sCategory.MetaDescription,sCategory.ImageUrl,sCategory.[Description] from ProductGroups sCategory  Join ProdGroupLInk link on sCategory.GroupName=link.ProdGroupName join ProductGroupHead Category on link.GroupHeadID=Category.GroupHeadID Where Category.OrgID IN (94,380,932,546) AND sCategory.GroupName IN (" + subcategories + ");";
                 using (var db = new SqlConnection(Shared.connString))
                 {

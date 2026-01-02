@@ -1,5 +1,4 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EsquireVRN.Models
 {
@@ -8,8 +7,8 @@ namespace EsquireVRN.Models
         [Key]
         public long Id { get; set; }
         public string ProductCode { get; set; }
-        public decimal? OldPrice { get; set; }
-        public decimal SpecialPrice { get; set; }
+        public decimal? PublicPrice { get; set; }
+        public decimal Special_Price { get; set; }
         public DateTime? Date { get; set; }
         public long PageId { get; set; }
         public decimal? Margin { get; set; }
@@ -18,8 +17,8 @@ namespace EsquireVRN.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string? PageType { get; set; }
-        public string? Brand { get; set; }
-        public string? SubCategory { get; set; }
+        public string? ManufacturerName { get; set; }
+        public string? GroupName { get; set; }
         public long? Stock { get; set; }
         public long? ProdID { get; set; }
         public string? ProductName { get; set; }
