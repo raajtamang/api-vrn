@@ -3359,6 +3359,37 @@ namespace EsquireVRN.Utils
             return dAddress;
         }
 
+        internal static DeliveryAddress UpdateDeliveryAddress(long id, DeliveryAddress deliveryaddress)
+        {
+            string query = "UPDATE [dbo].[WEBCustShipping] SET [ShippingDesc] = @ShippingDesc,[ShippingAddress] = @ShippingAddress,[ShippingCountry] = @ShippingCountry,[ShippingType] = @ShippingType,[ShippingAddressIEID] = @ShippingAddressIEID,[CourierDirectKey] = @CourierDirectKey,[Town]=@Town,[Phone]=@Phone,[PostalCode]=@PostalCode,[Name]=@Name,[Email]=@Email WHERE ShippingID=" + id;
+            DeliveryAddress dAddress = new();
+            using (var db = new SqlConnection(connString))
+            {
+                var dAddressId = db.Query<long>(query, new { deliveryaddress.CustID, deliveryaddress.ShippingDesc, deliveryaddress.ShippingAddress, deliveryaddress.ShippingCountry, deliveryaddress.ShippingType, ShippingAddressIEID = deliveryaddress.ShippingddressIEID, deliveryaddress.CourierDirectKey, deliveryaddress.Town, deliveryaddress.Phone, deliveryaddress.PostalCode, deliveryaddress.Name, deliveryaddress.Email }).FirstOrDefault();
+                dAddress = GetDeliveryAddress(dAddressId);
+            }
+            return dAddress;
+        }
+
+        internal static bool DeleteDeliveryAddress(long ShippingID)
+        {
+            try
+            {
+                string query = "DELETE FROM [dbo].[WEBCustShipping] WHERE ShippingID=@ShippingID";
+                DeliveryAddress dAddress = new();
+                using (var db = new SqlConnection(connString))
+                {
+                    db.Execute(query, new { ShippingID });
+                    return true;
+                }
+
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static MailAddress[] splitEMailTo(string strAddressesToSplit, string strName)
         {
             List<MailAddress> mList = [];
