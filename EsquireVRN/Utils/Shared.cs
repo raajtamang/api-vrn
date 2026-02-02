@@ -2307,16 +2307,27 @@ namespace EsquireVRN.Utils
             }
         }
 
-        public static Customer GetCustomer(long id)
+        public static Customer? GetCustomer(long id)
         {
             string query = "SELECT [CustID],[OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[PostalCode],[DateCreated],[Title],[CellNo],[Notes],[PostalCountry],[PostalAddressIEID],[IdNo],[VatNo],[SendEmails],[ReferenceCode],[IsCommissionActive],[TimesToUseCommission],[FraudulentUserID],[Password],[UserType] FROM [dbo].[WEBCustomer] where [CustID]=@CustomerId";
-            Customer customer = new();
             using (var db = new SqlConnection(connString))
             {
                 var values = new { CustomerId = id };
-                customer = db.Query<Customer>(query, values).FirstOrDefault();
+                var customer = db.Query<Customer>(query, values).FirstOrDefault();
+                return customer;
             }
-            return customer;
+        }
+
+        public static Customer? UpdateCustomer(long id, Customer customer)
+        {
+            string query = "UPDATE [dbo].[WEBCustomer] SET [FirstName] = @FirstName,[Surname] = @Surname,[Tel] = @Tel,[Tel2] = @Tel2,[Fax] = @Fax,[Email] = @Email,[Company]=@Company,[Title] = @Title,[CellNo] = @CellNo,[Notes] = @Notes,[IdNo] = @IdNo,[Password]=@Password,[PostalAdd]=@PostalAdd,[UserType]=@UserType,DateCreated=@DateCreated WHERE [CustID]=@CustomerId";
+
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.Password, customer.UserType, CustomerId = id, customer.DateCreated };
+                db.Execute(query, values);
+                return GetCustomer(id);
+            }
         }
 
         internal static List<BankDetails> GetBankDetails()
@@ -3585,7 +3596,7 @@ namespace EsquireVRN.Utils
             return margin;
         }
 
-        internal static List<SpecialPageProduct> GetDealsOfTheDay(int pNum,int pSize)
+        internal static List<SpecialPageProduct> GetDealsOfTheDay(int pNum, int pSize)
         {
             Pricing prices = GetPriceUsed(null);
             double margin = GetMargin();
@@ -3673,7 +3684,7 @@ namespace EsquireVRN.Utils
         internal static double GetPriceByProductCode(string id)
         {
             Pricing prices = GetPriceUsed(null);
-            string strWEBPriceUsed =Val(prices.UsePriceNumber.ToString());
+            string strWEBPriceUsed = Val(prices.UsePriceNumber.ToString());
             string query = "Select p.PriceExclVat" + strWEBPriceUsed + "*1.15 FROM PRODUCTS p WHERE p.Active=1 AND p.OutputMe=1 AND p.OrgID IN (94,380,932,546) AND ProductCode='" + id + "'";
             double price = 0;
             using (var db = new SqlConnection(connString))

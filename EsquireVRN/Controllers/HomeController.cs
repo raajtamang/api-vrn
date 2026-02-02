@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using EsquireVRN.Models;
 using EsquireVRN.Utils;
+using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Net.Mail;
@@ -217,6 +219,41 @@ namespace EsquireVRN.Controllers
             List<HomepageSetup> setups = Shared.GetHomepageSetups();
             List<Banner> banners = Shared.GetBanners([.. setups.Select(x => x.ContentId)]);
             return Ok(new { setups, banners });
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Customer")]
+        [Route("api/GetProfile")]
+        public IActionResult GetAccountDetail()
+        {
+            long CustomerID = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
+            return Ok(Shared.GetCustomer(CustomerID));
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Customer")]
+        [Route("api/UpdateProfile")]
+        public IActionResult Update([FromBody] Customer customer)
+        {
+            long CustomerID = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
+
+            var oldCustomer = Shared.GetCustomer(CustomerID);
+            if (oldCustomer == null)
+            {
+                return StatusCode(404, new { error = "Profile doesn't exist. Please check and try again." });
+            }
+            customer.UserType = "Customer";
+            if (customer.DateCreated == null)
+            {
+                customer.DateCreated = oldCustomer.DateCreated;
+            }
+            if (string.IsNullOrWhiteSpace(customer.Company))
+            {
+                customer.Company = oldCustomer.Company;
+            }
+            var newCustomer = Shared.UpdateCustomer(CustomerID, customer);
+
+            return Ok(new { message = "Profile updated successfully.", ProfileDetails = newCustomer });
         }
     }
 }
