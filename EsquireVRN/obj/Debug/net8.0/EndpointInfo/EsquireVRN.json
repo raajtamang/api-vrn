@@ -231,6 +231,131 @@
         }
       }
     },
+    "/api/DeliveryAddress": {
+      "get": {
+        "tags": [
+          "DeliveryAddress"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "DeliveryAddress"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryAddress"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryAddress"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryAddress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DeliveryAddress/{id}": {
+      "get": {
+        "tags": [
+          "DeliveryAddress"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "DeliveryAddress"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryAddress"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryAddress"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeliveryAddress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "DeliveryAddress"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/login": {
       "post": {
         "tags": [
@@ -298,6 +423,49 @@
         "tags": [
           "Home"
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/GetProfile": {
+      "get": {
+        "tags": [
+          "Home"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/UpdateProfile": {
+      "put": {
+        "tags": [
+          "Home"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -2474,6 +2642,192 @@
         },
         "additionalProperties": false
       },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "custID": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "orgID": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "accountID": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "surname": {
+            "type": "string",
+            "nullable": true
+          },
+          "tel": {
+            "type": "string",
+            "nullable": true
+          },
+          "tel2": {
+            "type": "string",
+            "nullable": true
+          },
+          "fax": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "company": {
+            "type": "string",
+            "nullable": true
+          },
+          "postalAdd": {
+            "type": "string",
+            "nullable": true
+          },
+          "postalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateCreated": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "cellNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "postalType": {
+            "type": "string",
+            "nullable": true
+          },
+          "postalCountry": {
+            "type": "string",
+            "nullable": true
+          },
+          "postalAddressIEID": {
+            "type": "string",
+            "nullable": true
+          },
+          "idNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "vatNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "sendEmails": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "referenceCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "isCommissionActive": {
+            "type": "boolean"
+          },
+          "timesToUseCommission": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "accountCommissionPercentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "customerDiscountPriceNo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "customerDiscountPercentage": {
+            "type": "number",
+            "format": "float"
+          },
+          "referenceMarketingJourneyId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "commissionOnProfit": {
+            "type": "boolean"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "fraudulentUserID": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "totalCommissionPercentage": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "userType": {
+            "type": "string",
+            "nullable": true
+          },
+          "bankName": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountType": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "branchNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "defaultOrgBranchID": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "cdTown": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "markFradulent": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "accountNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CustomerRegistrationModel": {
         "type": "object",
         "properties": {
@@ -2580,6 +2934,70 @@
             "nullable": true
           },
           "postalCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeliveryAddress": {
+        "type": "object",
+        "properties": {
+          "shippingID": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "shippingDesc": {
+            "maxLength": 100,
+            "type": "string",
+            "nullable": true
+          },
+          "shippingAddress": {
+            "maxLength": 400,
+            "type": "string",
+            "nullable": true
+          },
+          "shippingCountry": {
+            "maxLength": 50,
+            "type": "string",
+            "nullable": true
+          },
+          "shippingType": {
+            "maxLength": 30,
+            "type": "string",
+            "nullable": true
+          },
+          "shippingddressIEID": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "courierDirectKey": {
+            "maxLength": 100,
+            "type": "string",
+            "nullable": true
+          },
+          "town": {
+            "maxLength": 150,
+            "type": "string",
+            "nullable": true
+          },
+          "custID": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "postalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
             "type": "string",
             "nullable": true
           }

@@ -14,6 +14,8 @@ using SelectPdf;
 using System.IdentityModel.Tokens.Jwt;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.ComponentModel;
+using EsquireVRN.Models.DTO;
 
 namespace EsquireVRN.Utils
 {
@@ -2309,7 +2311,7 @@ namespace EsquireVRN.Utils
 
         public static Customer? GetCustomer(long id)
         {
-            string query = "SELECT [CustID],[OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[PostalCode],[DateCreated],[Title],[CellNo],[Notes],[PostalCountry],[PostalAddressIEID],[IdNo],[VatNo],[SendEmails],[ReferenceCode],[IsCommissionActive],[TimesToUseCommission],[FraudulentUserID],[Password],[UserType] FROM [dbo].[WEBCustomer] where [CustID]=@CustomerId";
+            string query = "SELECT [CustID],[OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[PostalCode],[DateCreated],[Title],[CellNo],[Notes],[PostalCountry],[PostalAddressIEID],[IdNo],[VatNo],[SendEmails],[ReferenceCode],[IsCommissionActive],[TimesToUseCommission],[FraudulentUserID],[UserType] FROM [dbo].[WEBCustomer] where [CustID]=@CustomerId";
             using (var db = new SqlConnection(connString))
             {
                 var values = new { CustomerId = id };
@@ -2700,7 +2702,7 @@ namespace EsquireVRN.Utils
                     bDetail.CreditAvailable = CreditAvailable;
                 }
             }
-            catch (Exception ex)
+            catch
             {
 
             }
@@ -3004,7 +3006,7 @@ namespace EsquireVRN.Utils
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 returnValue.CustID = INVALID_LOGIN;
             }
@@ -3186,7 +3188,7 @@ namespace EsquireVRN.Utils
                 client.Send(myMail);
                 return;
             }
-            catch (Exception Excp)
+            catch
             {
                 //DebugMe("Error in sendMail strTo: " + strTo + " \r\nstrFrom: " + strFrom + " \r\nSubject: " + strSubject, Excp, 1);
             }
@@ -3227,11 +3229,12 @@ namespace EsquireVRN.Utils
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Email),
-                new Claim(ClaimTypes.Role,role),
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim("FullName", user.UserName),
-                new Claim("UsePrice", user.UsePrice.ToString())
+                new(ClaimTypes.NameIdentifier, user.Email),
+                new(ClaimTypes.Role,role),
+                new(ClaimTypes.Name, user.Email),
+                new("FullName", user.UserName),
+                new("UsePrice", user.UsePrice.ToString()),
+                new("AcountId",user.AccountID)
             };
             if (!string.IsNullOrEmpty(user.CustID))
             {
@@ -3285,7 +3288,7 @@ namespace EsquireVRN.Utils
                     mOut = new MailAddress(strAddress, strName);
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 mOut = new MailAddress(strAddress, strName);
                 //DebugMe(1, "Error splitting E-Mail in splitEMailFrom " + strAddress + " was!", ex);
@@ -3692,6 +3695,177 @@ namespace EsquireVRN.Utils
                 price = db.Query<double>(query).FirstOrDefault();
             }
             return price;
+        }
+
+        //Update Password
+        internal static bool UpdateAdminPassword(string? email, string Password)
+        {
+            string QueryStr = "Update Users SET Password=@Password where EMailAddress=@Email";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { Email = email, Password };
+                int result = db.Execute(QueryStr, values);
+                if (result > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+        }
+
+        internal static bool UpdatePassword(string? email, string Password)
+        {
+            string QueryStr = "Update WEBCustomer SET Password=@Password where Email=@Email";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { Email = email, Password };
+                int result = db.Execute(QueryStr, values);
+                if (result > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+        }
+        internal static string VerifyPassword(string? email, string oldPassword)
+        {
+            string QueryStr = "SELECT CustID FROM WEBCustomer WHERE Email=@Email AND Password=@Password";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { Email = email, Password = oldPassword };
+                long? userId = db.Query<long>(QueryStr, values).FirstOrDefault();
+                if (userId > 0)
+                {
+                    if (IsCustomerFraudulant(userId.Value))
+                    {
+                        return "Fradulent";
+                    }
+                    return "Verified";
+                }
+                else
+                {
+                    return "Invalid";
+                }
+
+            }
+        }
+        public static bool IsCustomerFraudulant(long custID)
+        {
+            bool bReturn = false;
+            try
+            {
+                using (var db = new SqlConnection(connString))
+                {
+                    string queryStr = @"SELECT FraudulentUserID FROM WEBCustomer WHERE (CustID = @custID)";
+                    var result = db.Query(queryStr, new { CustID = custID }).FirstOrDefault();
+                    if (result != null)
+                    {
+                        long ltemp = long.Parse(Val(result.FraudulentUserID.ToString()));
+                        if (ltemp > 0)
+                        {
+                            bReturn = true;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                //DebugMe(1, "Error in isCustomerFraudulant where custID = " + custID.ToString(), ex);
+            }
+            return bReturn;
+        }
+
+        internal static string VerifyAdminPassword(string? email, string oldPassword)
+        {
+            string QueryStr = "SELECT UserID FROM Users WHERE EMailAddress=@Email AND Password=@Password";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { Email = email, Password = oldPassword };
+                long? userId = db.Query<long>(QueryStr, values).FirstOrDefault();
+                if (userId == null)
+                {
+                    return "Invalid";
+                }
+                else
+                {
+                    return "Verified";
+                }
+
+            }
+        }
+        //Account User
+        public static PagedUsers GetCutomers(int pNum, int pSize, long AccountId)
+        {
+            string query = "SELECT [CustID],[OrgID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[PostalCode],[DateCreated],[Title],[CellNo],[Notes],[PostalCountry],[PostalAddressIEID],[IdNo],[VatNo],[SendEmails],[ReferenceCode],[IsCommissionActive],[TimesToUseCommission],[FraudulentUserID],[Password] FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + " ORDER BY CreatedDated OFFSET " + ((pNum - 1) * pSize) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + ";";
+            List<Customer> customers = [];
+            int pageCount = 1;
+            using (var db = new SqlConnection(connString))
+            {
+                var result = db.QueryMultiple(query);
+                customers = [.. result.Read<Customer>()];
+                long userCount = result.ReadFirstOrDefault<long>();
+                pageCount = Convert.ToInt32(userCount / pSize);
+                decimal pageDivision = Convert.ToDecimal(userCount) / Convert.ToDecimal(pSize);
+                if ((pageDivision - pageCount) > 0)
+                {
+                    pageCount += 1;
+                }
+            }
+            PagedUsers pUsers = new()
+            {
+                page_count = pageCount,
+                Users = customers
+            };
+            return pUsers;
+        }
+
+        internal static Customer? AddCustomer(Customer customer)
+        {
+            string query = "INSERT INTO [dbo].[WEBCustomer] ([OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[Password],[DateCreated],[Title],[CellNo],[Notes],[IdNo],[SendEmails],[UserType],[CommissionOnProfit],[Active],[IsCommissionActive]) OUTPUT INSERTED.CustID VALUES (@OrgID,@AccountID,@FirstName,@Surname,@Tel,@Tel2,@Fax,@Email,@Company,@PostalAdd,@Password,@DateCreated,@Title,@CellNo,@Notes,@IdNo,@SendEmails,@UserType,@CommissionOnProfit,@Active,@IsCommissionActive)";
+
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { customer.OrgID, customer.AccountID, customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Password, customer.DateCreated, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.SendEmails, customer.UserType, customer.CommissionOnProfit, customer.Active, customer.IsCommissionActive };
+                var id = db.Query<long>(query, values).FirstOrDefault();
+                return GetCustomer(id);
+            }
+        }
+
+        public static void MarkFradulent(long? UserId, long id)
+        {
+            string Query = "UPDATE [dbo].[WebCustomer] SET [FraudulentUserID]=@UserId where CustID=" + id;
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { UserId };
+                db.Execute(Query, values);
+            }
+        }
+
+        internal static bool DeleteCustomer(long id)
+        {
+            try
+            {
+                string query = "DELETE FROM [dbo].[WEBCustomer] WHERE CustID=@CustomerId";
+
+                using (var db = new SqlConnection(connString))
+                {
+                    var values = new { CustomerId = id };
+                    db.Execute(query, values);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

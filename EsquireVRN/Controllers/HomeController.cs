@@ -255,5 +255,56 @@ namespace EsquireVRN.Controllers
 
             return Ok(new { message = "Profile updated successfully.", ProfileDetails = newCustomer });
         }
+
+        [HttpPost]
+        [Authorize]
+        [Route("api/ChangePassword")]
+        public IActionResult UpdatePassword([FromBody] ChangePassword changePassword)
+        {
+            string email = User.Identity.Name;
+            string passwordVerified = "Invalid";
+            if (User.IsInRole("Admin"))
+            {
+                passwordVerified = Shared.VerifyAdminPassword(email, changePassword.OldPassword);
+            }
+            else
+            {
+                passwordVerified = Shared.VerifyPassword(email, changePassword.OldPassword);
+            }
+
+            if (passwordVerified == "Fradulent")
+            {
+                return StatusCode(400, new { error = "Your account has been marked fraudulent!" });
+            }
+            else if (passwordVerified == "Invalid")
+            {
+                return StatusCode(400, new { error = "Invalid Password. Please check and try again." });
+            }
+            else if (passwordVerified == "Verified")
+            {
+                if (string.Compare(changePassword.NewPassword, changePassword.ConfirmPassword, true) == 0)
+                {
+                    bool passwordChanged = false;
+                    if (User.IsInRole("Admin"))
+                    {
+                        passwordChanged = Shared.UpdateAdminPassword(email, changePassword.NewPassword);
+                    }
+                    else
+                    {
+                        passwordChanged = Shared.UpdatePassword(email, changePassword.NewPassword);
+                    }
+                    if (passwordChanged)
+                    {
+                        return Ok(new { message = "Password updated successfully." });
+                    }
+                    return StatusCode(500, new { error = "Something went wrong. Please try again." });
+                }
+                else
+                {
+                    return StatusCode(403, new { error = "New password and confirm password do not match." });
+                }
+            }
+            return StatusCode(401, new { error = "Invalid Password. Please check and try again." });
+        }
     }
 }

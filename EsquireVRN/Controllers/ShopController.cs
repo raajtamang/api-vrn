@@ -267,7 +267,6 @@ namespace EsquireVRN.Controllers
                     return StatusCode(422, new { result = iProducts });
                 }
 
-                string BilliingName = "", BilliingEmail = "", ShippingName = "", ShippingEmail = "";
 
 
                 Customer CustomerDetails = Shared.GetCustomer(custId);
@@ -298,7 +297,7 @@ namespace EsquireVRN.Controllers
                 };
                 return Ok(new { Customer = CustomerDetails, OrgnisationDetails = orgDetails, CartItems = cartItems, BankDetails = bandetails, DeliveryDetails = dDetais });
             }
-            catch (Exception Ex)
+            catch
             {
                 return StatusCode(500, new { error = "Something went wrong with server. Please try again." });
             }

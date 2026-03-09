@@ -98,3 +98,4 @@ D:\dashboard\VRN\EsquireVRN\EsquireVRN\bin\Debug\net8.0\Serilog.Sinks.Console.dl
 D:\dashboard\VRN\EsquireVRN\EsquireVRN\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
 D:\dashboard\VRN\EsquireVRN\EsquireVRN\bin\Debug\net8.0\Serilog.Sinks.File.dll
 D:\dashboard\VRN\EsquireVRN\EsquireVRN\obj\Debug\net8.0\EsquireVRN.sourcelink.json
+D:\dashboard\VRN\EsquireVRN\EsquireVRN\obj\Debug\net8.0\swae.build.ex.cache
