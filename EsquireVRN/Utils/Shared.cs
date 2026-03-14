@@ -2976,6 +2976,22 @@ namespace EsquireVRN.Utils
             return sb.ToString();
         }
 
+        internal static string GetPaymentDate(long id)
+        {
+            String rDate = "";
+            using (var db = new SqlConnection(connString))
+            {
+                string query = "Select ChangeDateTime From WEBOrderStatusChange Where NewStatusID=3 AND OrderID=@OrderId";
+                var values = new { OrderId = id };
+                DateTime Date = db.Query<DateTime>(query, values).FirstOrDefault();
+                rDate = Date.ToString("yyyy-MM-dd") + "T" + Date.ToString("HH:mm:ss");
+                if (rDate == "0001-01-01T00:00:00")
+                {
+                    return "";
+                }
+            }
+            return rDate;
+        }
         internal static LoginDetails AdminLogin(string username, string password)
         {
             LoginDetails returnValue = new()
