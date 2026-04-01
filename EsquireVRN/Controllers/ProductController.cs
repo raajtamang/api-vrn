@@ -16,7 +16,7 @@ namespace EsquireVRN.Controllers
         [HttpGet]
         public IActionResult Get(int page_number, int page_size)
         {
-            return Ok(Shared.GetPagedProducts("AND (Products.Status=1 OR Products.Status=3 OR Products.Status=4)", page_number, page_size));
+            return Ok(Shared.GetPagedProducts("", page_number, page_size));
         }
 
         // GET api/<ProductController>/5

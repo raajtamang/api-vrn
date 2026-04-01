@@ -24,7 +24,7 @@ namespace EsquireVRN.Models
         public long DeliveryWaybillID { get; set; }
         public string? CustRef { get; set; }
         public string? DiscountRefCode { get; set; }
-        public decimal Discount { get; set; }
+        public decimal? Discount { get; set; }
         public long DeliveryID { get; set; }
         public long? FinconId { get; set; }
         public string? ShippingInstruction { get; set; }

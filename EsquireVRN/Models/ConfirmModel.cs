@@ -12,5 +12,7 @@
         public string? CustRef { get; set; }
         public string? DeliveryQuoteId { get; set; }
         public string? ShippingInstruction { get; set; }
+        public string? DiscountVoucher { get; set; }
+        public decimal? Discount { get; set; }
     }
 }

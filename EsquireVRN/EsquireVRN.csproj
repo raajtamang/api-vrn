@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\VICTUS\.nuget\packages\dotnetcore.npoi\1.2.3\contentFiles\any\netstandard2.0\NOTICE.TXT" />
+    <Content Remove="C:\Users\VICTUS\.nuget\packages\select.htmltopdf.netcore\25.2.0\contentFiles\any\any\Select.Html.dep" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="DotNetCore.NPOI" Version="1.2.3" />

@@ -1,5 +1,47 @@
 [
   {
+    "ContainingType": "EsquireVRN.Controllers.AboutController",
+    "Method": "Post",
+    "RelativePath": "api/About",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.AboutController",
+    "Method": "Get",
+    "RelativePath": "api/About",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.AboutController",
+    "Method": "Put",
+    "RelativePath": "api/About",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EsquireVRN.Controllers.BrandController",
     "Method": "Get",
     "RelativePath": "api/Brand",
@@ -162,6 +204,90 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "EsquireVRN.Controllers.ContactPageController",
+    "Method": "GetById",
+    "RelativePath": "api/ContactPage",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.ContactPageController",
+    "Method": "Create",
+    "RelativePath": "api/ContactPage/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "EsquireVRN.Models.ContactPage",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.ContactPageController",
+    "Method": "Update",
+    "RelativePath": "api/ContactPage/update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "EsquireVRN.Models.ContactPage",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.CustomerInformationController",
+    "Method": "Post",
+    "RelativePath": "api/CustomerInformation",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.CustomerInformationController",
+    "Method": "Get",
+    "RelativePath": "api/CustomerInformation",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.CustomerInformationController",
+    "Method": "Put",
+    "RelativePath": "api/CustomerInformation",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EsquireVRN.Controllers.HomeController",
     "Method": "RegisterCustomer",
     "RelativePath": "api/customerRegistration",
@@ -257,9 +383,103 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "EsquireVRN.Controllers.DisclaimerController",
+    "Method": "Post",
+    "RelativePath": "api/Disclaimer",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.DisclaimerController",
+    "Method": "Get",
+    "RelativePath": "api/Disclaimer",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.DisclaimerController",
+    "Method": "Put",
+    "RelativePath": "api/Disclaimer",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.FAQController",
+    "Method": "Post",
+    "RelativePath": "api/FAQ",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.FAQController",
+    "Method": "Get",
+    "RelativePath": "api/FAQ",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.FAQController",
+    "Method": "Put",
+    "RelativePath": "api/FAQ",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EsquireVRN.Controllers.HomeController",
     "Method": "GetHomepageSetup",
     "RelativePath": "api/GetHomepageSetup",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "GetResellerProfile",
+    "RelativePath": "api/GetOrgDetail",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -438,16 +658,6 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.NormalSpecialPageController",
-    "Method": "GetCNormalSpecialPageProducts",
-    "RelativePath": "api/NormalSpecialPage/GetCustomerNormalSpecialPageProducts",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.NormalSpecialPageController",
     "Method": "NormalSpecialPageProducts",
     "RelativePath": "api/NormalSpecialPage/GetProducts",
     "HttpMethod": "GET",
@@ -536,6 +746,22 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.OrdersController",
+    "Method": "ConvertToOrder",
+    "RelativePath": "api/Orders/ConvertToOrder",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "EsquireVRN.Models.ConvertResellerOrderToOrderModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.OrdersController",
     "Method": "GetOrderTracking",
     "RelativePath": "api/Orders/GetOrderTracking",
     "HttpMethod": "GET",
@@ -568,6 +794,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.OrdersController",
+    "Method": "UpdateOrderStatus",
+    "RelativePath": "api/Orders/UpdateStatus",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "EsquireVRN.Models.DTO.UpdateOrderStatusDTO",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -720,6 +962,48 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.PrivacyPolicyController",
+    "Method": "Post",
+    "RelativePath": "api/PrivacyPolicy",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.PrivacyPolicyController",
+    "Method": "Get",
+    "RelativePath": "api/PrivacyPolicy",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.PrivacyPolicyController",
+    "Method": "Put",
+    "RelativePath": "api/PrivacyPolicy",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "EsquireVRN.Controllers.ProductController",
@@ -1075,6 +1359,64 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "ResellerLogin",
+    "RelativePath": "api/ResellerLogin",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginModel",
+        "Type": "EsquireVRN.Models.LoginModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.SecurityPolicyController",
+    "Method": "Post",
+    "RelativePath": "api/SecurityPolicy",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.SecurityPolicyController",
+    "Method": "Get",
+    "RelativePath": "api/SecurityPolicy",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.SecurityPolicyController",
+    "Method": "Put",
+    "RelativePath": "api/SecurityPolicy",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EsquireVRN.Controllers.ShopController",
     "Method": "AddToCart",
     "RelativePath": "api/Shop/AddToCart",
@@ -1092,19 +1434,19 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.ShopController",
-    "Method": "CancelOrders",
-    "RelativePath": "api/Shop/AutoCancelOrder",
+    "Method": "CancelOrder",
+    "RelativePath": "api/Shop/CancelOrder",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "u",
-        "Type": "System.String",
+        "Name": "OrderId",
+        "Type": "System.Int64",
         "IsRequired": false
       },
       {
-        "Name": "p",
+        "Name": "rejection_reason",
         "Type": "System.String",
         "IsRequired": false
       }
@@ -1266,20 +1608,20 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.ShopController",
-    "Method": "ProcessOrders",
-    "RelativePath": "api/Shop/ProcessOrders",
+    "Method": "PaymentReceived",
+    "RelativePath": "api/Shop/RecordPayment",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "u",
-        "Type": "System.String",
+        "Name": "OrderId",
+        "Type": "System.Int64",
         "IsRequired": false
       },
       {
-        "Name": "p",
-        "Type": "System.String",
+        "Name": "PaymentId",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
@@ -1498,6 +1840,229 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "EsquireVRN.Controllers.TermsController",
+    "Method": "Post",
+    "RelativePath": "api/Terms",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.TermsController",
+    "Method": "Get",
+    "RelativePath": "api/Terms",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.TermsController",
+    "Method": "Put",
+    "RelativePath": "api/Terms",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "UpdateOrgDetail",
+    "RelativePath": "api/UpdateOrgDetail",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "OrgName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBEMailInfo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBEMailOrders",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBOrgURL",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBPriceUsed",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBCustPriceUsed",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBStockOnly",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "isFranchise",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBMinStock",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBNoImg",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBUseGroup",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBAutoOrder",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "WEBProdOrderBy",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgRegNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgVATNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgTel1",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgTel2",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgFax",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgStreet1",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgStreet2",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgStreet3",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgStreet4",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgStreet5",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgProvince",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "VATRegistered",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "FromDoorID",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "FinType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgLength",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgWidth",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgHeight",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgMass",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "WebsiteLogoURL",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Margin",
+        "Type": "System.Nullable\u00601[[System.Decimal, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "Logo",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EsquireVRN.Controllers.HomeController",
     "Method": "Update",
     "RelativePath": "api/UpdateProfile",
@@ -1598,6 +2163,48 @@
       {
         "Name": "id",
         "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.WarrentyCentersController",
+    "Method": "Post",
+    "RelativePath": "api/WarrentyCenters",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.WarrentyCentersController",
+    "Method": "Get",
+    "RelativePath": "api/WarrentyCenters",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.WarrentyCentersController",
+    "Method": "Put",
+    "RelativePath": "api/WarrentyCenters",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
         "IsRequired": true
       }
     ],

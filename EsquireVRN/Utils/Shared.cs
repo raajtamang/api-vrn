@@ -261,14 +261,27 @@ namespace EsquireVRN.Utils
                       Organisation.WEBStockOnly, Organisation.isFranchise, Organisation.WEBMinStock, Organisation.WEBNoImg, Organisation.WEBUseGroup, 
                       Organisation.WEBAutoOrder, Organisation.WEBProdOrderBy, Organisation.OrgRegNo, Organisation.OrgVATNo, Organisation.OrgTel1, Organisation.OrgFax, 
                       Organisation.OrgStreet1, Organisation.OrgStreet2, Organisation.OrgStreet3, Organisation.OrgStreet4, Organisation.OrgStreet5, Organisation.VATRegistered, 
-                      Organisation.FromDoorID,Organisation.FinType, Users.UserID,Organisation.OrgLength,Organisation.OrgWidth,Organisation.OrgHeight,Organisation.OrgMass
+                      Organisation.FromDoorID,Organisation.FinType, Users.UserID,Organisation.OrgLength,Organisation.OrgWidth,Organisation.OrgHeight,Organisation.OrgMass,Organisation.WebsiteLogoURL,Organisation.Margin
                 FROM Organisation INNER JOIN
                       Users ON Organisation.OrgID = Users.OrgID
-                WHERE (Organisation.OrgID = " + strOrgID + ") AND (Users.Menu <> 10);";
+                WHERE (Organisation.OrgID = " + strOrgID + ");";
                 detail = db.Query<OrgWebDetail>(strSQL).FirstOrDefault();
             }
             return detail;
         }
+
+        internal static OrgWebDetail UpdateOrgDetail(OrgWebDetail webDetail)
+        {
+            string query = "Update Organisation SET OrgRegNo=@OrgRegNo,OrgVATNo=@OrgVATNo,OrgTel1=@OrgTel1,OrgTel2=@OrgTel2,OrgFax=@OrgFax,OrgStreet1=@OrgStreet1,OrgStreet2=@OrgStreet2,OrgStreet3=@OrgStreet3,OrgStreet4=@OrgStreet4,OrgStreet5=@OrgStreet5,OrgProvince=@OrgProvince,OrgLength=@OrgLength,OrgWidth=@OrgWidth,OrgHeight=@OrgHeight,OrgMass=@OrgMass,VATRegistered=@VATRegistered,WEBPriceUsed=@WEBPriceUsed,WEBCustPriceUsed=@WEBCustPriceUsed,Margin=@Margin,WebsiteLogoURL=@WebsiteLogoURL Where OrgID=" + GetOrgID();
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { webDetail.OrgRegNo, webDetail.OrgVATNo, webDetail.OrgTel1, webDetail.OrgTel2, webDetail.OrgFax, webDetail.OrgStreet1, webDetail.OrgStreet2, webDetail.OrgStreet3, webDetail.OrgStreet4, webDetail.OrgStreet5, webDetail.OrgProvince, webDetail.OrgLength, webDetail.OrgWidth, webDetail.OrgHeight, webDetail.OrgMass, webDetail.VATRegistered, webDetail.WEBPriceUsed, webDetail.WEBCustPriceUsed };
+                db.Execute(query, values);
+                var orgWebDetail = GetOrgWebDetail();
+                return orgWebDetail;
+            }
+        }
+
 
         public static long GetOrgID()
         {
@@ -655,7 +668,7 @@ namespace EsquireVRN.Utils
             }
             return pageList;
         }
-        public static List<SpecialPageProductDetail> GetNormalProducts(long id, string pType)
+        public static List<SpecialPageProduct> GetNormalProducts(long id, string pType)
         {
             DateTime today = DateTime.UtcNow.AddHours(2);
             string strWEBPriceUsed = "";
@@ -679,17 +692,17 @@ namespace EsquireVRN.Utils
             double margin = GetMargin();
 
             string whereQuery = string.Join(',', pages);
-            string query = "Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + " as OldPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as SpecialPrice,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName as SubCategory,m.ManufacturerName as Brand,p.ImgURL,p.Description,p.Active,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as StockQty From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID In (94,380,932,546) and spp.StartDate<='" + today + "' and spp.EndDate>='" + today + "' And spp.PageType='Normal Special' And PageId=" + id;
+            string query = "Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15 *" + margin + " as PublicPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock, (Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=p.ProdID) as Rating From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID In (94,380,932,546) and ([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A'))>1 and spp.StartDate<='" + today + "' and spp.EndDate>='" + today + "' And spp.PageType='Normal Special' And PageId=" + id;
             if (pages.Count > 0)
             {
-                query += @"UNION Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + " as OldPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as SpecialPrice,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName as SubCategory,m.ManufacturerName as Brand,p.ImgURL,p.Description,p.Active,([dbo].[GetProductStockCount](p.ProdID, p.Status, N'A')) as StockQty From SpecialPageProduct spp left Join Products p on spp.ProductCode = p.ProductCode  join Manufacturers m on p.ManufID = m.ManufID Where p.Active = 1 and p.OutputMe = 1 and p.OrgID In(94,380,932,546) and spp.StartDate <= '" + today + "' and spp.EndDate >= '" + today + "' And spp.PageType = 'Promotion Special' and spp.PageId In(" + whereQuery + ")";
+                query += @"UNION Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15 *" + margin + " as PublicPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock, (Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=p.ProdID) as Rating From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID In (94,380,932,546) and ([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A'))>1 and spp.StartDate<='" + today + "' and spp.EndDate>='" + today + "' And spp.PageType = 'Promotion Special' and spp.PageId In(" + whereQuery + ")";
             }
-            List<SpecialPageProductDetail> pageList = new();
+            List<SpecialPageProduct> pageList = new();
             using (var db = new SqlConnection(connString))
             {
-                pageList = db.Query<SpecialPageProductDetail>(query).ToList();
+                pageList = db.Query<SpecialPageProduct>(query).ToList();
             }
-            return pageList.OrderBy(x => x.SpecialPrice).DistinctBy(x => x.ProductCode).Where(x => x.StockQty > 0).ToList();
+            return pageList.OrderBy(x => x.Special_Price).DistinctBy(x => x.ProductCode).Where(x => x.Stock > 0).ToList();
         }
 
         internal static SpecialPageProductDetail GetSpecialPageProductDetail(long id)
@@ -1798,7 +1811,7 @@ namespace EsquireVRN.Utils
             {
                 OrgWebDetail detail = GetOrgWebDetail();
                 string strWEBStockOnly = detail.WEBStockOnly.ToString();
-                string query = @"SELECT wb.BasketID,wb.SessionID,wb.custID,wb.OrgID, wb.ProdID, wb.ProdQty, wb.ProdDesc, wb.Price, wb.ProdCode,p.ImgURL,dbo.GetProductStockCount(p.ProdID, p.Status, N'A') AS StockQuantity FROM WEBBasket wb join Products p on wb.ProdID=p.ProdID where SessionID=@Id";
+                string query = @"SELECT wb.BasketID,wb.SessionID,wb.custID,wb.OrgID, wb.ProdID, wb.ProdQty, wb.ProdDesc, wb.Price, wb.ProdCode,p.ImgURL,dbo.GetProductStockCount(p.ProdID, p.Status, N'A') AS StockQuantity FROM ResellerWEBBasket wb join Products p on wb.ProdID=p.ProdID where SessionID=@Id";
                 using (var db = new SqlConnection(connString))
                 {
                     var values = new { Id = sessionId };
@@ -1825,7 +1838,7 @@ namespace EsquireVRN.Utils
 
             OrgWebDetail detail = GetOrgWebDetail();
             string strWEBStockOnly = detail.WEBStockOnly.ToString();
-            string query = @"SELECT wb.BasketID,wb.SessionID,wb.custID,wb.OrgID, wb.ProdID, wb.ProdQty, wb.ProdDesc, wb.Price, wb.ProdCode,p.ImgURL,dbo.GetProductStockCount(p.ProdID, p.Status, N'A') AS StockQuantity FROM WEBBasket wb join Products p on wb.ProdID=p.ProdID where CustId=@CustomerId and wb.OrgId=" + GetOrgID();
+            string query = @"SELECT wb.BasketID,wb.SessionID,wb.custID,wb.OrgID, wb.ProdID, wb.ProdQty, wb.ProdDesc, wb.Price, wb.ProdCode,p.ImgURL,dbo.GetProductStockCount(p.ProdID, p.Status, N'A') AS StockQuantity FROM ResellerWEBBasket wb join Products p on wb.ProdID=p.ProdID where CustId=@CustomerId and wb.OrgId=" + GetOrgID();
             using (var db = new SqlConnection(connString))
             {
                 var values = new { CustomerId = CustId };
@@ -1844,7 +1857,7 @@ namespace EsquireVRN.Utils
         }
         public static long AddToCart(CartItem cartItem)
         {
-            string query = @"INSERT INTO WEBBasket (OrgID, SessionID, ProdID, ProdQty, ProdDesc, Price, ProdCode, CustID) OUTPUT INSERTED.BasketID VALUES (@OrgID,@SessionID,@ProdID,@ProdQty,@ProdDesc,@Price,@ProdCode,@CustID)";
+            string query = @"INSERT INTO ResellerWEBBasket (OrgID, SessionID, ProdID, ProdQty, ProdDesc, Price, ProdCode, CustID) OUTPUT INSERTED.BasketID VALUES (@OrgID,@SessionID,@ProdID,@ProdQty,@ProdDesc,@Price,@ProdCode,@CustID)";
             using (var db = new SqlConnection(connString))
             {
                 return db.Query<long>(query, cartItem).FirstOrDefault();
@@ -1856,7 +1869,7 @@ namespace EsquireVRN.Utils
             try
             {
 
-                string query = @"UPDATE WEBBasket SET OrgID=@OrgID, ProdQty=@ProdQty, ProdDesc=@ProdDesc, Price=@Price, ProdCode=@ProdCode Where CustID=" + cartItem.CustID + " AND ProdID=" + cartItem.ProdID + " AND OrgID=" + cartItem.OrgID;
+                string query = @"UPDATE ResellerWEBBasket SET OrgID=@OrgID, ProdQty=@ProdQty, ProdDesc=@ProdDesc, Price=@Price, ProdCode=@ProdCode Where CustID=" + cartItem.CustID + " AND ProdID=" + cartItem.ProdID + " AND OrgID=" + cartItem.OrgID;
                 using (var db = new SqlConnection(connString))
                 {
                     db.Execute(query, cartItem);
@@ -1875,7 +1888,7 @@ namespace EsquireVRN.Utils
             try
             {
 
-                string query = @"UPDATE WEBBasket SET OrgID=@OrgID, ProdQty=@ProdQty, ProdDesc=@ProdDesc, Price=@Price, ProdCode=@ProdCode,CustID=@CustID";
+                string query = @"UPDATE ResellerWEBBasket SET OrgID=@OrgID, ProdQty=@ProdQty, ProdDesc=@ProdDesc, Price=@Price, ProdCode=@ProdCode,CustID=@CustID";
                 using (var db = new SqlConnection(connString))
                 {
                     db.Execute(query, cartItems);
@@ -1893,7 +1906,7 @@ namespace EsquireVRN.Utils
         {
             try
             {
-                string query = @"DELETE FROM WEBBasket Where SessionID='" + sessionId + "' and BasketID=" + id;
+                string query = @"DELETE FROM ResellerWEBBasket Where SessionID='" + sessionId + "' and BasketID=" + id;
                 using (var db = new SqlConnection(connString))
                 {
                     db.Execute(query);
@@ -1911,7 +1924,7 @@ namespace EsquireVRN.Utils
         {
             try
             {
-                string query = @"DELETE FROM WEBBasket Where CustId=" + CustId + " and BasketID=" + id;
+                string query = @"DELETE FROM ResellerWEBBasket Where CustId=" + CustId + " and BasketID=" + id;
                 using (var db = new SqlConnection(connString))
                 {
                     db.Execute(query);
@@ -2192,7 +2205,7 @@ namespace EsquireVRN.Utils
         {
             try
             {
-                string query = @"DELETE FROM WEBBasket Where CustId=" + CustId;
+                string query = @"DELETE FROM ResellerWEBBasket Where CustId=" + CustId;
                 using (var db = new SqlConnection(connString))
                 {
                     int output = db.Execute(query);
@@ -2213,7 +2226,7 @@ namespace EsquireVRN.Utils
         {
             try
             {
-                string query = @"DELETE FROM WEBBasket Where SessionID='" + sessionId + "'";
+                string query = @"DELETE FROM ResellerWEBBasket Where SessionID='" + sessionId + "'";
                 using (var db = new SqlConnection(connString))
                 {
                     int output = db.Execute(query);
@@ -2463,9 +2476,84 @@ namespace EsquireVRN.Utils
             SendMail(strSubject, strHTMLBody, to.ToArray(), from, null, includeSignature);
         }
 
+        public static void SendEsquireMailHangFire(string strSubject, string strHTMLBody, List<string> to, string from, bool includeSignature)
+        {
+            try
+            {
+                string strSite = GetWebConfigKeyValue("SiteName");
+                MailMessage myMail = new()
+                {
+                    Subject = strSubject
+                };
+                foreach (string m in to)
+                    myMail.To.Add(new MailAddress(m));
+                if (from != "productquestions@improweb.com")
+                    myMail.CC.Add(new MailAddress(from)); 
+
+                string strTitle = "";
+                if (includeSignature)
+                    strTitle = "Sent From " + strSite;
+
+                myMail.From = new MailAddress(from);
+                myMail.IsBodyHtml = true;
+
+                myMail.Body = "<html><head><TITLE>" + strTitle + "</TITLE>" +
+                    "<STYLE>BODY {FONT-SIZE: 12px; FONT-FAMILY: Arial, helvetica, sans-serif; " +
+                    "SCROLLBAR-BASE-COLOR:#2D5281;}</STYLE></head><BODY>" +
+                    "<table WIDTH=100% BORDER=0 cellspacing=0 cellpadding=0><tr><td>" + strHTMLBody +
+                    "</td></tr><tr><td><HR></td></tr></table></BODY></html>";
+                SmtpClient client = EsquireMailSetup();
+                client.Send(myMail);
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex.Message);
+
+            }
+        }
+
         public static void SendMailHangFire(string strSubject, string strHTMLBody, List<string> to, List<string> cc, string from, bool includeSignature)
         {
             SendMail(strSubject, strHTMLBody, to.ToArray(), from, cc, includeSignature);
+        }
+
+        public static void SendEsquireMailHangFire(string strSubject, string strHTMLBody, List<string> to, List<string> bcc, string from, bool includeSignature)
+        {
+            try
+            {
+                string strSite = GetWebConfigKeyValue("SiteName");
+                MailMessage myMail = new()
+                {
+                    Subject = strSubject
+                };
+                foreach (string m in to)
+                    myMail.To.Add(new MailAddress(m));
+
+                if (bcc != null)
+                {
+                    foreach (string m in bcc)
+                        myMail.Bcc.Add(new MailAddress(m));
+                }
+                string strTitle = "";
+                if (includeSignature)
+                    strTitle = "Sent From " + strSite;
+
+                myMail.From = new MailAddress(from);
+                myMail.IsBodyHtml = true;
+
+                myMail.Body = "<html><head><TITLE>" + strTitle + "</TITLE>" +
+                    "<STYLE>BODY {FONT-SIZE: 12px; FONT-FAMILY: Arial, helvetica, sans-serif; " +
+                    "SCROLLBAR-BASE-COLOR:#2D5281;}</STYLE></head><BODY>" +
+                    "<table WIDTH=100% BORDER=0 cellspacing=0 cellpadding=0><tr><td>" + strHTMLBody +
+                    "</td></tr><tr><td><HR></td></tr></table></BODY></html>";
+                SmtpClient client = EsquireMailSetup();
+                client.Send(myMail);
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex.Message);
+
+            }
         }
 
         public static void SendMail(string strSubject, string strHTMLBody, string[] to, string from, List<string> bcc, bool includeSignature)
@@ -2520,6 +2608,8 @@ namespace EsquireVRN.Utils
         {
             try
             {
+                SmtpClient client = MailSetup();
+
                 //string[] strAdminEmails = getAdminEMail().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                 string strSite = GetWebConfigKeyValue("SiteName");
                 MailMessage myMail = new MailMessage();
@@ -2549,23 +2639,89 @@ namespace EsquireVRN.Utils
                     "SCROLLBAR-BASE-COLOR:#2D5281;}</STYLE></head><BODY>" +
                     "<table WIDTH=100% BORDER=0 cellspacing=0 cellpadding=0><tr><td>" + strHTMLBody +
                     "</td></tr><tr><td><HR></td></tr></table></BODY></html>";
-                PdfDocument doc = GetPdf(attachment);
-                MemoryStream pdfStream = new MemoryStream();
+                if (!string.IsNullOrEmpty(attachment))
+                {
+                    PdfDocument doc = GetPdf(attachment);
+                    MemoryStream pdfStream = new MemoryStream();
 
-                doc.Save(pdfStream);
-                pdfStream.Position = 0;
-                if (type == "Order")
-                {
-                    myMail.Attachments.Add(new Attachment(pdfStream, "OrderReceipt-" + orderId + ".pdf"));
+                    doc.Save(pdfStream);
+                    pdfStream.Position = 0;
+                    if (type == "Order")
+                    {
+                        myMail.Attachments.Add(new Attachment(pdfStream, "OrderReceipt-" + orderId + ".pdf"));
+                    }
+                    else
+                    {
+                        myMail.Attachments.Add(new Attachment(pdfStream, "QuoteNo-" + orderId + ".pdf"));
+                    }
+                    client.Send(myMail);
+                    pdfStream.Close();
+                    doc.Close();
                 }
-                else
-                {
-                    myMail.Attachments.Add(new Attachment(pdfStream, "QuoteNo-" + orderId + ".pdf"));
-                }
-                SmtpClient client = MailSetup();
                 client.Send(myMail);
-                pdfStream.Close();
-                doc.Close();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Error(ex.Message);
+
+            }
+        }
+
+        public static void SendEsquireMail(string strSubject, string strHTMLBody, string[] to, string from, List<string> bcc, bool includeSignature, string attachment, string orderId, string type)
+        {
+            try
+            {
+                SmtpClient client = EsquireMailSetup();
+
+                //string[] strAdminEmails = getAdminEMail().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                string strSite = GetWebConfigKeyValue("SiteName");
+                MailMessage myMail = new MailMessage();
+                myMail.Subject = strSubject;
+                foreach (string m in to)
+                    myMail.To.Add(new MailAddress(m));
+                if (from != "productquestions@improweb.com")
+                    myMail.CC.Add(new MailAddress(from));
+
+                //foreach (string adminEmail in strAdminEmails)
+                //    myMail.Bcc.Add(new MailAddress(adminEmail));
+
+                if (bcc != null)
+                {
+                    foreach (string m in bcc)
+                        myMail.Bcc.Add(new MailAddress(m));
+                }
+                string strTitle = "";
+                if (includeSignature)
+                    strTitle = "Sent From " + strSite;
+
+                myMail.From = new MailAddress(from);
+                myMail.IsBodyHtml = true;
+
+                myMail.Body = "<html><head><TITLE>" + strTitle + "</TITLE>" +
+                    "<STYLE>BODY {FONT-SIZE: 12px; FONT-FAMILY: Arial, helvetica, sans-serif; " +
+                    "SCROLLBAR-BASE-COLOR:#2D5281;}</STYLE></head><BODY>" +
+                    "<table WIDTH=100% BORDER=0 cellspacing=0 cellpadding=0><tr><td>" + strHTMLBody +
+                    "</td></tr><tr><td><HR></td></tr></table></BODY></html>";
+                if (!string.IsNullOrEmpty(attachment))
+                {
+                    PdfDocument doc = GetPdf(attachment);
+                    MemoryStream pdfStream = new MemoryStream();
+
+                    doc.Save(pdfStream);
+                    pdfStream.Position = 0;
+                    if (type == "Order")
+                    {
+                        myMail.Attachments.Add(new Attachment(pdfStream, "OrderReceipt-" + orderId + ".pdf"));
+                    }
+                    else
+                    {
+                        myMail.Attachments.Add(new Attachment(pdfStream, "QuoteNo-" + orderId + ".pdf"));
+                    }
+                    client.Send(myMail);
+                    pdfStream.Close();
+                    doc.Close();
+                }
+                client.Send(myMail);
             }
             catch (Exception ex)
             {
@@ -2666,6 +2822,21 @@ namespace EsquireVRN.Utils
             return client;
         }
 
+        public static SmtpClient EsquireMailSetup()
+        {
+
+            SmtpClient client = new()
+            {
+                Port = 25,
+                Host = "secmx1.esquire.co.za",
+                EnableSsl = true,
+                Timeout = 20000,
+                Credentials = new System.Net.NetworkCredential("info@esquire.co.za", ""),
+                UseDefaultCredentials = true
+            };
+            return client;
+        }
+
         internal static string GetCustomerAccountNo(long customerID)
         {
             string Query = "Select Accounts.AccountNo from WEBCustomer JOIN Accounts on WebCustomer.AccountID=Accounts.AccountID Where WEBCustomer.CustID=" + customerID;
@@ -2745,6 +2916,18 @@ namespace EsquireVRN.Utils
             return order;
         }
 
+        public static ResellerOrder? GetResellerOrder(long id)
+        {
+            string query = "SELECT * FROM [dbo].[ResellerOrders] WHERE [ResellerOrderID]=@OrderId";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { OrderId = id };
+                var order = db.Query<ResellerOrder>(query, values).FirstOrDefault();
+                return order;
+
+            }
+        }
+
         public static List<OrderItem> GetOrderItems(long id)
         {
             OrgWebDetail detail = GetOrgWebDetail();
@@ -2758,6 +2941,7 @@ namespace EsquireVRN.Utils
             }
             return items;
         }
+
 
         public static DeliveryAddress GetDeliveryAddress(long ShippingID)
         {
@@ -3139,6 +3323,52 @@ namespace EsquireVRN.Utils
             return returnValue;
         }
 
+        public static LoginDetails ResellerLogin(string username, string password)
+        {
+            LoginDetails returnValue = new()
+            {
+                CustID = INVALID_LOGIN,
+                Email = username,
+                IsLoggedIn = false
+            };
+            try
+            {
+                string strSql = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password, 
+                    WEBCustomer.FirstName, WEBCustomer.Surname,Accounts.AccountNo, Accounts.Active, Accounts.UsePrice, Accounts.DefaultBranch " +
+                "FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
+                        username.Replace("\'", "\'\'") + "') AND ( WEBCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (94,380,932,546,473) Order By WEBCustomer.CustID" + @";
+                    SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
+                    Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1) AND Users.OrgID IN (94,380,932,546,473);";
+                using (var connection = new SqlConnection(connString))
+                {
+                    var result = connection.QueryMultiple(strSql);
+                    var uDetail = result.Read<LoginUDetail>().FirstOrDefault();
+                    if (uDetail != null)
+                    {
+                        returnValue.CustID = Convert.ToString(uDetail.CustID);
+                        returnValue.UserName = Convert.ToString(uDetail.FirstName) + " " + Convert.ToString(uDetail.Surname);
+                        returnValue.UsePrice = Convert.ToInt32(uDetail.UsePrice);
+                        returnValue.IsLoggedIn = true;
+                        returnValue.FirstName = Convert.ToString(uDetail.FirstName);
+                        returnValue.Surname = Convert.ToString(uDetail.Surname);
+                        returnValue.AccountID = Convert.ToString(uDetail.AccountID);
+                        returnValue.DefaultBranch = Convert.ToString(uDetail.DefaultBranch);
+                        returnValue.AccountNumber = Convert.ToString(uDetail.AccountNo);
+                    }
+                    var fradulent_check = result.Read().FirstOrDefault();
+                    if (fradulent_check != null)
+                    {
+                        returnValue.CustID = ACCOUNT_FRAUDULENT;
+                        returnValue.IsLoggedIn = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                returnValue.CustID = INVALID_LOGIN;
+            }
+            return returnValue;
+        }
         public static string getAdminEMail()
         {
 
@@ -3282,6 +3512,23 @@ namespace EsquireVRN.Utils
             try
             {
                 returnValue = StaticConfig.GetValue<string>("AdminEmail");
+            }
+            catch
+            {
+            }
+            return returnValue;
+        }
+
+        public static string? GetOrgLogo()
+        {
+            string returnValue = "";
+            try
+            {
+                string query = "Select WebsiteLogoURL from Organisation Where OrgId=" + Shared.GetOrgID();
+                using (var db = new SqlConnection(connString))
+                {
+                    returnValue = db.Query<string>(query).FirstOrDefault();
+                }
             }
             catch
             {
@@ -3540,6 +3787,19 @@ namespace EsquireVRN.Utils
             {
                 var values = new { OrderId = orderId };
                 trakings = db.Query<OrderTracking>(QueryStr, values).ToList();
+            }
+            return trakings;
+        }
+
+        public static List<OrderTracking> GetResellerOrderTracking(long orderId)
+        {
+
+            List<OrderTracking> trakings = [];
+            string QueryStr = "SELECT rOTracking.Id,WStatus.Status,rOTracking.UpdatedDate FROM ResellerOrderTracking rOTracking JOIN WEBOrderStatus WStatus ON rOTracking.StatusId=WStatus.StatusID WHERE rOTracking.ResellerOrderID=@OrderId ORDER BY rOTracking.UpdatedDate DESC";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { OrderId = orderId };
+                trakings = [.. db.Query<OrderTracking>(QueryStr, values)];
             }
             return trakings;
         }
@@ -3882,6 +4142,217 @@ namespace EsquireVRN.Utils
             {
                 return false;
             }
+        }
+
+        //Pages Section
+        public static async Task<long> AddContentPage(ContentPage page)
+        {
+            var query = @"
+            INSERT INTO ContentPages (Type, OrgId, Content, Created_Date)
+            VALUES (@Type, @OrgId, @Content, @Created_Date);
+            SELECT CAST(SCOPE_IDENTITY() as bigint);";
+
+            using var conn = new SqlConnection(connString);
+            return await conn.ExecuteScalarAsync<long>(query, page);
+        }
+
+        // Get All Pages
+        public static async Task<IEnumerable<ContentPage>> GeContentPages()
+        {
+            var query = "SELECT * FROM ContentPages";
+
+            using var conn = new SqlConnection(connString);
+            return await conn.QueryAsync<ContentPage>(query);
+        }
+
+        // Get Page By Id
+        public static async Task<ContentPage?> GetContentPageById(long id, string type)
+        {
+            var query = "SELECT * FROM ContentPages WHERE OrgId =" + id + " AND Type=N'" + type + "'";
+
+            using var conn = new SqlConnection(connString);
+            return await conn.QueryFirstOrDefaultAsync<ContentPage>(query, new { Id = id });
+        }
+
+        // Update Page
+        public static async Task<bool> UpdateContentPage(long orgId, string type, ContentPage page)
+        {
+            var query = @"
+            UPDATE ContentPages
+            SET Content = @Content,
+                Updated_Date = @Updated_Date
+            WHERE OrgId =" + orgId + " AND Type=N'" + type + "'";
+
+            using var conn = new SqlConnection(connString);
+            var rows = await conn.ExecuteAsync(query, page);
+            return rows > 0;
+        }
+
+        // Delete Page
+        public static async Task<bool> DeleteResellerPage(long id)
+        {
+            var query = "DELETE FROM ContentPages WHERE Id = @Id";
+
+            using var conn = new SqlConnection(connString);
+            var rows = await conn.ExecuteAsync(query, new { Id = id });
+            return rows > 0;
+        }
+
+        //Contact Page
+        public static int CreateContactPage(ContactPage model)
+        {
+            using (IDbConnection db = new SqlConnection(connString))
+            {
+                string query = @"INSERT INTO ContactPage 
+            (Phone, Email, Address, Facebook, Twitter, Youtube, LinkedIn, Instagram, Map_IFrame, OrgId, Created_Date)
+            VALUES 
+            (@Phone, @Email, @Address, @Facebook, @Twitter, @Youtube, @LinkedIn, @Instagram, @Map_IFrame, @OrgId, @Created_Date)";
+
+                model.Created_Date = DateTime.Now;
+
+                return db.Execute(query, model);
+            }
+        }
+
+        public static IEnumerable<ContactPage> GetAllContactPages()
+        {
+            using (IDbConnection db = new SqlConnection(connString))
+            {
+                string query = "SELECT * FROM ContactPage";
+                return db.Query<ContactPage>(query);
+            }
+        }
+
+        public static ContactPage? GetContactPageById(long id)
+        {
+            using (IDbConnection db = new SqlConnection(connString))
+            {
+                string query = "SELECT * FROM ContactPage WHERE OrgId = @Id";
+                return db.QueryFirstOrDefault<ContactPage>(query, new { Id = id });
+            }
+        }
+        public static int UpdateContactPage(ContactPage model)
+        {
+            using (IDbConnection db = new SqlConnection(connString))
+            {
+                string query = @"UPDATE ContactPage SET
+                Phone = @Phone,
+                Email = @Email,
+                Address = @Address,
+                Facebook = @Facebook,
+                Twitter = @Twitter,
+                Youtube = @Youtube,
+                LinkedIn = @LinkedIn,
+                Instagram = @Instagram,
+                Map_IFrame = @Map_IFrame,
+                OrgId = @OrgId,
+                Updated_Date = @Updated_Date
+            WHERE OrgId = @OrgId";
+
+                model.Updated_Date = DateTime.Now;
+
+                return db.Execute(query, model);
+            }
+        }
+
+        public static int DeleteContactPage(long id)
+        {
+            using (IDbConnection db = new SqlConnection(connString))
+            {
+                string query = "DELETE FROM ContactPage WHERE Id = @Id";
+                return db.Execute(query, new { Id = id });
+            }
+        }
+
+        internal static void UpdateResellerOrderStatus(string? strOrdID, long quotationId)
+        {
+            string query = "Update ResellerOrders Set Accepted=1,Ordered=1,WEBOrderID=" + strOrdID + " Where ResellerOrderID=" + quotationId;
+            using (var db = new SqlConnection(connString))
+            {
+                db.Execute(query);
+            }
+        }
+
+        internal static List<ResellerOrderItems> GetResellerOrderItems(long resellerOrderId)
+        {
+            OrgWebDetail detail = GetOrgWebDetail();
+            string strWEBStockOnly = detail.WEBStockOnly.ToString();
+            string query = "SELECT wO.[ItemID],wO.[OrderID],wO.[ProdID],wO.[ProdQty],wO.[Price],wO.[ProdDesc],wO.[ProdCode],dbo.GetProductStockCount(p.ProdID, p.Status, 'A') as StockCount,p.ImgURL as Image FROM [dbo].[ResellerOrderItems] wO JOIN [dbo].[Products] p on wO.ProdID=p.ProdID WHERE ResellerOrderID=@OrderId";
+            List<ResellerOrderItems> items = new();
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { OrderId = resellerOrderId };
+                items = [.. db.Query<ResellerOrderItems>(query, values)];
+            }
+            return items;
+        }
+
+        internal static bool UpdateResellerOrderStatus(long OrderId, int StatusId, string Updater)
+        {
+            try
+            {
+                using (var db = new SqlConnection(connString))
+                {
+                    string q2 = @"INSERT INTO [dbo].[ResellerOrderTracking] ([ResellerOrderID],[StatusID],[UpdatedDate],[UpdatedBy]) OUTPUT Inserted.Id VALUES (@OrderID,@NewStatusID,@ChangeDateTime,@ChangeBy)";
+                    var values = new { OrderID = OrderId, NewStatusID = StatusId, ChangeDateTime = DateTime.UtcNow.AddHours(2), ChangeBy = Updater };
+                    var changeId = db.Query(q2, values).FirstOrDefault();                   
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static void ChangeResellerOrderStatus(long resellerOrderID, int statusId, long userId)
+        {
+            using var db=new SqlConnection(connString);
+            string q2 = @"INSERT INTO [dbo].[ResellerOrderTracking] ([ResellerOrderID],[StatusID],[UpdatedDate],[UpdatedBy]) OUTPUT Inserted.Id VALUES (@OrderID,@NewStatusID,@ChangeDateTime,@ChangeBy)";
+            var values = new { OrderID = resellerOrderID, NewStatusID = statusId, ChangeDateTime = DateTime.UtcNow.AddHours(2), ChangeBy = userId };
+            var changeId = db.Query(q2, values).FirstOrDefault();
+        }
+
+        public static OrderStatusEmailModel GetStatusEmail(int status)
+        {
+            string query = "Select Header,Detail From WEBOrderStatusAction Where StatusID=" + status;
+            OrderStatusEmailModel eModel = new();
+            using (var db = new SqlConnection(connString))
+            {
+                eModel = db.Query<OrderStatusEmailModel>(query).FirstOrDefault();
+                return eModel;
+            }
+        }
+
+        public static string GetpaymentType(long payID)
+        {
+            string query = "select Method from WEBPayMethod Where PayID=" + payID;
+            string paymentType = "";
+            using (var db = new SqlConnection(connString))
+            {
+                paymentType = db.Query<string>(query).FirstOrDefault();
+                return paymentType;
+            }
+        }
+
+        public static string CheckStock(long custId)
+        {
+            List<CartItem> cartItems = Shared.GetCartItemsByCustId(custId);
+            string error = "";
+            List<string> stocklessProducts = new();
+            foreach (var item in cartItems)
+            {
+                long stockCount = Shared.GetProductStock(item.ProdID);
+                if (stockCount < item.StockQuantity)
+                {
+                    stocklessProducts.Add(item.ProdCode);
+                }
+            }
+            if (stocklessProducts.Count > 0)
+            {
+                error = "Items with Product Codes (" + string.Join(',', stocklessProducts) + ") has invalid stock quantity. Please check and try again.";
+            }
+            return error;
         }
     }
 }

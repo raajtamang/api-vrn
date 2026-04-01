@@ -79,13 +79,13 @@ namespace EsquireVRN.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500,new { error = ex.Message });
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 
         [HttpGet]
         [Route("UpdateUserId")]
-        [Authorize(Roles = "Reseller,Customer")]
+        [Authorize(Roles = "Customer")]
         public IActionResult UpdateUserId(string SessionId)
         {
             List<CartItem> cartItems = Shared.GetCartItems(SessionId);
@@ -98,7 +98,7 @@ namespace EsquireVRN.Controllers
 
         [HttpGet]
         [Route("GetClientCartItems")]
-        [Authorize(Roles = "Reseller,Customer")]
+        [Authorize(Roles = "Customer")]
         public IActionResult GetClientCartItems()
         {
             long CustId = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
@@ -108,7 +108,7 @@ namespace EsquireVRN.Controllers
 
         [HttpPut]
         [Route("UpdateCart")]
-        [Authorize(Roles = "Reseller,Customer")]
+        [Authorize(Roles = "Customer")]
         public IActionResult UpdateCart([FromBody] CartItem cartItem)
         {
             long CustId = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
@@ -217,7 +217,7 @@ namespace EsquireVRN.Controllers
                 {
                     return StatusCode(400, new { error = "Your account is inactive." });
                 }
-                string OutOfStockProducts = CheckStock(custId);
+                string OutOfStockProducts = Shared.CheckStock(custId);
                 if (!string.IsNullOrEmpty(OutOfStockProducts))
                 {
                     return StatusCode(500, new { error = OutOfStockProducts });
@@ -304,30 +304,12 @@ namespace EsquireVRN.Controllers
 
         }
 
-        private string CheckStock(long custId)
-        {
-            List<CartItem> cartItems = Shared.GetCartItemsByCustId(custId);
-            string error = "";
-            List<string> stocklessProducts = new();
-            foreach (var item in cartItems)
-            {
-                long stockCount = Shared.GetProductStock(item.ProdID);
-                if (stockCount < item.StockQuantity)
-                {
-                    stocklessProducts.Add(item.ProdCode);
-                }
-            }
-            if (stocklessProducts.Count > 0)
-            {
-                error = "Items with Product Codes (" + string.Join(',', stocklessProducts) + ") has invalid stock quantity. Please check and try again.";
-            }
-            return error;
-        }
+
 
         [HttpPost]
         [Route("Confirm")]
-        [Authorize(Roles = "Customer,Reseller")]
-        public async Task<IActionResult> Confirm(ConfirmModel confirmModel)
+        [Authorize(Roles = "Customer")]
+        public IActionResult Confirm(ConfirmModel confirmModel)
         {
             SqlConnection Conn = new SqlConnection(Shared.connString);
             try
@@ -356,7 +338,7 @@ namespace EsquireVRN.Controllers
 
                 string strSQL = "";
                 long CustomerID = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
-                strSQL = @"SELECT WEBBasket.*, Products.PurchasePrice 
+                strSQL = @"SELECT ResellerWEBBasket.*, Products.PurchasePrice 
                             FROM WEBBasket INNER JOIN Products ON WEBBasket.ProdID = Products.ProdID
                             WHERE WEBBasket.OrgID=" + Shared.GetOrgID() + " AND WEBBasket.CustId=" + CustomerID;
                 DataTable dtBasket = new DataTable();
@@ -381,305 +363,85 @@ namespace EsquireVRN.Controllers
                 }
 
                 string notes = "";
-                
+
                 if (confirmModel.ShippingId == 0)
                 {
                     strShipID = Shared.GetShippingId(CustomerID);
 
                 }
-
-                strSQL = "INSERT INTO WEBOrders (CustID, DeliveryMethod, DeliveryDescID, DeliveryCost, PayID, " +
-                 "ShippingID, StatusID, OrgID, OrgBranchID, DeliveryQuoteID, DistOrdStatus, CustRef, Notes, Discount,DeliveryId,ShippingInstruction) VALUES " +
+                decimal discount = 0;
+                if (confirmModel.Discount > 0)
+                {
+                    discount = Convert.ToDecimal(confirmModel.Discount);
+                }
+                strSQL = "INSERT INTO ResellerOrders (CustID, DeliveryMethod, DeliveryDescID, DeliveryCost, PayID, " +
+                 "ShippingID, OrgID, OrgBranchID, DeliveryQuoteID, Notes, Discount,DiscountVoucher,DeliveryId,ShippingInstruction,StatusID) VALUES " +
                  "(" + CustomerID + ", N'" +
                  details.DeliveryDesc.Replace("'", "''") + "'," +
-                 details.DeliveryDescID.ToString() + "," + strCost + "," + confirmModel.PaymentId + "," + strShipID + ",2," + Shared.GetOrgID() +
-                 "," + strBraID + ",N'" + strDeliveryQuoteId + "',1 ,N'" + custRef + "', N'" + notes + "'," +
-                 bundleDiscount.ToString("0.00").Replace(",", ".") + ",N'" + details.DeliveryID + "',N'" + strShippingInstruction + "'); SELECT SCOPE_IDENTITY();";
+                 details.DeliveryDescID.ToString() + "," + strCost + "," + confirmModel.PaymentId + "," + strShipID + "," + Shared.GetOrgID() +
+                 "," + strBraID + ",N'" + strDeliveryQuoteId + "', N'" + notes + "'," +
+                discount + ",N'" + confirmModel.DiscountVoucher + ",N'" + details.DeliveryID + "',N'" + strShippingInstruction + "',2); SELECT SCOPE_IDENTITY();";
                 if (Conn.State == ConnectionState.Closed)
                 {
                     Conn.Open();
                 }
                 Shared.UpdateCartPrice(CustomerID);
 
-                //SqlCommand Cmd = new SqlCommand(strSQL, Conn);
+                List<CartItem> OItems = Shared.GetCartItemsByCustId(CustomerID);
+
                 using (var db = new SqlConnection(Shared.connString))
                 {
                     strOrdID = db.Query<string>(strSQL).FirstOrDefault();
                 }
-                Shared.UpdateOrderStatus(Convert.ToInt64(strOrdID), 2, "" + CustomerID);
+                Shared.UpdateResellerOrderStatus(Convert.ToInt64(strOrdID), 2, "" + CustomerID);
 
-                //strOrdID = Cmd.ExecuteScalar().ToString();
-                WebOrder wo = new WebOrder(Shared.connString);
-                WebOrder.WebOrderDetails[] woDetails = wo.ProcessBasketForWebOrder(dtBasket, Shared.GetOrgID());
                 StringBuilder sbSql = new StringBuilder();
                 double TotalAmount = 0;
-                foreach (WebOrder.WebOrderDetails detail in woDetails)
+                foreach (var detail in OItems)
                 {
-                    sbSql.Append(@"INSERT INTO WEBOrderItems (OrderID, ProdID, ProdQty, Price, ProdDesc, ProdCode)
-                                VALUES (" + Shared.Val(strOrdID) + "," + detail.ProdId + "," +
-                        detail.Qty + "," + detail.Price.ToString("0.00").Replace(",", ".") +
-                        ",'" + detail.Description.Replace("\'", "\'\'") + "','" +
+                    sbSql.Append(@"INSERT INTO ResellerOrderItems (ResellerOrderID, ProdID, ProdQty, Price, ProdDesc, ProdCode)
+                                VALUES (" + Shared.Val(strOrdID) + "," + detail.ProdID + "," +
+                        detail.ProdQty + "," + detail.Price.ToString("0.00").Replace(",", ".") +
+                        ",'" + detail.ProdDesc.Replace("\'", "\'\'") + "','" +
                         detail.ProdCode.Replace("\'", "\'\'") + "');");
-                    TotalAmount += Math.Round((Math.Round(detail.Price, 2) * detail.Qty), 2);
+                    TotalAmount += Convert.ToDouble(Math.Round((Math.Round(detail.Price, 2) * detail.ProdQty), 2));
                 }
                 if (confirmModel.DeliveryCharge > 0)
                 {
                     TotalAmount += Math.Round((Convert.ToDouble(confirmModel.DeliveryCharge)), 2);
                 }
+                sbSql.Append(@"Update ResellerOrders Set TotalAmountExcl=" + (TotalAmount / 1.15) + " Where ResellerOrderID=" + strOrdID);
                 if (sbSql.ToString().Length > 5)
                 {
                     using (var db = new SqlConnection(Shared.connString))
                     {
                         db.Execute(sbSql.ToString());
                     }
-                    //Cmd = new SqlCommand(sbSql.ToString(), Conn);
-                    //Cmd.ExecuteNonQuery();
-                }
 
+                }
 
                 long OrderId = Convert.ToInt64(strOrdID);
                 Shared.BranchDetail branchDetail = Shared.getBranchName("" + confirmModel.NearestBranchId);
                 string confrimMail = branchDetail.BranchEMail;
                 string branchName = branchDetail.OrgBraShort;
 
+                Shared.ClearCartWithCustId(CustomerID);
 
-                if (confirmModel.PaymentId == Shared.PAY_ID_ELECTRONIC_TRANSFER)
-                {
-                    string FinconUrl = Shared.GetWebConfigKeyValue("FinconUrl");
-                    string FinconServerUsername = Shared.GetWebConfigKeyValue("FinconServerUsername");
-                    string FinconServerPassword = Shared.GetWebConfigKeyValue("FinconServerPassword");
-                    string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
-                    if (string.IsNullOrEmpty(connectId))
-                    {
-                        Customer tempcustomer = Shared.GetCustomer(CustomerID);
-                        notes = "";
-                        string sql = "Update WebOrders Set FinconId=-1,Notes=N'" + notes + "' Where OrderID=" + strOrdID;
-                        using (var db = new SqlConnection(Shared.connString))
-                        {
-                            db.Execute(sql);
-                        }
+                Customer customer = Shared.GetCustomer(CustomerID);
+                List<string> emails = PrepareResellerOrderEmail(Convert.ToInt64(strOrdID), customer);
+                string emailbody = emails[0];
+                string doc = emails[1];
 
-                        Shared.ClearCartWithCustId(CustomerID);
+                string subject = "Order Confirmation";
+                string[] toEmail =
+                 [
+                    new(customer.Email)
+                 ];
+                List<string> bcc = [confrimMail, "4me.suren@gmail.com"];
 
-                        string finconsubject = "Order Confirmation and Processing Update";
-                        string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                        List<string> Emails = new() { tempcustomer.Email };
-                        List<string> cc = new() { "syanthan1st@gmail.com", confrimMail, "info@esquire.co.za" };
-                        string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
-                        BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za", false));
+                BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(OrderId), "Order"));
 
-                        return StatusCode(200, new { message = "Order confirmed successfully." });
-                    }
-                    Shared.FinconResult RESULT = await Shared.UpdateFincon(OrderId, connectId, FinconServerUsername, FinconServerPassword);
-                    if (RESULT.Error)
-                    {
-                        if (RESULT.ErrorMessage == "Connection Error")
-                        {
-                            Customer tempcustomer = Shared.GetCustomer(CustomerID);
-                            string tempnotes = "";
-                            string sql = "Update WebOrders Set FinconId=-1,Notes=N'" + tempnotes + "' Where OrderID=" + strOrdID;
-                            using (var db = new SqlConnection(Shared.connString))
-                            {
-                                db.Execute(sql);
-                            }
-
-                            Shared.ClearCartWithCustId(CustomerID);
-
-                            string finconsubject = "Order Confirmation and Processing Update";
-                            string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                            List<string> Emails = new() { tempcustomer.Email };
-                            List<string> cc = new() { "syanthan1st@gmail.com", confrimMail, "info@esquire.co.za" };
-                            string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
-                            BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za", false));
-
-                            return StatusCode(200, new { message = "Order confirmed successfully." });
-                        }
-                        else
-                        {
-                            string AccountNo = Shared.GetCustomerAccountNo(CustomerID);
-                            string finconsubject = "Warning : Couldn't update order to fincon server.";
-                            string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                            string storeName = Shared.GetWebConfigKeyValue("SiteName");
-                            List<string> Emails = new() { "nicholas@esquire.co.za", "mahomed@esquire.co.za", "kabir@esquire.co.za", "irfhan@esquire.co.za", "syanthan1st@gmail.com", "senzo@esquire.co.za", "khanyisa@esquire.co.za", "mccalvin@esuire.co.za", "tumelo@esquire.co.za", "prince@esquire.co.za", "mariamw@esquire.co.za" };
-                            string finconemailbody = "<br /><br />Error occurred while sending order to fincon. Please check the fincon server. <br />Account Number : " + AccountNo + ".<br /><br />Customer Id : " + CustomerID + "<br />Error : " + RESULT.ErrorMessage;
-                            BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, "info@esquire.co.za", true));
-
-                            return StatusCode(500, new { error = RESULT.ErrorMessage });
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(RESULT.FinconId))
-                    {
-                        notes = "ON#: Order Number: " + RESULT.FinconId;
-                        string sql = "Update WebOrders Set FinconId=" + RESULT.FinconId + ",Notes=N'" + notes + "',DistOrdStatus=4 Where OrderID=" + strOrdID;
-                        using (var db = new SqlConnection(Shared.connString))
-                        {
-                            db.Execute(sql);
-                        }
-
-                        Shared.ClearCartWithCustId(CustomerID);
-
-                        Shared.BillingDetail? BillingDetail = await Shared.GetBillingDetail(connectId, CustomerID, FinconServerUsername, FinconServerPassword);
-
-                        string terms = "";
-                        string CreditAvailable = "0.00";
-                        if (BillingDetail != null)
-                        {
-                            terms = BillingDetail.Value.Terms;
-                            CreditAvailable = BillingDetail.Value.CreditAvailable;
-                        }
-                        Customer customer = Shared.GetCustomer(CustomerID);
-                        List<string> emails = PrepareEmail(Convert.ToInt64(strOrdID), RESULT.FinconId, terms, CreditAvailable, Convert.ToInt64(customer.OrgID));
-                        string emailbody = emails[0];
-                        string doc = emails[1];
-
-                        string subject = "Order Number: " + RESULT.FinconId + " From Esquire Technologies has been processed.";
-                        string[] toEmail = new string[]
-                         {
-                        new(customer.Email)
-                         };
-                        List<string> bcc = new() { "test@esquire.co.za", confrimMail, "info@esquire.co.za" };
-
-                        BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(RESULT.FinconId), "Order"));
-
-                        return Ok(new { message = "Order confirmed successfully." });
-                    }
-                    else
-                    {
-                        string AccountNo = Shared.GetCustomerAccountNo(CustomerID);
-                        string finconsubject = "Warning : Couldn't update order to fincon server.";
-                        string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                        string storeName = Shared.GetWebConfigKeyValue("SiteName");
-                        List<string> Emails = new() { "nicholas@esquire.co.za", "mahomed@esquire.co.za", "kabir@esquire.co.za", "irfhan@esquire.co.za", "syanthan1st@gmail.com", "senzo@esquire.co.za", "khanyisa@esquire.co.za", "mccalvin@esuire.co.za", "tumelo@esquire.co.za", "prince@esquire.co.za", "mariamw@esquire.co.za" };
-                        string finconemailbody = "<br /><br />Error occurred while sending order to fincon. Please check the fincon server. <br />Account Number : " + AccountNo + ".<br /><br />Customer Id : " + CustomerID + "<br />Error : " + RESULT.ErrorMessage;
-                        BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, "info@esquire.co.za", true));
-                        return StatusCode(500, new { error = RESULT.ErrorMessage });
-                    }
-
-                }
-                else if (confirmModel.PaymentId == Shared.COLLECT_AND_PAY_AT_SHOP)
-                {
-                    string FinconUrl = Shared.GetWebConfigKeyValue("FinconUrl");
-                    string FinconServerUsername = Shared.GetWebConfigKeyValue("FinconServerUsername");
-                    string FinconServerPassword = Shared.GetWebConfigKeyValue("FinconServerPassword");
-                    string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
-
-                    if (string.IsNullOrEmpty(connectId))
-                    {
-                        Customer tempcustomer = Shared.GetCustomer(CustomerID);
-                        notes = "";
-                        string sql = "Update WebOrders Set FinconId=-1,Notes=N'" + notes + "' Where OrderID=" + strOrdID;
-                        using (var db = new SqlConnection(Shared.connString))
-                        {
-                            db.Execute(sql);
-                        }
-
-                        Shared.ClearCartWithCustId(CustomerID);
-
-                        string finconsubject = "Order Confirmation and Processing Update";
-                        string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                        List<string> Emails = new() { tempcustomer.Email };
-                        List<string> cc = new() { "syanthan1st@gmail.com", confrimMail, "info@esquire.co.za" };
-                        string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
-                        BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za", false));
-
-                        return StatusCode(200, new { message = "Order confirmed successfully." });
-                    }
-
-                    Shared.FinconResult RESULT = await Shared.UpdateFincon(OrderId, connectId, FinconServerUsername, FinconServerPassword);
-                    if (RESULT.Error)
-                    {
-                        if (RESULT.ErrorMessage == "Connection Error")
-                        {
-                            Customer tempcustomer = Shared.GetCustomer(CustomerID);
-                            notes = "";
-                            string sql = "Update WebOrders Set FinconId=-1,Notes=N'" + notes + "' Where OrderID=" + strOrdID;
-                            using (var db = new SqlConnection(Shared.connString))
-                            {
-                                db.Execute(sql);
-                            }
-
-                            Shared.ClearCartWithCustId(CustomerID);
-
-                            string finconsubject = "Order Confirmation and Processing Update";
-                            string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                            List<string> Emails = new() { tempcustomer.Email };
-                            List<string> cc = new() { "syanthan1st@gmail.com", confrimMail, "info@esquire.co.za" };
-                            string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
-                            BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za", false));
-
-                            return StatusCode(200, new { message = "Order confirmed successfully." });
-                        }
-                        else
-                        {
-                            string AccountNo = Shared.GetCustomerAccountNo(CustomerID);
-                            string finconsubject = "Warning : Couldn't update order to fincon server.";
-                            string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                            string storeName = Shared.GetWebConfigKeyValue("SiteName");
-                            List<string> Emails = new() { "nicholas@esquire.co.za", "mahomed@esquire.co.za", "kabir@esquire.co.za", "irfhan@esquire.co.za", "syanthan1st@gmail.com", "senzo@esquire.co.za", "khanyisa@esquire.co.za", "mccalvin@esuire.co.za", "tumelo@esquire.co.za", "prince@esquire.co.za", "mariamw@esquire.co.za" };
-                            string finconemailbody = "<br /><br />Error occurred while sending order to fincon. Please check the fincon server. <br />Account Number : " + AccountNo + ".<br /><br />Customer Id : " + CustomerID + "<br />Error : " + RESULT.ErrorMessage;
-                            BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, "info@esquire.co.za", true));
-                            return StatusCode(500, new { error = RESULT.ErrorMessage });
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(RESULT.FinconId))
-                    {
-                        notes = "ON#: Order Number: " + RESULT.FinconId;
-                        string sql = "Update WebOrders Set FinconId=" + RESULT.FinconId + ",Notes=N'" + notes + "',DistOrdStatus=4 Where OrderID=" + strOrdID;
-                        using (var db = new SqlConnection(Shared.connString))
-                        {
-                            db.Execute(sql);
-                        }
-
-                        Shared.ClearCartWithCustId(CustomerID);
-
-                        Shared.BillingDetail? BillingDetail = await Shared.GetBillingDetail(connectId, CustomerID, FinconServerUsername, FinconServerPassword);
-
-                        string terms = "";
-                        string CreditAvailable = "0.00";
-                        if (BillingDetail != null)
-                        {
-                            terms = BillingDetail.Value.Terms;
-                            CreditAvailable = BillingDetail.Value.CreditAvailable;
-                        }
-                        Customer customer = Shared.GetCustomer(CustomerID);
-                        List<string> emails = PrepareEmail(Convert.ToInt64(strOrdID), RESULT.FinconId, terms, CreditAvailable, Convert.ToInt64(customer.OrgID));
-                        string emailbody = emails[0];
-                        string doc = emails[1];
-                        string finconId = Convert.ToInt64(RESULT.FinconId).ToString().PadLeft(8, '0');
-                        string subject = "Order Number: " + finconId + " From Esquire Technologies has been processed.";
-                        string[] toEmail = new string[]
-                         {
-                        new(customer.Email)
-                         };
-                        List<string> bcc = new() { "test@esquire.co.za", confrimMail, "info@esquire.co.za" };
-
-                        BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(RESULT.FinconId), "Order"));
-
-                        return Ok(new { message = "Order confirmed successfully." });
-                    }
-                    else
-                    {
-                        string AccountNo = Shared.GetCustomerAccountNo(CustomerID);
-                        string finconsubject = "Warning : Couldn't update order to fincon server.";
-                        string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                        string storeName = Shared.GetWebConfigKeyValue("SiteName");
-                        List<string> Emails = new() { "nicholas@esquire.co.za", "mahomed@esquire.co.za", "kabir@esquire.co.za", "irfhan@esquire.co.za", "syanthan1st@gmail.com", "senzo@esquire.co.za", "khanyisa@esquire.co.za", "mccalvin@esuire.co.za", "tumelo@esquire.co.za", "prince@esquire.co.za", "mariamw@esquire.co.za" };
-                        string finconemailbody = "<br /><br />Error occurred while sending order to fincon. Please check the fincon server. <br />Account Number : " + AccountNo + ".<br /><br />Customer Id : " + CustomerID + "<br />Error : " + RESULT.ErrorMessage;
-                        BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, "info@esquire.co.za", true));
-                        return StatusCode(500, new { error = RESULT.ErrorMessage });
-                    }
-                }
-                else if (confirmModel.PaymentId == Shared.PAY_ID_CREDIT_CARD_INSTANT_EFT_MOBI_CREDIT)
-                {
-                    Serilog.Log.Error("Order No. : " + OrderId + " : Confirm Total Price : " + TotalAmount);
-                    string refId = EncryptionService.EncryptString(OrderId + "-" + CustomerID) + "!" + OrderId;
-                    return Ok(new { message = "Order confirmed successfully. Please proceed to make payment.", reference = refId, TotalAmount, CustomerEmail = User.Identity.Name });
-                }
                 return Ok(new { message = "Order confirmed successfully." });
-
-
             }
             catch (Exception Excp)
             {
@@ -687,46 +449,203 @@ namespace EsquireVRN.Controllers
                 Serilog.Log.Error(Excp.Message + " at line number " + linenumber);
                 return StatusCode(500, new { error = "Something went wrong with the server. Please try again in a few minutes." });
 
-            }           
+            }
 
         }
 
-        private List<string> PrepareEmail(long orderId, string finconId, string terms, string credit, long OrgId)
+
+        [HttpGet("RecordPayment")]
+        public IActionResult PaymentReceived(long OrderId, int PaymentId)
         {
-            finconId = Convert.ToInt64(finconId).ToString().PadLeft(8, '0');
+            try
+            {
+                var order = Shared.GetResellerOrder(OrderId);
+                double deliveryCharge = 0;
+                if (order == null)
+                {
+                    return NotFound(new { error = "Order doesn't exist. Please check and try again." });
+                }
+
+                if (order.DeliveryCost > 0)
+                {
+                    deliveryCharge = Convert.ToDouble(order.DeliveryCost);
+                }
+                var customer = Shared.GetCustomer(order.CustomerID);
+                if (customer == null)
+                {
+                    return NotFound(new { error = "Customer doesn't exist. Please check and try again." });
+                }
+
+                string query = "UPDATE ResellerOrders SET PayId=" + PaymentId + ",PaymentDate=N'" + DateTime.Now + "' WHERE ResellerOrderId=" + OrderId;
+                using var db = new SqlConnection(Shared.connString);
+                db.Execute(query);
+
+                Shared.UpdateResellerOrderStatus(order.ResellerOrderID, 3, "" + order.CustomerID);
+
+                Shared.DeliveryDetails details = Shared.getDeliveryDescID(order.DeliveryDescID);
+                string BillBody = "";
+                double orderAmount = 0, taxAmount = 0;
+                string currencyFormat = Shared.GetWebConfigKeyValue("CurrencyFormat");
+
+                List<ResellerOrderItems> items = Shared.GetResellerOrderItems(OrderId);
+                foreach (var detail in items)
+                {
+                    BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><p style='white-space:pre-wrap;max-width: 650px;'>" + detail.ProdDesc + "</p></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + detail.ProdQty + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>" + detail.Price + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + Math.Round((detail.Price * detail.ProdQty), 2).ToString(currencyFormat) + "</td></tr>";
+                    orderAmount += (detail.Price / 1.15) * detail.ProdQty;
+                    taxAmount += (detail.Price / 1.15) * detail.ProdQty * 0.15;
+                }
+
+                if (deliveryCharge > 0)
+                {
+                    taxAmount += (deliveryCharge / 1.15) * deliveryCharge * 0.15;
+                    BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><div>Courier with Courier Direct:&nbsp;</div><div>Print out the <a href='" + order.DeliveryQuoteID + "' target='_blank'>Waybill - " + order.DeliveryQuoteID + "</a></div></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>1</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge).ToString(currencyFormat) + "</td></tr>";
+                }
+
+                string emailbody = "";
+                string deliveryAddress = "";
+
+                if ("" + order.DeliveryDescID == Shared.CD_DESC_ID)
+                {
+                    DeliveryAddress dAddress = Shared.GetDeliveryAddress(order.ShippingID);
+
+                    if (dAddress != null)
+                    {
+                        deliveryAddress = dAddress.ShippingAddress + ", " + dAddress.Town + ", " + dAddress.ShippingCountry;
+                    }
+                }
+                else
+                {
+                    deliveryAddress = "Collect From Shop";
+                    if (order.DeliveryDescID == Shared.OWN_COURIER_TO_COLLECT)
+                    {
+                        deliveryAddress = "Own Courier To Collect";
+                    }
+                }
+
+                string tAmount = Math.Round((orderAmount + deliveryCharge), 2).ToString(currencyFormat);
+                string MailFormat = Shared.GetWebConfigKeyValue("ResellerPaymentMail");
+                emailbody = MailFormat.Replace("{customer_name}", customer.FirstName + ' ' + customer.Surname).Replace("customer_email", customer.Email).Replace("{invoice_no}", order.ResellerOrderID.ToString("D8")).Replace("{invoice_date}", DateTime.Now.ToString("yyyy/MM/dd")).Replace("{payment_method}", "EFT").Replace("{invoice_items}", BillBody).Replace("{subtotal}", orderAmount.ToString("00")).Replace("{tax}", taxAmount.ToString("00")).Replace("{shipping}", (deliveryCharge / 1.15).ToString("00")).Replace("{total}", tAmount).Replace("{shipping_address}", deliveryAddress).Replace("{orgname}", Shared.GetOrgName()).Replace("{website}", Shared.GetWebConfigKeyValue("Website")).Replace("{logo_url}", Shared.GetOrgLogo());
+
+                Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.NearestBranchId);
+                string confrimMail = branchDetail.BranchEMail;
+                string branchName = branchDetail.OrgBraShort;
+
+                string subject = "Invoice";
+                string[] toEmail =
+                 [
+                    new(customer.Email)
+                 ];
+                List<string> bcc = ["4me.suren@gmail.com", confrimMail];
+
+                BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, "", Convert.ToString(OrderId), "Order"));
+
+                return Ok(new { message = "Order status updated to paid successfully." });
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Something went wrong. Please try again." });
+            }
+        }
+
+        [HttpGet("CancelOrder")]
+        public IActionResult CancelOrder(long OrderId, string rejection_reason)
+        {
+            try
+            {
+                var order = Shared.GetResellerOrder(OrderId);
+                if (order == null)
+                {
+                    return NotFound(new { error = "Order doesn't exist. Please check and try again." });
+                }
+                double deliveryCharge = 0;
+                if (order.DeliveryCost > 0)
+                {
+                    deliveryCharge = Convert.ToDouble(order.DeliveryCost);
+                }
+                var customer = Shared.GetCustomer(order.CustomerID);
+                if (customer == null)
+                {
+                    return NotFound(new { error = "Customer doesn't exist. Please check and try again." });
+                }
+
+                string query = "UPDATE ResellerOrders SET Rejected=1,Rejection_Reason=@reason WHERE ResellerOrderId=" + OrderId;
+                using var db = new SqlConnection(Shared.connString);
+                db.Execute(query, new { reason = rejection_reason });
+
+                Shared.UpdateResellerOrderStatus(order.ResellerOrderID, 7, "" + customer.CustID);
+
+                string SupportUrl = Shared.GetWebConfigKeyValue("SupportUrl");
+
+
+                string emailbody = "";
+
+                List<ResellerOrderItems> items = Shared.GetResellerOrderItems(OrderId);
+                string BillBody = "";
+                double orderAmount = 0;
+                string currencyFormat = Shared.GetWebConfigKeyValue("CurrencyFormat");
+                double tAmount = 0;
+                foreach (var detail in items)
+                {
+                    BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><p style='white-space:pre-wrap;max-width: 650px;'>" + detail.ProdDesc + "</p></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + detail.ProdQty + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>" + detail.Price + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + Math.Round((detail.Price * detail.ProdQty), 2).ToString(currencyFormat) + "</td></tr>";
+                    orderAmount += Math.Round((Math.Round(detail.Price, 2) * detail.ProdQty), 2);
+                }
+                if (deliveryCharge > 0)
+                {
+                    BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><div>Courier with Courier Direct:&nbsp;</div><div>Print out the <a href='" + order.DeliveryQuoteID + "' target='_blank'>Waybill - " + order.DeliveryQuoteID + "</a></div></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>1</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge).ToString(currencyFormat) + "</td></tr>";
+                }
+                tAmount = orderAmount + deliveryCharge;
+                string MailFormat = Shared.GetWebConfigKeyValue("OrderCancellationMail");
+                emailbody = MailFormat.Replace("{orgname}", Shared.GetOrgName()).Replace("{customer_name}", customer.FirstName + " " + customer.Surname).Replace("{order_id}", order.ResellerOrderID.ToString("D8")).Replace("{order_date}", order.DateCreated.ToString("yyyy/MM/dd")).Replace("{cancel_reason}", rejection_reason).Replace("{support_link}", SupportUrl).Replace("{year}", DateTime.Now.ToString("yyyy")).Replace("{canceled_items}", BillBody).Replace("{subtotal}", "" + orderAmount).Replace("{shipping}", "" + deliveryCharge).Replace("{total}", "" + tAmount);
+
+                Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.NearestBranchId);
+                string confrimMail = branchDetail.BranchEMail;
+                string branchName = branchDetail.OrgBraShort;
+
+                string subject = "Order Canceled";
+                string[] toEmail =
+                 [
+                    new(customer.Email)
+                 ];
+                List<string> bcc = ["test@esquire.co.za", confrimMail, "info@esquire.co.za"];
+
+                BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, "", Convert.ToString(OrderId), "Order"));
+
+                return Ok(new { message = "Order status updated to paid successfully." });
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Something went wrong. Please try again." });
+            }
+        }
+
+        private List<string> PrepareResellerOrderEmail(long orderId, Customer customer)
+        {
             var requestUrl = $"{Request.Scheme}://{Request.Host.Value}/api/Shop";
-            Order order = Shared.GetOrder(orderId);
-            Shared.DeliveryDetails details = Shared.getDeliveryDescID(order.DeliveryID);
-            string AccountNumber = Shared.GetAccountNumber(order.CustID);
+            var order = Shared.GetResellerOrder(orderId);
+            Shared.DeliveryDetails details = Shared.getDeliveryDescID(order.DeliveryDescID);
+            string AccountNumber = Shared.GetAccountNumber(order.CustomerID);
             double deliveryCharge = Math.Round(Convert.ToDouble(order.DeliveryCost), 2);
             List<OrderItem> items = Shared.GetOrderItems(orderId);
             string BillBody = "", PdfBody = "";
             double orderAmount = 0;
-            Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.OrgBranchID);
+            Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.NearestBranchId);
             string currencyFormat = Shared.GetWebConfigKeyValue("CurrencyFormat");
             string confrimMail = branchDetail.BranchEMail;
-            string strShippingInstruction = "";
-            if (!string.IsNullOrEmpty(order.ShippingInstruction))
-            {
-                strShippingInstruction = "(" + order.ShippingInstruction + ")";
-            }
-            string paymentRefId = EncryptionService.EncryptString("" + orderId + "-" + order.CustID) + "!" + order.OrderID;
+
             foreach (var detail in items)
             {
-                BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>" + detail.ProdCode + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><p style='white-space:pre-wrap;max-width: 650px;'>" + detail.ProdDesc + "</p></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + Math.Round((detail.Price / 1.15), 2).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>" + detail.ProdQty + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + Math.Round(((detail.Price / 1.15) * detail.ProdQty), 2).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + Math.Round((detail.Price * detail.ProdQty), 2).ToString(currencyFormat) + "</td></tr>";
-                PdfBody += "<tr><td style='padding: 0.5rem; text-align: left; font-size: 0.9rem; border-bottom: 2px solid #077ea2;'>" + detail.ProdCode + "</td><td style='white-space: nowrap;padding: 0.5rem; text-align: left; font-size: 0.9rem; border-bottom: 2px solid #077ea2;'><p style='white-space:pre-wrap;max-width: 650px;'>" + detail.ProdDesc + "</p></td><td style='padding: 0.5rem; text-align: left; font-size: 0.9rem; border-bottom: 2px solid #077ea2;'>R " + Math.Round((detail.Price / 1.15), 2).ToString(currencyFormat) + "</td><td style='padding: 0.5rem; text-align: left; font-size: 0.9rem; border-bottom: 2px solid #077ea2;'>" + detail.ProdQty + "</td><td style='padding: 0.5rem; text-align: left; font-size: 0.9rem; border-bottom: 2px solid #077ea2;'>R " + Math.Round(((detail.Price / 1.15) * detail.ProdQty), 2).ToString(currencyFormat) + "</td><td style='padding: 0.5rem; text-align: left; font-size: 0.9rem; border-bottom: 2px solid #077ea2;'>R " + Math.Round((detail.Price * detail.ProdQty), 2).ToString(currencyFormat) + "</td></tr>";
+                BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><p style='white-space:pre-wrap;max-width: 650px;'>" + detail.ProdDesc + "</p></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + detail.ProdQty + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>" + detail.Price + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + Math.Round((detail.Price * detail.ProdQty), 2).ToString(currencyFormat) + "</td></tr>";
                 orderAmount += Math.Round((Math.Round(detail.Price, 2) * detail.ProdQty), 2);
             }
             string strDeliveryQuoteId = requestUrl + "/GetWayBill" + "?c=" + order.DeliveryQuoteID;
             string paySlipUrl = requestUrl + "/GetPackingSlip" + "?o=" + orderId + "&c=" + AccountNumber;
             if (deliveryCharge > 0)
             {
-                BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>CDT001</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><div>Courier with Courier Direct:&nbsp;</div><div>Print out the <a href='" + strDeliveryQuoteId + "' target='_blank'>Waybill - " + order.DeliveryQuoteID + "</a></div></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge / 1.15).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>1</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge / 1.15).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge).ToString(currencyFormat) + "</td></tr>";
-                PdfBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>CDT001</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><div>Courier with Courier Direct:&nbsp;</div><div>Print out the <a href='" + strDeliveryQuoteId + "' target='_blank'>Waybill - " + order.DeliveryQuoteID + "</a></div></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge / 1.15).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>1</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge / 1.15).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge).ToString(currencyFormat) + "</td></tr>";
+                BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><div>Courier with Courier Direct:&nbsp;</div><div>Print out the <a href='" + strDeliveryQuoteId + "' target='_blank'>Waybill - " + order.DeliveryQuoteID + "</a></div></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>1</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + (deliveryCharge).ToString(currencyFormat) + "</td></tr>";
             }
 
             string pdfContent = "";
-            string emailbody;
+            string emailbody = "";
             if ("" + order.DeliveryDescID == Shared.CD_DESC_ID)
             {
                 DeliveryAddress dAddress = Shared.GetDeliveryAddress(order.ShippingID);
@@ -735,59 +654,23 @@ namespace EsquireVRN.Controllers
                 {
                     deliveryAddress = dAddress.ShippingAddress + ", " + dAddress.Town + ", " + dAddress.ShippingCountry;
                 }
-                string orderInstruction = "Use this order number when talking to Esquire Technologies.";
-                if (OrgId == 473)
-                {
-                    orderInstruction = "Use this order number when talking to Esquire Technologies*.";
-                }
-                string MailFormat = Shared.GetWebConfigKeyValue("OrderConfirmMailCourierDirect");
-                string PdfFormat = Shared.GetWebConfigKeyValue("OrderConfirmPdfCourierDirect");
+
+                string MailFormat = Shared.GetWebConfigKeyValue("ResellerOrderConfirmMail");
                 string tAmount = Math.Round((orderAmount + deliveryCharge), 2).ToString(currencyFormat);
-                string use_this = "Use this order number when talking to Esquire Technologies. | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
-
-                string talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref :  Debit or Credit Card (" + paymentRefId + ")";
-                if (order.PayID == 2)
-                {
-                    talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref : Electronic Funds Transfer (EFT)";
-                }
-                else if (order.PayID == 12)
-                {
-                    talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref : Collect And Pay At Shop";
-
-                }
-                emailbody = MailFormat.Replace("{0}", talkTo).Replace("{1}", finconId).Replace("{2}", "R " + tAmount).Replace("{3}", deliveryAddress).Replace("{4}", strDeliveryQuoteId).Replace("{5}", order.DeliveryQuoteID).Replace("{6}", paySlipUrl).Replace("{7}", BillBody).Replace("{8}", "R " + tAmount).Replace("{BranchMail}", confrimMail).Replace("{credit}", credit).Replace("{terms}", terms).Replace("{order_instruction}", orderInstruction).Replace("{use_this_while}", use_this);
-                pdfContent = PdfFormat.Replace("{0}", talkTo).Replace("{1}", finconId).Replace("{2}", "R " + tAmount).Replace("{3}", deliveryAddress).Replace("{4}", strDeliveryQuoteId).Replace("{5}", order.DeliveryQuoteID).Replace("{6}", paySlipUrl).Replace("{7}", PdfBody).Replace("{8}", "R " + tAmount).Replace("{BranchMail}", confrimMail).Replace("{credit}", credit).Replace("{terms}", terms).Replace("{order_instruction}", orderInstruction).Replace("{use_this_while}", use_this);
+                emailbody = MailFormat.Replace("{customer_name}", customer.FirstName + ' ' + customer.Surname).Replace("{order_id}", order.ResellerOrderID.ToString("D8")).Replace("{order_date}", order.DateCreated.ToString("yyyy/MM/dd")).Replace("{payment_method}", "EFT").Replace("{order_items}", BillBody).Replace("{subtotal}", orderAmount.ToString("00")).Replace("{shipping}", deliveryCharge.ToString("00")).Replace("{total}", tAmount).Replace("{shipping_address}", deliveryAddress).Replace("{orgname}", Shared.GetOrgName()).Replace("{website}", Shared.GetWebConfigKeyValue("Website"));
             }
             else
             {
-                string collect_courier = "Collect From Shop";
+                string deliveryAddress = "Collect From Shop";
                 if (order.DeliveryDescID == Shared.OWN_COURIER_TO_COLLECT)
                 {
-                    collect_courier = "Own Courier To Collect";
+                    deliveryAddress = "Own Courier To Collect";
                 }
-                string MailFormat = Shared.GetWebConfigKeyValue("OrderConfirmMailCollectFromShop");
-                string PdfFormat = Shared.GetWebConfigKeyValue("OrderConfirmPdfCollectFromShop");
+                string MailFormat = Shared.GetWebConfigKeyValue("ResellerOrderConfirmMail");
 
-                string orderInstruction = "Use this order number when talking to Esquire Technologies.";
-                string use_this = "Use this order number when talking to Esquire Technologies. | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
-                if (OrgId == 473)
-                {
-                    orderInstruction = "Use this order number when talking to Esquire Technologies*.";
-                }
                 string oAmount = orderAmount.ToString(currencyFormat);
-                string talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref :  Debit or Credit Card (" + paymentRefId + ")";
-                if (order.PayID == 2)
-                {
-                    talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref :  Electronic Funds Transfer (EFT)";
-                }
-                else if (order.PayID == 12)
-                {
-                    talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref : Collect And Pay At Shop";
+                emailbody = MailFormat.Replace("{customer_name}", customer.FirstName + ' ' + customer.Surname).Replace("{order_id}", order.ResellerOrderID.ToString("D8")).Replace("{order_date}", order.DateCreated.ToString("yyyy/MM/dd")).Replace("{payment_method}", "EFT").Replace("{order_items}", BillBody).Replace("{subtotal}", oAmount).Replace("{shipping}", deliveryCharge.ToString("00")).Replace("{total}", oAmount).Replace("{shipping_address}", deliveryAddress).Replace("{orgname}", Shared.GetOrgName()).Replace("{website}", Shared.GetWebConfigKeyValue("Website"));
 
-                }
-
-                emailbody = MailFormat.Replace("{0}", talkTo).Replace("{1}", finconId).Replace("{2}", "R " + oAmount).Replace("{3}", paySlipUrl).Replace("{4}", BillBody).Replace("{5}", "R " + oAmount).Replace("{BranchMail}", confrimMail).Replace("{credit}", credit).Replace("{terms}", terms).Replace("{order_instruction}", orderInstruction).Replace("{use_this_while}", use_this).Replace("{collect_courier}", collect_courier);
-                pdfContent = PdfFormat.Replace("{0}", talkTo).Replace("{1}", finconId).Replace("{2}", "R " + oAmount).Replace("{3}", paySlipUrl).Replace("{4}", PdfBody).Replace("{5}", "R " + oAmount).Replace("{BranchMail}", confrimMail).Replace("{credit}", credit).Replace("{terms}", terms).Replace("{order_instruction}", orderInstruction).Replace("{use_this_while}", use_this).Replace("{collect_courier}", collect_courier);
             }
             List<string> returnString = new()
             {
@@ -795,9 +678,13 @@ namespace EsquireVRN.Controllers
                 pdfContent
             };
             double eTotal = orderAmount + deliveryCharge;
-            Serilog.Log.Error("Order No. : " + order.OrderID + " : Email Total Price : " + eTotal);
+            Serilog.Log.Error("Order No. : " + order.ResellerOrderID + " : Email Total Price : " + eTotal);
             return returnString;
         }
+
+
+
+
 
         [HttpGet]
         [Route("GetPackingSlip")]
@@ -840,191 +727,7 @@ namespace EsquireVRN.Controllers
                 }
             }
         }
-        [HttpGet]
-        [Route("PaymentMade/{id}")]
-        public async Task<IActionResult> PaymentMade(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return StatusCode(401, "Invalid Reference Key.");
-            }
-            long OrderId = 0;
-            try
-            {
-                string reqId = id.Split('!')[1];
-                //string key = reqId.Replace("-", "=").Replace("_", "+").Replace(".", "/");
-                //string decrypedKey = EncryptionService.DecryptString(key);
-                OrderId = Convert.ToInt64(reqId);
-                //long CustId = Convert.ToInt64(decrypedKey.Split('-')[1]);
-            }
-            catch
-            {
-                return StatusCode(401, "Invalid Reference Key.");
-            }
-            Order order = Shared.GetOrder(OrderId);
 
-            if (order == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new { error = "Order doesn't exist." });
-            }
-            Customer cust = Shared.GetCustomer(order.CustID);
-            if (order == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new { error = "Customer doesn't exist." });
-            }
-
-            Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.OrgBranchID);
-            string confrimMail = branchDetail.BranchEMail;
-            string branchName = branchDetail.OrgBraShort;
-            string terms = "";
-            string CreditAvailable = "0.00";
-            string FinconId = "";
-            string FinconUrl = Shared.GetWebConfigKeyValue("FinconUrl");
-            string FinconServerUsername = Shared.GetWebConfigKeyValue("FinconServerUsername");
-            string FinconServerPassword = Shared.GetWebConfigKeyValue("FinconServerPassword");
-            if (order.FinconId == null)
-            {
-                string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
-                if (string.IsNullOrEmpty(connectId))
-                {
-                    Customer tempcustomer = Shared.GetCustomer(order.CustID);
-                    string tempnotes = "";
-                    string sql = "Update WebOrders Set FinconId=-1,StatusID=3,Notes=N'" + tempnotes + "' Where OrderID=" + order.OrderID;
-                    using (var db = new SqlConnection(Shared.connString))
-                    {
-                        db.Execute(sql);
-                    }
-
-                    Shared.ClearCartWithCustId(order.CustID);
-
-                    string finconsubject = "Order Confirmation and Processing Update";
-                    string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                    List<string> Emails = new() { tempcustomer.Email };
-                    List<string> cc = new() { "syanthan1st@gmail.com", confrimMail, "info@esquire.co.za" };
-                    string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
-                    BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za", false));
-
-                    return StatusCode(200, new { message = "Order confirmed successfully." });
-                }
-
-                Shared.FinconResult RESULT = await Shared.UpdateFincon(order.OrderID, connectId, FinconServerUsername, FinconServerPassword);
-                if (RESULT.Error)
-                {
-                    if (RESULT.ErrorMessage == "Connection Error")
-                    {
-                        Customer tempcustomer = Shared.GetCustomer(order.CustID);
-                        string tempnotes = "";
-                        string sql = "Update WebOrders Set FinconId=-1,StatusID=3,Notes=N'" + tempnotes + "' Where OrderID=" + order.OrderID;
-                        using (var db = new SqlConnection(Shared.connString))
-                        {
-                            db.Execute(sql);
-                        }
-
-                        Shared.ClearCartWithCustId(order.CustID);
-
-                        string finconsubject = "Order Confirmation and Processing Update";
-                        string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                        List<string> Emails = new() { tempcustomer.Email };
-                        List<string> cc = new() { "syanthan1st@gmail.com", confrimMail, "info@esquire.co.za" };
-                        string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
-                        BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za", false));
-
-                        return StatusCode(200, new { message = "Order confirmed successfully." });
-                    }
-                    else
-                    {
-                        string AccountNo = Shared.GetCustomerAccountNo(order.CustID);
-                        string finconsubject = "Warning : Couldn't update order to fincon server.";
-                        string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                        string storeName = Shared.GetWebConfigKeyValue("SiteName");
-                        List<string> Emails = new() { "nicholas@esquire.co.za", "mahomed@esquire.co.za", "kabir@esquire.co.za", "irfhan@esquire.co.za", "syanthan1st@gmail.com", "senzo@esquire.co.za", "khanyisa@esquire.co.za", "mccalvin@esuire.co.za", "tumelo@esquire.co.za", "prince@esquire.co.za", "mariamw@esquire.co.za" };
-                        string finconemailbody = "<br /><br />Error occurred while sending order to fincon. Please check the fincon server. <br />Account Number : " + AccountNo + ".<br /><br />Customer Id : " + order.CustID+ "<br />Error : " + RESULT.ErrorMessage;
-                        BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, "info@esquire.co.za", true));
-                        return StatusCode(500, new { error = RESULT.ErrorMessage });
-                    }
-                }
-
-
-                string notes = "";
-                if (!string.IsNullOrEmpty(RESULT.FinconId))
-                {
-                    notes = "ON#: Order Number: " + RESULT.FinconId;
-                    string sql = "Update WebOrders Set FinconId=" + RESULT.FinconId + ",Notes=N'" + notes + "',DistOrdStatus=4,StatusID=3,PayID=3 Where OrderID=" + OrderId;
-                    using (var db = new SqlConnection(Shared.connString))
-                    {
-                        db.Execute(sql);
-                    }
-
-
-                    FinconId = RESULT.FinconId;
-                    string changeby = "" + order.CustID;
-                    Shared.UpdateOrderStatus(OrderId, 3, changeby);
-
-                    Shared.BillingDetail? BillingDetail = await Shared.GetBillingDetail(connectId, order.CustID, FinconServerUsername, FinconServerPassword);
-                    if (BillingDetail != null)
-                    {
-                        terms = BillingDetail.Value.Terms;
-                        CreditAvailable = BillingDetail.Value.CreditAvailable;
-                    }
-
-                    Shared.ClearCartWithCustId(order.CustID);
-
-                }
-                else
-                {
-                    string AccountNo = Shared.GetCustomerAccountNo(order.CustID);
-                    string finconsubject = "Warning : Couldn't update order to fincon server.";
-                    string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                    string storeName = Shared.GetWebConfigKeyValue("SiteName");
-                    List<string> Emails = new() { "nicholas@esquire.co.za", "mahomed@esquire.co.za", "kabir@esquire.co.za", "irfhan@esquire.co.za", "syanthan1st@gmail.com", "senzo@esquire.co.za", "khanyisa@esquire.co.za", "mccalvin@esuire.co.za", "tumelo@esquire.co.za", "prince@esquire.co.za", "mariamw@esquire.co.za" };
-                    string finconemailbody = "<br /><br />Error occurred while sending order to fincon. Please check the fincon server. <br />Account Number : " + AccountNo + ".<br /><br />Customer Id : " + order.CustID + "<br />Error : " + RESULT.ErrorMessage;
-                    BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, "info@esquire.co.za", true));
-                    return StatusCode(500, new { error = RESULT.ErrorMessage });
-                }
-
-
-            }
-            else
-            {
-                string sql = "Update WebOrders Set DistOrdStatus=4,StatusID=3,PayID=3 Where OrderID=" + OrderId;
-                using (var db = new SqlConnection(Shared.connString))
-                {
-                    db.Execute(sql);
-                }
-                // FinconId = RESULT.FinconId;
-                string changeby = "" + order.CustID;
-                Shared.UpdateOrderStatus(OrderId, 3, changeby);
-
-                FinconId = "" + order.FinconId;
-
-                string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
-
-                Shared.BillingDetail? BillingDetail = await Shared.GetBillingDetail(connectId, order.CustID, FinconServerUsername, FinconServerPassword);
-                if (BillingDetail != null)
-                {
-                    terms = BillingDetail.Value.Terms;
-                    CreditAvailable = BillingDetail.Value.CreditAvailable;
-                }
-
-                Shared.ClearCartWithCustId(order.CustID);
-            }
-
-
-            Customer customer = Shared.GetCustomer(order.CustID);
-            List<string> emails = PrepareEmail(order.OrderID, FinconId, terms, CreditAvailable, Convert.ToInt64(customer.OrgID));
-            string emailbody = emails[0];
-            string doc = emails[1];
-
-            string subject = "Order Number: " + FinconId + " From Esquire Technologies has been processed.";
-            string[] toEmail = new string[]
-            {
-                        new(cust.Email)
-            };
-            List<string> bcc = new() { "test@esquire.co.za", confrimMail, "info@esquire.co.za" };
-
-            BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(FinconId), "Order"));
-            return Ok(new { message = "Order confirmed successfully." });
-        }
 
         [HttpGet]
         [Route("ResendEmail/{id}")]
@@ -1037,8 +740,8 @@ namespace EsquireVRN.Controllers
             {
                 return StatusCode(StatusCodes.Status404NotFound, new { error = "Order doesn't exist." });
             }
-            Customer cust = Shared.GetCustomer(order.CustID);
-            if (order == null)
+            var cust = Shared.GetCustomer(order.CustID);
+            if (cust == null)
             {
                 return StatusCode(StatusCodes.Status404NotFound, new { error = "Customer doesn't exist." });
             }
@@ -1062,8 +765,7 @@ namespace EsquireVRN.Controllers
                 terms = BillingDetail.Value.Terms;
                 CreditAvailable = BillingDetail.Value.CreditAvailable;
             }
-            Customer customer = Shared.GetCustomer(order.CustID);
-            List<string> emails = PrepareEmail(order.OrderID, "" + order.FinconId, terms, CreditAvailable, Convert.ToInt64(customer.OrgID));
+            List<string> emails = PrepareResellerOrderEmail(order.OrderID, cust);
             string emailbody = emails[0];
             string doc = emails[1];
 
@@ -1073,19 +775,13 @@ namespace EsquireVRN.Controllers
             {
                 email = cust.Email;
             }
-            string[] toEmail = new string[]
-            {
+            string[] toEmail =
+            [
                         new(email)
-            };
-            List<string> bcc = new();
-            if (User.IsInRole("Admin"))
-            {
-                bcc = new() { "test@esquire.co.za", confrimMail, "info@esquire.co.za" };
-            }
-            else
-            {
-                bcc = new() { "test@esquire.co.za" };
-            }
+            ];
+            List<string> bcc = [];
+
+            bcc = [confrimMail];
             BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(order.FinconId), "Order"));
 
             //doc.Close();
@@ -1133,144 +829,64 @@ namespace EsquireVRN.Controllers
             return StatusCode(200, new { message = "Order has been cancelled." });
         }
 
- 
-
         [HttpGet]
-        [Route("AutoCancelOrder")]
-        public IActionResult CancelOrders(string u, string p)
+        [Route("PaymentMade/{id}")]
+        public IActionResult PaymentMade(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return StatusCode(401, "Invalid Reference Key.");
+            }
+            long OrderId = 0;
             try
             {
-                LoginDetails l = Shared.AdminLogin(u, p);
-                if (l.CustID == Shared.INVALID_LOGIN)
-                {
-                    return StatusCode(StatusCodes.Status401Unauthorized, new { error = "Invalid Login" });
-                }
-                string query = "Update WEBOrders Set StatusID=10,DistOrdStatus=6 WHERE PayID=3 AND StatusID=2 AND FinconId IS NULL AND ORGID=" + Shared.GetOrgID() + " AND OrderDate <= DATEADD(MINUTE, -10, GETDATE())";
-                using (var db = new SqlConnection(Shared.connString))
-                {
-                    db.Execute(query);
-                }
+                string reqId = id.Split('!')[1];
+                OrderId = Convert.ToInt64(reqId);
             }
-            catch (Exception ex)
+            catch
             {
-                string finconsubject = "Warning : Order couldn't be cancelled automatically.";
-                string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                string storeName = Shared.GetWebConfigKeyValue("SiteName");
-                List<string> Emails = new() { "nicholas@esquire.co.za", "mahomed@esquire.co.za", "kabir@esquire.co.za", "irfhan@esquire.co.za", "syanthan1st@gmail.com", "senzo@esquire.co.za", "khanyisa@esquire.co.za", "mccalvin@esuire.co.za", "tumelo@esquire.co.za", "prince@esquire.co.za", "mariamw@esquire.co.za" };
-                string finconemailbody = "<br /><br />Error occurred while canceling order. Error is : " + ex.Message;
-                BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, "info@esquire.co.za", true));
+                return StatusCode(401, "Invalid Reference Key.");
             }
-            return Ok();
-        }
+            Order order = Shared.GetOrder(OrderId);
 
-
-        [HttpGet]
-        [Route("ProcessOrders")]
-        public async Task<IActionResult> ProcessOrders(string u, string p)
-        {
-            try
+            if (order == null)
             {
-                LoginDetails l = Shared.AdminLogin(u, p);
-                if (l.CustID == Shared.INVALID_LOGIN)
-                {
-                    return StatusCode(StatusCodes.Status401Unauthorized, new { error = "Invalid Login" });
-                }
-                List<Order> orders = new();
-                string query = "SELECT [OrderID],[CustID],[OrderDate],[DeliveryMethod],[DeliveryDescID],[DeliveryCost],[PayID],[StatusID],[Notes],[ShippingID],[OrgID],[OrgBranchID],[Insurance],[DeliveryQuoteID],[DistOrdStatus],[ReviewEmailSent],[DeliveryWaybillID],[CustRef],[DiscountRefCode],[Discount],[DeliveryID],[FinconId],[ShippingInstruction] FROM [dbo].[WEBOrders] WHERE [FinconId]=-1";
-                using (var db = new SqlConnection(Shared.connString))
-                {
-                    orders = db.Query<Order>(query).ToList();
-                }
-
-                if (orders.Count == 0)
-                {
-                    return Ok(new { message = "No orders were found to be processed." });
-                }
-
-                string FinconUrl = Shared.GetWebConfigKeyValue("FinconUrl");
-                string FinconServerUsername = Shared.GetWebConfigKeyValue("FinconServerUsername");
-                string FinconServerPassword = Shared.GetWebConfigKeyValue("FinconServerPassword");
-                string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
-                string UpdateErrors = "";
-                if (string.IsNullOrEmpty(connectId))
-                {
-                    return StatusCode(500, new { error = "Fincon Server unavailable." });
-                }
-                foreach (var order in orders)
-                {
-                    Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.OrgBranchID);
-                    string confrimMail = branchDetail.BranchEMail;
-                    string branchName = branchDetail.OrgBraShort;
-
-                    Shared.FinconResult RESULT = await Shared.UpdateFincon(order.OrderID, connectId, FinconServerUsername, FinconServerPassword);
-                    if (RESULT.Error)
-                    {
-                        if (RESULT.ErrorMessage == "Connection Error")
-                        {
-                            return StatusCode(500, new { error = "Fincon Server unavailable." });
-                        }
-                        else
-                        {
-                            UpdateErrors += RESULT.ErrorMessage;
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(RESULT.FinconId))
-                    {
-                        string notes = "ON#: Order Number: " + RESULT.FinconId;
-                        string sql = "Update WebOrders Set FinconId=" + RESULT.FinconId + ",Notes=N'" + notes + "',DistOrdStatus=4 Where OrderID=" + order.OrderID;
-                        using (var db = new SqlConnection(Shared.connString))
-                        {
-                            db.Execute(sql);
-                        }
-
-                        Shared.BillingDetail? BillingDetail = await Shared.GetBillingDetail(connectId, order.CustID, FinconServerUsername, FinconServerPassword);
-
-                        string terms = "";
-                        string CreditAvailable = "0.00";
-                        if (BillingDetail != null)
-                        {
-                            terms = BillingDetail.Value.Terms;
-                            CreditAvailable = BillingDetail.Value.CreditAvailable;
-                        }
-                        Customer customer = Shared.GetCustomer(order.CustID);
-                        List<string> emails = PrepareEmail(Convert.ToInt64(order.OrderID), RESULT.FinconId, terms, CreditAvailable, Convert.ToInt64(customer.OrgID));
-                        string emailbody = emails[0];
-                        string doc = emails[1];
-
-                        string subject = "Order Number: " + RESULT.FinconId + " From Esquire Technologies has been processed.";
-                        string[] toEmail = new string[]
-                         {
-                        new(customer.Email)
-                         };
-                        List<string> bcc = new() { "test@esquire.co.za", confrimMail, "info@esquire.co.za" };
-
-                        BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(RESULT.FinconId), "Order"));
-                    }
-                    else
-                    {
-                        return StatusCode(500, new { error = "Fincon Server unavailable." });
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(UpdateErrors))
-                {
-                    string AccountNo = Shared.GetCustomerAccountNo(Convert.ToInt64(l.CustID));
-                    string finconsubject = "Warning : Couldn't update order to fincon server.";
-                    string adminEmail = Shared.GetWebConfigKeyValue("AdminEmail");
-                    string storeName = Shared.GetWebConfigKeyValue("SiteName");
-                    List<string> Emails = new() { "nicholas@esquire.co.za", "mahomed@esquire.co.za", "kabir@esquire.co.za", "irfhan@esquire.co.za", "syanthan1st@gmail.com", "senzo@esquire.co.za", "khanyisa@esquire.co.za", "mccalvin@esuire.co.za", "tumelo@esquire.co.za", "prince@esquire.co.za", "mariamw@esquire.co.za" };
-                    string finconemailbody = "<br /><br />Error occurred while sending order to fincon. Please check the fincon server. <br />Account Number : " + AccountNo + ".<br /><br />Customer Id : " + l.CustID + "<br />Error : " + UpdateErrors;
-                    BackgroundJob.Enqueue(() => Shared.SendMailHangFire(finconsubject, finconemailbody, Emails, "info@esquire.co.za", true));
-                    return StatusCode(500, new { error = UpdateErrors});
-                }
-                return Ok(new { message = "Orders processed successfully." });
+                return StatusCode(StatusCodes.Status404NotFound, new { error = "Order doesn't exist." });
             }
-            catch (Exception ex)
+            var cust = Shared.GetCustomer(order.CustID);
+            if (cust == null)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return StatusCode(StatusCodes.Status404NotFound, new { error = "Customer doesn't exist." });
             }
+
+            Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.OrgBranchID);
+            string confrimMail = branchDetail.BranchEMail;
+            string branchName = branchDetail.OrgBraShort;
+
+            string sql = "Update ResellerOrders Set StatusID=3,PayID=3,PaymentDate=N'" + DateTime.Now + "' Where ResellerOrderID=" + OrderId;
+            using (var db = new SqlConnection(Shared.connString))
+            {
+                db.Execute(sql);
+            }
+
+            string changeby = "" + order.CustID;
+            Shared.UpdateResellerOrderStatus(OrderId, 3, changeby);
+
+            Shared.ClearCartWithCustId(order.CustID);
+
+            List<string> emails = PrepareResellerOrderEmail(order.OrderID, cust);
+            string emailbody = emails[0];
+            string doc = emails[1];
+
+            string subject = "Order Number: " + order.OrderID.ToString("D8") + " From " + Shared.GetOrgName() + " has been processed.";
+            string[] toEmail =
+            [
+                        new(cust.Email)
+            ];
+            List<string> bcc = [confrimMail];
+
+            BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(order.OrderID), "Order"));
+            return Ok(new { message = "Order confirmed successfully." });
         }
     }
 

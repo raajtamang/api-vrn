@@ -5,6 +5,76 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/About": {
+      "post": {
+        "tags": [
+          "About"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "About"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "About"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Brand": {
       "get": {
         "tags": [
@@ -231,6 +301,150 @@
         }
       }
     },
+    "/api/ContactPage/create": {
+      "post": {
+        "tags": [
+          "ContactPage"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactPage"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactPage"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactPage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ContactPage": {
+      "get": {
+        "tags": [
+          "ContactPage"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ContactPage/update": {
+      "put": {
+        "tags": [
+          "ContactPage"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactPage"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactPage"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactPage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/CustomerInformation": {
+      "post": {
+        "tags": [
+          "CustomerInformation"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "CustomerInformation"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "CustomerInformation"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/DeliveryAddress": {
       "get": {
         "tags": [
@@ -349,6 +563,146 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Disclaimer": {
+      "post": {
+        "tags": [
+          "Disclaimer"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Disclaimer"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Disclaimer"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/FAQ": {
+      "post": {
+        "tags": [
+          "FAQ"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "FAQ"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "FAQ"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -493,6 +847,284 @@
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/ChangePassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ResellerLogin": {
+      "post": {
+        "tags": [
+          "Home"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/GetOrgDetail": {
+      "get": {
+        "tags": [
+          "Home"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/UpdateOrgDetail": {
+      "put": {
+        "tags": [
+          "Home"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "OrgName": {
+                    "type": "string"
+                  },
+                  "WEBEMailInfo": {
+                    "type": "string"
+                  },
+                  "WEBEMailOrders": {
+                    "type": "string"
+                  },
+                  "WEBOrgURL": {
+                    "type": "string"
+                  },
+                  "WEBPriceUsed": {
+                    "type": "string"
+                  },
+                  "WEBCustPriceUsed": {
+                    "type": "string"
+                  },
+                  "WEBStockOnly": {
+                    "type": "string"
+                  },
+                  "isFranchise": {
+                    "type": "string"
+                  },
+                  "WEBMinStock": {
+                    "type": "string"
+                  },
+                  "WEBNoImg": {
+                    "type": "boolean"
+                  },
+                  "WEBUseGroup": {
+                    "type": "string"
+                  },
+                  "WEBAutoOrder": {
+                    "type": "boolean"
+                  },
+                  "WEBProdOrderBy": {
+                    "type": "string"
+                  },
+                  "OrgRegNo": {
+                    "type": "string"
+                  },
+                  "OrgVATNo": {
+                    "type": "string"
+                  },
+                  "OrgTel1": {
+                    "type": "string"
+                  },
+                  "OrgTel2": {
+                    "type": "string"
+                  },
+                  "OrgFax": {
+                    "type": "string"
+                  },
+                  "OrgStreet1": {
+                    "type": "string"
+                  },
+                  "OrgStreet2": {
+                    "type": "string"
+                  },
+                  "OrgStreet3": {
+                    "type": "string"
+                  },
+                  "OrgStreet4": {
+                    "type": "string"
+                  },
+                  "OrgStreet5": {
+                    "type": "string"
+                  },
+                  "OrgProvince": {
+                    "type": "string"
+                  },
+                  "VATRegistered": {
+                    "type": "boolean"
+                  },
+                  "FromDoorID": {
+                    "type": "string"
+                  },
+                  "FinType": {
+                    "$ref": "#/components/schemas/FinType"
+                  },
+                  "OrgLength": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "OrgWidth": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "OrgHeight": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "OrgMass": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "WebsiteLogoURL": {
+                    "type": "string"
+                  },
+                  "Margin": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "Logo": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "OrgName": {
+                  "style": "form"
+                },
+                "WEBEMailInfo": {
+                  "style": "form"
+                },
+                "WEBEMailOrders": {
+                  "style": "form"
+                },
+                "WEBOrgURL": {
+                  "style": "form"
+                },
+                "WEBPriceUsed": {
+                  "style": "form"
+                },
+                "WEBCustPriceUsed": {
+                  "style": "form"
+                },
+                "WEBStockOnly": {
+                  "style": "form"
+                },
+                "isFranchise": {
+                  "style": "form"
+                },
+                "WEBMinStock": {
+                  "style": "form"
+                },
+                "WEBNoImg": {
+                  "style": "form"
+                },
+                "WEBUseGroup": {
+                  "style": "form"
+                },
+                "WEBAutoOrder": {
+                  "style": "form"
+                },
+                "WEBProdOrderBy": {
+                  "style": "form"
+                },
+                "OrgRegNo": {
+                  "style": "form"
+                },
+                "OrgVATNo": {
+                  "style": "form"
+                },
+                "OrgTel1": {
+                  "style": "form"
+                },
+                "OrgTel2": {
+                  "style": "form"
+                },
+                "OrgFax": {
+                  "style": "form"
+                },
+                "OrgStreet1": {
+                  "style": "form"
+                },
+                "OrgStreet2": {
+                  "style": "form"
+                },
+                "OrgStreet3": {
+                  "style": "form"
+                },
+                "OrgStreet4": {
+                  "style": "form"
+                },
+                "OrgStreet5": {
+                  "style": "form"
+                },
+                "OrgProvince": {
+                  "style": "form"
+                },
+                "VATRegistered": {
+                  "style": "form"
+                },
+                "FromDoorID": {
+                  "style": "form"
+                },
+                "FinType": {
+                  "style": "form"
+                },
+                "OrgLength": {
+                  "style": "form"
+                },
+                "OrgWidth": {
+                  "style": "form"
+                },
+                "OrgHeight": {
+                  "style": "form"
+                },
+                "OrgMass": {
+                  "style": "form"
+                },
+                "WebsiteLogoURL": {
+                  "style": "form"
+                },
+                "Margin": {
+                  "style": "form"
+                },
+                "Logo": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -839,18 +1471,6 @@
         }
       }
     },
-    "/api/NormalSpecialPage/GetCustomerNormalSpecialPageProducts": {
-      "get": {
-        "tags": [
-          "NormalSpecialPage"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Orders": {
       "get": {
         "tags": [
@@ -920,11 +1540,73 @@
         }
       }
     },
+    "/api/Orders/UpdateStatus": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderStatusDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Orders/OrderStatus": {
       "get": {
         "tags": [
           "Orders"
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Orders/ConvertToOrder": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertResellerOrderToOrderModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertResellerOrderToOrderModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertResellerOrderToOrderModel"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1160,6 +1842,76 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/PrivacyPolicy": {
+      "post": {
+        "tags": [
+          "PrivacyPolicy"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "PrivacyPolicy"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PrivacyPolicy"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -1658,6 +2410,76 @@
         }
       }
     },
+    "/api/SecurityPolicy": {
+      "post": {
+        "tags": [
+          "SecurityPolicy"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "SecurityPolicy"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "SecurityPolicy"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Shop/GetCartItems": {
       "get": {
         "tags": [
@@ -1898,6 +2720,65 @@
         }
       }
     },
+    "/api/Shop/RecordPayment": {
+      "get": {
+        "tags": [
+          "Shop"
+        ],
+        "parameters": [
+          {
+            "name": "OrderId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "PaymentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Shop/CancelOrder": {
+      "get": {
+        "tags": [
+          "Shop"
+        ],
+        "parameters": [
+          {
+            "name": "OrderId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "rejection_reason",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Shop/GetPackingSlip": {
       "get": {
         "tags": [
@@ -1936,28 +2817,6 @@
           {
             "name": "c",
             "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Shop/PaymentMade/{id}": {
-      "get": {
-        "tags": [
-          "Shop"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -2022,50 +2881,16 @@
         }
       }
     },
-    "/api/Shop/AutoCancelOrder": {
+    "/api/Shop/PaymentMade/{id}": {
       "get": {
         "tags": [
           "Shop"
         ],
         "parameters": [
           {
-            "name": "u",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "p",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Shop/ProcessOrders": {
-      "get": {
-        "tags": [
-          "Shop"
-        ],
-        "parameters": [
-          {
-            "name": "u",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "p",
-            "in": "query",
+            "name": "id",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -2323,6 +3148,76 @@
         }
       }
     },
+    "/api/Terms": {
+      "post": {
+        "tags": [
+          "Terms"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Terms"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Terms"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Users": {
       "get": {
         "tags": [
@@ -2459,6 +3354,76 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/WarrentyCenters": {
+      "post": {
+        "tags": [
+          "WarrentyCenters"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "WarrentyCenters"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "WarrentyCenters"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -2853,6 +3818,102 @@
           "shippingInstruction": {
             "type": "string",
             "nullable": true
+          },
+          "discountVoucher": {
+            "type": "string",
+            "nullable": true
+          },
+          "discount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContactPage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "facebook": {
+            "type": "string",
+            "nullable": true
+          },
+          "twitter": {
+            "type": "string",
+            "nullable": true
+          },
+          "youtube": {
+            "type": "string",
+            "nullable": true
+          },
+          "linkedIn": {
+            "type": "string",
+            "nullable": true
+          },
+          "instagram": {
+            "type": "string",
+            "nullable": true
+          },
+          "map_IFrame": {
+            "type": "string",
+            "nullable": true
+          },
+          "orgId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "created_Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_Date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConvertResellerOrderToOrderModel": {
+        "required": [
+          "resellerOrderId"
+        ],
+        "type": "object",
+        "properties": {
+          "resellerOrderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "paymentId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreatePageDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3218,6 +4279,16 @@
           }
         },
         "additionalProperties": false
+      },
+      "FinType": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "LoginModel": {
         "type": "object",
@@ -3810,6 +4881,34 @@
           "image": {
             "type": "string",
             "format": "binary",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateOrderStatusDTO": {
+        "required": [
+          "resellerOrderID",
+          "statusId"
+        ],
+        "type": "object",
+        "properties": {
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "resellerOrderID": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdatePageDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
             "nullable": true
           }
         },
