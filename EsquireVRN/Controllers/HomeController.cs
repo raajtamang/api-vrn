@@ -382,7 +382,7 @@ namespace EsquireVRN.Controllers
 
         [HttpPut]
         [Route("api/UpdateOrgDetail")]
-        [Authorize(Roles ="Reseller")]
+        [Authorize(Roles = "Reseller")]
         public IActionResult UpdateOrgDetail([FromForm] OrgWebDetail webDetail)
         {
             try
@@ -454,6 +454,11 @@ namespace EsquireVRN.Controllers
 
         }
 
-
+        [HttpGet("api/GetLogo")]
+        public IActionResult GetLogo()
+        {
+            var logo = Shared.GetOrgLogo();
+            return Ok(new { Logo = logo });
+        }
     }
 }

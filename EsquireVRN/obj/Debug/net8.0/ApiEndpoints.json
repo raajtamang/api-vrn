@@ -478,6 +478,16 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "GetLogo",
+    "RelativePath": "api/GetLogo",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
     "Method": "GetResellerProfile",
     "RelativePath": "api/GetOrgDetail",
     "HttpMethod": "GET",

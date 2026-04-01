@@ -3,6 +3,26 @@
   "WorkspaceRootPath": "D:\\dashboard\\VRN\\EsquireVRN\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\models\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\models\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\controllers\\warrentycenterscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\controllers\\warrentycenterscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\controllers\\privacypolicycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\controllers\\privacypolicycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -17,10 +37,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\controllers\\contactpagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\controllers\\contactpagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\controllers\\customerinformationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -47,19 +63,68 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "PrivacyPolicyController.cs",
-              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\PrivacyPolicyController.cs",
-              "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\PrivacyPolicyController.cs",
-              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\PrivacyPolicyController.cs",
-              "RelativeToolTip": "EsquireVRN\\Controllers\\PrivacyPolicyController.cs",
-              "ViewState": "AgIAADIAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\HomeController.cs",
+              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "EsquireVRN\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAAHoBAAAAAAAAAAAuwNABAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-01T10:11:02.975Z",
+              "WhenOpened": "2026-04-01T13:39:12.66Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Customer.cs",
+              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Models\\Customer.cs",
+              "RelativeDocumentMoniker": "EsquireVRN\\Models\\Customer.cs",
+              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Models\\Customer.cs",
+              "RelativeToolTip": "EsquireVRN\\Models\\Customer.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAAzwDQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-01T12:16:30.867Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UsersController.cs",
+              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\UsersController.cs",
+              "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\UsersController.cs",
+              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\UsersController.cs",
+              "RelativeToolTip": "EsquireVRN\\Controllers\\UsersController.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAYwCAAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-01T12:12:15.523Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "WarrentyCentersController.cs",
+              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\WarrentyCentersController.cs",
+              "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\WarrentyCentersController.cs",
+              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\WarrentyCentersController.cs",
+              "RelativeToolTip": "EsquireVRN\\Controllers\\WarrentyCentersController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-01T12:12:14.441Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PrivacyPolicyController.cs",
+              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\PrivacyPolicyController.cs",
+              "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\PrivacyPolicyController.cs",
+              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\PrivacyPolicyController.cs",
+              "RelativeToolTip": "EsquireVRN\\Controllers\\PrivacyPolicyController.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-01T10:11:02.975Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\appsettings.json",
               "RelativeDocumentMoniker": "EsquireVRN\\appsettings.json",
@@ -67,12 +132,11 @@
               "RelativeToolTip": "EsquireVRN\\appsettings.json",
               "ViewState": "AgIAAF8AAAAAAAAAAIAwwGsAAAABCAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-04-01T10:02:14.261Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-01T10:02:14.261Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 8,
               "Title": "ContactPageController.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\ContactPageController.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\ContactPageController.cs",
@@ -80,12 +144,11 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\ContactPageController.cs",
               "ViewState": "AgIAAB8AAAAAAAAAAAAQwCUAAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-01T08:52:45.437Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-01T08:52:45.437Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 10,
               "Title": "ConfirmModel.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Models\\ConfirmModel.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Models\\ConfirmModel.cs",
@@ -93,8 +156,7 @@
               "RelativeToolTip": "EsquireVRN\\Models\\ConfirmModel.cs",
               "ViewState": "AgIAAAgAAAAAAAAAAAAUwA4AAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-01T08:40:53.297Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-01T08:40:53.297Z"
             },
             {
               "$type": "Document",
@@ -104,14 +166,13 @@
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\OrdersController.cs",
               "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\OrdersController.cs",
               "RelativeToolTip": "EsquireVRN\\Controllers\\OrdersController.cs",
-              "ViewState": "AgIAADUAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAKgAAAAAAAAAAAAswLcAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-01T08:39:50.98Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-01T08:39:50.98Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "ShopController.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\ShopController.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\ShopController.cs",
@@ -119,12 +180,11 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\ShopController.cs",
               "ViewState": "AgIAAIgCAAAAAAAAAAAAAJECAABZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-01T07:58:05.655Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-01T07:58:05.655Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 11,
               "Title": "AboutController.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\AboutController.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\AboutController.cs",
@@ -132,12 +192,11 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\AboutController.cs",
               "ViewState": "AgIAABAAAAAAAAAAAAAQwCwAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-01T07:51:51.447Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-01T07:51:51.447Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 9,
               "Title": "CustomerInformationController.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\CustomerInformationController.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\CustomerInformationController.cs",
@@ -145,8 +204,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\CustomerInformationController.cs",
               "ViewState": "AgIAABwAAAAAAAAAAAAQwCsAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-25T06:12:40.081Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-25T06:12:40.081Z"
             }
           ]
         }
