@@ -1,6 +1,7 @@
 ﻿using EsquireVRN.Models;
 using EsquireVRN.Models.DTO;
 using EsquireVRN.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EsquireVRN.Controllers
@@ -9,27 +10,27 @@ namespace EsquireVRN.Controllers
     [ApiController]
     public class SecurityPolicyController : ControllerBase
     {
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CreatePageDto dto)
-        {
-            long orgId = Shared.GetOrgID();
-            var opage = await Shared.GetContentPageById(orgId, "security_policy");
-            if (opage != null)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new { error = "There is a security policy page. Please try editing if you want to make changes to it." });
-            }
-            var page = new ContentPage
-            {
-                Type = "security_policy",
-                OrgId = Shared.GetOrgID(),
-                Content = dto.Content,
-                Created_Date = DateTime.UtcNow
-            };
+        //[HttpPost]
+        //public async Task<IActionResult> Post([FromBody] CreatePageDto dto)
+        //{
+        //    long orgId = Shared.GetOrgID();
+        //    var opage = await Shared.GetContentPageById(orgId, "security_policy");
+        //    if (opage != null)
+        //    {
+        //        return StatusCode(StatusCodes.Status403Forbidden, new { error = "There is a security policy page. Please try editing if you want to make changes to it." });
+        //    }
+        //    var page = new ContentPage
+        //    {
+        //        Type = "security_policy",
+        //        OrgId = Shared.GetOrgID(),
+        //        Content = dto.Content,
+        //        Created_Date = DateTime.UtcNow
+        //    };
 
-            var id = await Shared.AddContentPage(page);
-            var npage = await Shared.GetContentPageById(orgId, "security_policy");
-            return Ok(npage?.Content);
-        }
+        //    var id = await Shared.AddContentPage(page);
+        //    var npage = await Shared.GetContentPageById(orgId, "security_policy");
+        //    return Ok(npage?.Content);
+        //}
 
         [HttpGet]
         // GET: api/pages/{id}
@@ -45,23 +46,39 @@ namespace EsquireVRN.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Reseller")]
         public async Task<IActionResult> Put([FromBody] UpdatePageDto dto)
         {
             long OrgId = Shared.GetOrgID();
             var existing = await Shared.GetContentPageById(OrgId, "security_policy");
 
             if (existing == null)
-                return NotFound(new { error = "Security policy page doesn't exist. Please try creating one." });
+            {
+                var page = new ContentPage
+                {
+                    Type = "security_policy",
+                    OrgId = Shared.GetOrgID(),
+                    Content = dto.Content,
+                    Created_Date = DateTime.UtcNow
+                };
 
-            existing.Type = "security_policy";
-            existing.OrgId = OrgId;
-            existing.Content = dto.Content;
-            existing.Updated_Date = DateTime.UtcNow;
+                var id = await Shared.AddContentPage(page);
+                var npage = await Shared.GetContentPageById(OrgId, "security_policy");
+                return Ok(npage?.Content);
+            }
+            else
+            {
 
-            var success = await Shared.UpdateContentPage(OrgId, "security_policy", existing);
+                existing.Type = "security_policy";
+                existing.OrgId = OrgId;
+                existing.Content = dto.Content;
+                existing.Updated_Date = DateTime.UtcNow;
 
-            var npage = await Shared.GetContentPageById(OrgId, "security_policy");
-            return Ok(npage?.Content);
+                var success = await Shared.UpdateContentPage(OrgId, "security_policy", existing);
+
+                var npage = await Shared.GetContentPageById(OrgId, "security_policy");
+                return Ok(npage?.Content);
+            }
         }
     }
 }

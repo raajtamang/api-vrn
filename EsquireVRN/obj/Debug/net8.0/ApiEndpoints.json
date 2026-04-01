@@ -1,22 +1,6 @@
 [
   {
     "ContainingType": "EsquireVRN.Controllers.AboutController",
-    "Method": "Post",
-    "RelativePath": "api/About",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.AboutController",
     "Method": "Get",
     "RelativePath": "api/About",
     "HttpMethod": "GET",
@@ -215,24 +199,8 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.ContactPageController",
-    "Method": "Create",
-    "RelativePath": "api/ContactPage/create",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "model",
-        "Type": "EsquireVRN.Models.ContactPage",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.ContactPageController",
     "Method": "Update",
-    "RelativePath": "api/ContactPage/update",
+    "RelativePath": "api/ContactPage",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -240,22 +208,6 @@
       {
         "Name": "model",
         "Type": "EsquireVRN.Models.ContactPage",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.CustomerInformationController",
-    "Method": "Post",
-    "RelativePath": "api/CustomerInformation",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
         "IsRequired": true
       }
     ],
@@ -384,22 +336,6 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.DisclaimerController",
-    "Method": "Post",
-    "RelativePath": "api/Disclaimer",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.DisclaimerController",
     "Method": "Get",
     "RelativePath": "api/Disclaimer",
     "HttpMethod": "GET",
@@ -419,22 +355,6 @@
       {
         "Name": "dto",
         "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.FAQController",
-    "Method": "Post",
-    "RelativePath": "api/FAQ",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
         "IsRequired": true
       }
     ],
@@ -975,22 +895,6 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.PrivacyPolicyController",
-    "Method": "Post",
-    "RelativePath": "api/PrivacyPolicy",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.PrivacyPolicyController",
     "Method": "Get",
     "RelativePath": "api/PrivacyPolicy",
     "HttpMethod": "GET",
@@ -1379,22 +1283,6 @@
       {
         "Name": "loginModel",
         "Type": "EsquireVRN.Models.LoginModel",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.SecurityPolicyController",
-    "Method": "Post",
-    "RelativePath": "api/SecurityPolicy",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
         "IsRequired": true
       }
     ],
@@ -1851,22 +1739,6 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.TermsController",
-    "Method": "Post",
-    "RelativePath": "api/Terms",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.TermsController",
     "Method": "Get",
     "RelativePath": "api/Terms",
     "HttpMethod": "GET",
@@ -2179,19 +2051,13 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "EsquireVRN.Controllers.WarrentyCentersController",
-    "Method": "Post",
-    "RelativePath": "api/WarrentyCenters",
-    "HttpMethod": "POST",
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "ValidateToken",
+    "RelativePath": "api/ValidateToken",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "EsquireVRN.Models.DTO.CreatePageDto",
-        "IsRequired": true
-      }
-    ],
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

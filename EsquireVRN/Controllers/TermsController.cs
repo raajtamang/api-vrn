@@ -1,6 +1,7 @@
 ﻿using EsquireVRN.Models;
 using EsquireVRN.Models.DTO;
 using EsquireVRN.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EsquireVRN.Controllers
@@ -9,27 +10,27 @@ namespace EsquireVRN.Controllers
     [ApiController]
     public class TermsController : ControllerBase
     {
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CreatePageDto dto)
-        {
-            long orgId = Shared.GetOrgID();
-            var opage = await Shared.GetContentPageById(orgId, "terms");
-            if (opage != null)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new { error = "There is a Terms & Conditions page. Please try editing if you want to make changes to it." });
-            }
-            var page = new ContentPage
-            {
-                Type = "terms",
-                OrgId = Shared.GetOrgID(),
-                Content = dto.Content,
-                Created_Date = DateTime.UtcNow
-            };
+        //[HttpPost]
+        //public async Task<IActionResult> Post([FromBody] CreatePageDto dto)
+        //{
+        //    long orgId = Shared.GetOrgID();
+        //    var opage = await Shared.GetContentPageById(orgId, "terms");
+        //    if (opage != null)
+        //    {
+        //        return StatusCode(StatusCodes.Status403Forbidden, new { error = "There is a Terms & Conditions page. Please try editing if you want to make changes to it." });
+        //    }
+        //    var page = new ContentPage
+        //    {
+        //        Type = "terms",
+        //        OrgId = Shared.GetOrgID(),
+        //        Content = dto.Content,
+        //        Created_Date = DateTime.UtcNow
+        //    };
 
-            var id = await Shared.AddContentPage(page);
-            var npage = await Shared.GetContentPageById(orgId, "terms");
-            return Ok(npage?.Content);
-        }
+        //    var id = await Shared.AddContentPage(page);
+        //    var npage = await Shared.GetContentPageById(orgId, "terms");
+        //    return Ok(npage?.Content);
+        //}
 
         [HttpGet]
         // GET: api/pages/{id}
@@ -45,23 +46,39 @@ namespace EsquireVRN.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Reseller")]
         public async Task<IActionResult> Put([FromBody] UpdatePageDto dto)
         {
             long OrgId = Shared.GetOrgID();
             var existing = await Shared.GetContentPageById(OrgId, "terms");
 
             if (existing == null)
-                return NotFound(new { error = "Terms & Conditions page doesn't exist. Please try creating one." });
+            {
+                var page = new ContentPage
+                {
+                    Type = "terms",
+                    OrgId = Shared.GetOrgID(),
+                    Content = dto.Content,
+                    Created_Date = DateTime.UtcNow
+                };
 
-            existing.Type = "terms";
-            existing.OrgId = OrgId;
-            existing.Content = dto.Content;
-            existing.Updated_Date = DateTime.UtcNow;
+                var id = await Shared.AddContentPage(page);
+                var npage = await Shared.GetContentPageById(OrgId, "terms");
+                return Ok(npage?.Content);
+            }
+            else
+            {
 
-            var success = await Shared.UpdateContentPage(OrgId, "terms", existing);
+                existing.Type = "terms";
+                existing.OrgId = OrgId;
+                existing.Content = dto.Content;
+                existing.Updated_Date = DateTime.UtcNow;
 
-            var npage = await Shared.GetContentPageById(OrgId, "terms");
-            return Ok(npage?.Content);
+                var success = await Shared.UpdateContentPage(OrgId, "terms", existing);
+
+                var npage = await Shared.GetContentPageById(OrgId, "terms");
+                return Ok(npage?.Content);
+            }
         }
     }
 }

@@ -460,5 +460,17 @@ namespace EsquireVRN.Controllers
             var logo = Shared.GetOrgLogo();
             return Ok(new { Logo = logo });
         }
+
+        [HttpGet]
+        [Route("api/ValidateToken")]
+        public IActionResult ValidateToken()
+        {
+
+            if (User.Identity.IsAuthenticated)
+            {
+                return Ok(new { message = "Token is valid" });
+            }
+            return Unauthorized(new { error = "Token is invalid" });
+        }
     }
 }
