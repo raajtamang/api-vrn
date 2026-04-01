@@ -38,8 +38,9 @@ namespace EsquireVRN.Controllers
             long orgId = Shared.GetOrgID();
             var data = Shared.GetContactPageById(orgId);
 
+            string? Content = null;
             if (data == null)
-                return NotFound(new { error = "Contact page contents doesn't exist. Please try creating one." });
+                return Ok(new { Content });
 
             return Ok(data);
         }

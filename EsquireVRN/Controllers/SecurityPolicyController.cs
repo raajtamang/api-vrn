@@ -39,8 +39,9 @@ namespace EsquireVRN.Controllers
             long orgId = Shared.GetOrgID();
             var page = await Shared.GetContentPageById(orgId, "security_policy");
 
+            string? Content = null;
             if (page == null)
-                return NotFound(new { error = "Security policy page doesn't exist. Please try creating one." });
+                return Ok(new { Content });
 
             return Ok(page.Content);
         }

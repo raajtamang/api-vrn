@@ -39,8 +39,9 @@ namespace EsquireVRN.Controllers
             long orgId = Shared.GetOrgID();
             var page = await Shared.GetContentPageById(orgId, "customer_information");
 
+            string? Content = null;
             if (page == null)
-                return NotFound(new { error = "Customer information page doesn't exist. Please try creating one." });
+                return Ok(new { Content });
 
             return Ok(new { content = page.Content });
         }

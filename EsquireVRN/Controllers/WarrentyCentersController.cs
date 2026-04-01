@@ -28,9 +28,9 @@ namespace EsquireVRN.Controllers
         {
             long orgId = Shared.GetOrgID();
             var page = await Shared.GetContentPageById(orgId, "warrenty_centers");
-
+            string? Content = null;
             if (page == null)
-                return NotFound(new { error = "Warrenty center page doesn't exist. Please try creating one." });
+                return Ok(new { Content });
 
             return Ok(page.Content);
         }

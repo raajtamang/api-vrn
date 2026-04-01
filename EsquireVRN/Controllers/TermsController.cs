@@ -39,8 +39,9 @@ namespace EsquireVRN.Controllers
             long orgId = Shared.GetOrgID();
             var page = await Shared.GetContentPageById(orgId, "terms");
 
+            string? Content = null;
             if (page == null)
-                return NotFound(new { error = "Terms & Conditions page doesn't exist. Please try creating one." });
+                return Ok(new { Content });
 
             return Ok(page.Content);
         }
