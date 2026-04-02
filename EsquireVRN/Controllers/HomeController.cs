@@ -357,7 +357,6 @@ namespace EsquireVRN.Controllers
                 {
                     Shared.RecordLogin(lDetails.CustID);
                 }
-                Shared.UpdateCartPrice(Convert.ToInt64(lDetails.CustID));
                 List<DeliveryAddress> deliveryAderess = Shared.GetDeliveryAddresses(Convert.ToInt64(lDetails.CustID));
                 bool hasDeliveryAddress = false;
                 if (deliveryAderess.Count() > 0)

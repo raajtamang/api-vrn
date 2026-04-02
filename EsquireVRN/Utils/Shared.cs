@@ -139,7 +139,7 @@ namespace EsquireVRN.Utils
             using (var db = new SqlConnection(connString))
             {
                 string queryStr = "Select x.Id,x.Name,x.Logo,x.Link,x.MetaTitle,x.MetaDescription,x.Description,x.Featured,x.Position from (Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo],[ManufURL] as Link,[MetaTitle],[MetaDescription],[Description],[Featured],[Position],(SELECT Count(p.ProdID) from Products p  where dbo.GetProductStockCount(p.ProdID, p.Status, N'A')>0 and p.ManufID=m.ManufID and p.OutputMe=1 and p.Active=1 and p.OrgID IN (94,380,932,546) and p.ImgURL IS NOT NULL and p.ImgURL!='') as ItemCount from [dbo].[Manufacturers]  m) as x where x.ItemCount>0 ORDER BY x.Name";
-                brands = db.Query<Brand>(queryStr).ToList();
+                brands = [.. db.Query<Brand>(queryStr)];
             }
             return brands;
         }
@@ -3278,11 +3278,11 @@ namespace EsquireVRN.Utils
                     string strSQL = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password, 
                     WEBCustomer.FirstName, WEBCustomer.Surname, Accounts.Active, Accounts.UsePrice,Accounts.DefaultBranch FROM WEBCustomer 
                     INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND (WEbCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (94,380,932,546) Order By WebCustomer.CustID" + @";
+                        username.Replace("\'", "\'\'") + "') AND (WEbCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID="+GetOrgID()+" Order By WebCustomer.CustID" + @";
                     SELECT WEBCustomer.Email, WEBCustomer.FraudulentUserID, Users.FirstName, Users.Surname, Organisation.WEBOrgURL
                     FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
                         Organisation ON Users.OrgID = Organisation.OrgID
-                    WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1)  AND Users.OrgID IN (94,380,932,546);";
+                    WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1)  AND Users.OrgID="+GetOrgID()+" AND User.UserType=N'Customer';";
 
                     var result = db.QueryMultiple(strSQL);
                     var uDetail = result.Read<LoginUDetail>().FirstOrDefault();
@@ -3336,9 +3336,9 @@ namespace EsquireVRN.Utils
                 string strSql = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password, 
                     WEBCustomer.FirstName, WEBCustomer.Surname,Accounts.AccountNo, Accounts.Active, Accounts.UsePrice, Accounts.DefaultBranch " +
                 "FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND ( WEBCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (94,380,932,546,473) Order By WEBCustomer.CustID" + @";
+                        username.Replace("\'", "\'\'") + "') AND ( WEBCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID="+GetOrgID()+" Order By WEBCustomer.CustID" + @";
                     SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
-                    Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1) AND Users.OrgID IN (94,380,932,546,473);";
+                    Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1) AND Users.OrgID="+GetOrgID()+ " AND User.UserType=N'Reseller';";
                 using (var connection = new SqlConnection(connString))
                 {
                     var result = connection.QueryMultiple(strSql);
@@ -4080,7 +4080,7 @@ namespace EsquireVRN.Utils
         //Account User
         public static PagedUsers GetCutomers(int pNum, int pSize, long AccountId)
         {
-            string query = "SELECT [CustID],[OrgID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[PostalCode],[DateCreated],[Title],[CellNo],[Notes],[PostalCountry],[PostalAddressIEID],[IdNo],[VatNo],[SendEmails],[ReferenceCode],[IsCommissionActive],[TimesToUseCommission],[FraudulentUserID],[Password] FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + " ORDER BY CreatedDated OFFSET " + ((pNum - 1) * pSize) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + ";";
+            string query = "SELECT [CustID],[OrgID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[PostalCode],[DateCreated],[Title],[CellNo],[Notes],[PostalCountry],[PostalAddressIEID],[IdNo],[VatNo],[SendEmails],[ReferenceCode],[IsCommissionActive],[TimesToUseCommission],[FraudulentUserID],[Password] FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + " ORDER BY DateCreated OFFSET " + ((pNum - 1) * pSize) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + ";";
             List<Customer> customers = [];
             int pageCount = 1;
             using (var db = new SqlConnection(connString))
