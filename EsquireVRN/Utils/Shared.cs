@@ -3278,11 +3278,11 @@ namespace EsquireVRN.Utils
                     string strSQL = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password, 
                     WEBCustomer.FirstName, WEBCustomer.Surname, Accounts.Active, Accounts.UsePrice,Accounts.DefaultBranch FROM WEBCustomer 
                     INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND (WEbCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID="+GetOrgID()+" Order By WebCustomer.CustID" + @";
+                        username.Replace("\'", "\'\'") + "') AND (WEbCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID="+GetOrgID()+ "  AND WebCustomer.UserType=N'Customer' Order By WebCustomer.CustID" + @";
                     SELECT WEBCustomer.Email, WEBCustomer.FraudulentUserID, Users.FirstName, Users.Surname, Organisation.WEBOrgURL
                     FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
                         Organisation ON Users.OrgID = Organisation.OrgID
-                    WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1)  AND Users.OrgID="+GetOrgID()+" AND User.UserType=N'Customer';";
+                    WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1)  AND Users.OrgID="+GetOrgID()+";";
 
                     var result = db.QueryMultiple(strSQL);
                     var uDetail = result.Read<LoginUDetail>().FirstOrDefault();
@@ -3336,9 +3336,9 @@ namespace EsquireVRN.Utils
                 string strSql = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password, 
                     WEBCustomer.FirstName, WEBCustomer.Surname,Accounts.AccountNo, Accounts.Active, Accounts.UsePrice, Accounts.DefaultBranch " +
                 "FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND ( WEBCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID="+GetOrgID()+" Order By WEBCustomer.CustID" + @";
+                        username.Replace("\'", "\'\'") + "') AND ( WEBCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID="+GetOrgID()+ " AND WEBCustomer.UserType=N'Reseller' Order By WEBCustomer.CustID" + @";
                     SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
-                    Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1) AND Users.OrgID="+GetOrgID()+ " AND User.UserType=N'Reseller';";
+                    Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1) AND Users.OrgID="+GetOrgID()+ ";";
                 using (var connection = new SqlConnection(connString))
                 {
                     var result = connection.QueryMultiple(strSql);
