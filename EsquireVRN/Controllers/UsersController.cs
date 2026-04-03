@@ -58,7 +58,7 @@ namespace EsquireVRN.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(long id, [FromBody] Customer customer)
         {
-            Customer oldCustomer = Shared.GetCustomer(id);
+            var oldCustomer = Shared.GetCustomer(id);
             if (oldCustomer == null)
             {
                 return StatusCode(404, new { error = "Customer doesn't exit. Please check and try again." });
@@ -105,11 +105,11 @@ namespace EsquireVRN.Controllers
             {
                 customer.Company = oldCustomer.Company;
             }
-            Customer newCustomer = Shared.UpdateCustomer(id, customer);
+            var newCustomer = Shared.UpdateCustomer(id, customer);
             string emailBody = "";
             string subject = "";
             bool sendEmail = false;
-            if (oldCustomer.Active == true && newCustomer.Active == false)
+            if (oldCustomer.Active == true && newCustomer?.Active == false)
             {
                 string EmailFormat = Shared.GetWebConfigKeyValue("AccountDeactivated");
                 emailBody = EmailFormat.Replace("name", newCustomer.Title + " " + newCustomer.FirstName + " " + newCustomer.Surname);
@@ -117,16 +117,16 @@ namespace EsquireVRN.Controllers
                 sendEmail = true;
 
             }
-            else if (oldCustomer.Active == false && newCustomer.Active == true)
+            else if (oldCustomer.Active == false && newCustomer?.Active == true)
             {
                 string EmailFormat = Shared.GetWebConfigKeyValue("AccountActivated");
                 emailBody = EmailFormat.Replace("{title}", oldCustomer.Title).Replace("{fname}", oldCustomer.FirstName).Replace("{sname}", oldCustomer.Surname).Replace("{url}", "https://esquire.co.za");
                 subject = "Your online account at Esquire Online Store is now activated!";
                 sendEmail = true;
             }
-            if (sendEmail)
+            if (sendEmail && !string.IsNullOrEmpty(newCustomer?.Email))
             {
-                List<string> toEmail = new() { newCustomer.Email };
+                List<string> toEmail = new() { newCustomer?.Email };
                 string fromEmail = "noreply@esquire.co.za";
                 BackgroundJob.Enqueue(() => Shared.SendMailHangFire(subject, emailBody, toEmail, fromEmail, false));
             }
@@ -137,7 +137,7 @@ namespace EsquireVRN.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
-            Customer oldCustomer = Shared.GetCustomer(id);
+            var oldCustomer = Shared.GetCustomer(id);
             if (oldCustomer == null)
             {
                 return StatusCode(404, new { error = "Customer doesn't exit. Please check and try again." });

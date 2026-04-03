@@ -2335,11 +2335,11 @@ namespace EsquireVRN.Utils
 
         public static Customer? UpdateCustomer(long id, Customer customer)
         {
-            string query = "UPDATE [dbo].[WEBCustomer] SET [FirstName] = @FirstName,[Surname] = @Surname,[Tel] = @Tel,[Tel2] = @Tel2,[Fax] = @Fax,[Email] = @Email,[Company]=@Company,[Title] = @Title,[CellNo] = @CellNo,[Notes] = @Notes,[IdNo] = @IdNo,[Password]=@Password,[PostalAdd]=@PostalAdd,[UserType]=@UserType,DateCreated=@DateCreated WHERE [CustID]=@CustomerId";
+            string query = "UPDATE [dbo].[WEBCustomer] SET [FirstName] = @FirstName,[Surname] = @Surname,[Tel] = @Tel,[Tel2] = @Tel2,[Fax] = @Fax,[Email] = @Email,[Company]=@Company,[Title] = @Title,[CellNo] = @CellNo,[Notes] = @Notes,[IdNo] = @IdNo,[Password]=@Password,[PostalAdd]=@PostalAdd,[UserType]=@UserType,DateCreated=@DateCreated,[PostalCode]=@PostalCode,[PostalType]=@PostalType,[PostalCountry]=@PostalCountry,[PostalAddressIEID]=@PostalAddressIEID,[VatNo]=@VatNo,[BankName]=@BankName,[AccountType]=@AccountType,[AccountNo]=@AccountNo,[BranchNo]=@BranchNo,[DefaultOrgBranchID]=@DefaultOrgBranchID,[CDTown]=@CDTown,[AccountNumber]=@AccountNumber WHERE [CustID]=@CustomerId";
 
             using (var db = new SqlConnection(connString))
             {
-                var values = new { customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.Password, customer.UserType, CustomerId = id, customer.DateCreated };
+                var values = new { customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.Password, customer.UserType, CustomerId = id, customer.DateCreated, customer.PostalCode, customer.PostalType, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown, customer.AccountNumber };
                 db.Execute(query, values);
                 return GetCustomer(id);
             }
@@ -2488,7 +2488,7 @@ namespace EsquireVRN.Utils
                 foreach (string m in to)
                     myMail.To.Add(new MailAddress(m));
                 if (from != "productquestions@improweb.com")
-                    myMail.CC.Add(new MailAddress(from)); 
+                    myMail.CC.Add(new MailAddress(from));
 
                 string strTitle = "";
                 if (includeSignature)
@@ -3278,11 +3278,11 @@ namespace EsquireVRN.Utils
                     string strSQL = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password, 
                     WEBCustomer.FirstName, WEBCustomer.Surname, Accounts.Active, Accounts.UsePrice,Accounts.DefaultBranch FROM WEBCustomer 
                     INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND (WEbCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID="+GetOrgID()+ "  AND WebCustomer.UserType=N'Customer' Order By WebCustomer.CustID" + @";
+                        username.Replace("\'", "\'\'") + "') AND (WEbCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID=" + GetOrgID() + "  AND WebCustomer.UserType=N'Customer' Order By WebCustomer.CustID" + @";
                     SELECT WEBCustomer.Email, WEBCustomer.FraudulentUserID, Users.FirstName, Users.Surname, Organisation.WEBOrgURL
                     FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
                         Organisation ON Users.OrgID = Organisation.OrgID
-                    WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1)  AND Users.OrgID="+GetOrgID()+";";
+                    WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1)  AND Users.OrgID=" + GetOrgID() + ";";
 
                     var result = db.QueryMultiple(strSQL);
                     var uDetail = result.Read<LoginUDetail>().FirstOrDefault();
@@ -3336,9 +3336,9 @@ namespace EsquireVRN.Utils
                 string strSql = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password, 
                     WEBCustomer.FirstName, WEBCustomer.Surname,Accounts.AccountNo, Accounts.Active, Accounts.UsePrice, Accounts.DefaultBranch " +
                 "FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND ( WEBCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID="+GetOrgID()+ " AND WEBCustomer.UserType=N'Reseller' Order By WEBCustomer.CustID" + @";
+                        username.Replace("\'", "\'\'") + "') AND ( WEBCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID=" + GetOrgID() + " AND WEBCustomer.UserType=N'Reseller' Order By WEBCustomer.CustID" + @";
                     SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
-                    Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1) AND Users.OrgID="+GetOrgID()+ ";";
+                    Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1) AND Users.OrgID=" + GetOrgID() + ";";
                 using (var connection = new SqlConnection(connString))
                 {
                     var result = connection.QueryMultiple(strSql);
@@ -4080,7 +4080,7 @@ namespace EsquireVRN.Utils
         //Account User
         public static PagedUsers GetCutomers(int pNum, int pSize, long AccountId)
         {
-            string query = "SELECT [CustID],[OrgID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[PostalCode],[DateCreated],[Title],[CellNo],[Notes],[PostalCountry],[PostalAddressIEID],[IdNo],[VatNo],[SendEmails],[ReferenceCode],[IsCommissionActive],[TimesToUseCommission],[FraudulentUserID],[Password] FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + " ORDER BY DateCreated OFFSET " + ((pNum - 1) * pSize) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + ";";
+            string query = "SELECT * FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + " ORDER BY DateCreated OFFSET " + ((pNum - 1) * pSize) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) FROM [dbo].[WEBCustomer] where [UserType]='Customer' AND AccountID=" + AccountId + ";";
             List<Customer> customers = [];
             int pageCount = 1;
             using (var db = new SqlConnection(connString))
@@ -4105,11 +4105,11 @@ namespace EsquireVRN.Utils
 
         internal static Customer? AddCustomer(Customer customer)
         {
-            string query = "INSERT INTO [dbo].[WEBCustomer] ([OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[Password],[DateCreated],[Title],[CellNo],[Notes],[IdNo],[SendEmails],[UserType],[CommissionOnProfit],[Active],[IsCommissionActive]) OUTPUT INSERTED.CustID VALUES (@OrgID,@AccountID,@FirstName,@Surname,@Tel,@Tel2,@Fax,@Email,@Company,@PostalAdd,@Password,@DateCreated,@Title,@CellNo,@Notes,@IdNo,@SendEmails,@UserType,@CommissionOnProfit,@Active,@IsCommissionActive)";
+            string query = "INSERT INTO [dbo].[WEBCustomer] ([OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[Password],[DateCreated],[Title],[CellNo],[Notes],[IdNo],[SendEmails],[UserType],[CommissionOnProfit],[Active],[IsCommissionActive],[PostalCountry],[PostalAddressIEID],[VatNo],[BankName],[AccountType],[AccountNo],[BranchNo],[DefaultOrgBranchID],[CDTown],[AccountNumber]) OUTPUT INSERTED.CustID VALUES (@OrgID,@AccountID,@FirstName,@Surname,@Tel,@Tel2,@Fax,@Email,@Company,@PostalAdd,@Password,@DateCreated,@Title,@CellNo,@Notes,@IdNo,@SendEmails,@UserType,@CommissionOnProfit,@Active,@IsCommissionActive,@PostalCountry,@PostalAddressIEID,@VatNo,@BankName,@AccountType,@AccountNo,@BranchNo,@DefaultOrgBranchID,@CDTown,@AccountNumber)";
 
             using (var db = new SqlConnection(connString))
             {
-                var values = new { customer.OrgID, customer.AccountID, customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Password, customer.DateCreated, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.SendEmails, customer.UserType, customer.CommissionOnProfit, customer.Active, customer.IsCommissionActive };
+                var values = new { customer.OrgID, customer.AccountID, customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Password, customer.DateCreated, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.SendEmails, customer.UserType, customer.CommissionOnProfit, customer.Active, customer.IsCommissionActive, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown, customer.AccountNumber };
                 var id = db.Query<long>(query, values).FirstOrDefault();
                 return GetCustomer(id);
             }
@@ -4295,7 +4295,7 @@ namespace EsquireVRN.Utils
                 {
                     string q2 = @"INSERT INTO [dbo].[ResellerOrderTracking] ([ResellerOrderID],[StatusID],[UpdatedDate],[UpdatedBy]) OUTPUT Inserted.Id VALUES (@OrderID,@NewStatusID,@ChangeDateTime,@ChangeBy)";
                     var values = new { OrderID = OrderId, NewStatusID = StatusId, ChangeDateTime = DateTime.UtcNow.AddHours(2), ChangeBy = Updater };
-                    var changeId = db.Query(q2, values).FirstOrDefault();                   
+                    var changeId = db.Query(q2, values).FirstOrDefault();
                 }
                 return true;
             }
@@ -4307,7 +4307,7 @@ namespace EsquireVRN.Utils
 
         public static void ChangeResellerOrderStatus(long resellerOrderID, int statusId, long userId)
         {
-            using var db=new SqlConnection(connString);
+            using var db = new SqlConnection(connString);
             string q2 = @"INSERT INTO [dbo].[ResellerOrderTracking] ([ResellerOrderID],[StatusID],[UpdatedDate],[UpdatedBy]) OUTPUT Inserted.Id VALUES (@OrderID,@NewStatusID,@ChangeDateTime,@ChangeBy)";
             var values = new { OrderID = resellerOrderID, NewStatusID = statusId, ChangeDateTime = DateTime.UtcNow.AddHours(2), ChangeBy = userId };
             var changeId = db.Query(q2, values).FirstOrDefault();
