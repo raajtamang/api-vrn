@@ -45,6 +45,7 @@ namespace EsquireVRN.Controllers
                 customer.CommissionOnProfit = false;
                 customer.Active = true;
                 customer.IsCommissionActive = false;
+                customer.UserType = "Customer";
                 return Ok(Shared.AddCustomer(customer));
             }
             catch (Exception ex)
@@ -95,7 +96,7 @@ namespace EsquireVRN.Controllers
             {
 
             }
-            customer.UserType = "Reseller";
+            customer.UserType = "Customer";
             if (customer.DateCreated == null)
             {
                 customer.DateCreated = oldCustomer.DateCreated;
