@@ -11,29 +11,7 @@ namespace EsquireVRN.Controllers
 
     public class FAQController : ControllerBase
     {
-        //[HttpPost]
-        //public async Task<IActionResult> Post([FromBody] CreatePageDto dto)
-        //{
-        //    long orgId = Shared.GetOrgID();
-        //    var opage = await Shared.GetContentPageById(orgId, "faq");
-        //    if (opage != null)
-        //    {
-        //        return StatusCode(StatusCodes.Status403Forbidden, new { error = "There is a FAQ page. Please try editing if you want to make changes to it." });
-        //    }
-        //    var page = new ContentPage
-        //    {
-        //        Type = "faq",
-        //        OrgId = Shared.GetOrgID(),
-        //        Content = dto.Content,
-        //        Created_Date = DateTime.UtcNow
-        //    };
-
-        //    var id = await Shared.AddContentPage(page);
-        //    var npage = await Shared.GetContentPageById(orgId, "faq");
-        //    return Ok(npage?.Content);
-        //}
-
-        [HttpGet]
+       [HttpGet]
         // GET: api/pages/{id}
         public async Task<IActionResult> Get()
         {
@@ -44,7 +22,8 @@ namespace EsquireVRN.Controllers
             if (page == null)
                 return Ok(new { Content });
 
-            return Ok(page.Content);
+            var FAQs = await Shared.GetAllPageContentFAQByPageId(page.Id);
+            return Ok(new { content = page.Content, id=page.Id, faqs = FAQs });
         }
 
         [HttpPut]

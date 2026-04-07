@@ -313,6 +313,123 @@
         }
       }
     },
+    "/api/ContentPageFAQ": {
+      "post": {
+        "tags": [
+          "ContentPageFAQ"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPageFAQ"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPageFAQ"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPageFAQ"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ContentPageFAQ/{page_id}": {
+      "get": {
+        "tags": [
+          "ContentPageFAQ"
+        ],
+        "parameters": [
+          {
+            "name": "page_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ContentPageFAQ/{id}": {
+      "put": {
+        "tags": [
+          "ContentPageFAQ"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPageFAQ"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPageFAQ"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPageFAQ"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ContentPageFAQ"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/CustomerInformation": {
       "get": {
         "tags": [
@@ -534,6 +651,47 @@
       "put": {
         "tags": [
           "FAQ"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/GeneralInformation": {
+      "get": {
+        "tags": [
+          "GeneralInformation"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "GeneralInformation"
         ],
         "requestBody": {
           "content": {
@@ -3637,6 +3795,14 @@
             "type": "integer",
             "format": "int64"
           },
+          "websiteName": {
+            "type": "string",
+            "nullable": true
+          },
+          "websiteDescription": {
+            "type": "string",
+            "nullable": true
+          },
           "created_Date": {
             "type": "string",
             "format": "date-time"
@@ -3645,6 +3811,41 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentPageFAQ": {
+        "required": [
+          "answer",
+          "pageId",
+          "question"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "question": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "answer": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "pageId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "created_Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_Date": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -3668,6 +3869,18 @@
         "additionalProperties": false
       },
       "Customer": {
+        "required": [
+          "cdTown",
+          "company",
+          "email",
+          "firstName",
+          "postalAdd",
+          "postalCode",
+          "postalCountry",
+          "surname",
+          "tel",
+          "title"
+        ],
         "type": "object",
         "properties": {
           "custID": {
@@ -3685,16 +3898,16 @@
             "nullable": true
           },
           "firstName": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "surname": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "tel": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "tel2": {
             "type": "string",
@@ -3705,20 +3918,20 @@
             "nullable": true
           },
           "email": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "company": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "postalAdd": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "postalCode": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "dateCreated": {
             "type": "string",
@@ -3726,8 +3939,8 @@
             "nullable": true
           },
           "title": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "cellNo": {
             "type": "string",
@@ -3742,8 +3955,8 @@
             "nullable": true
           },
           "postalCountry": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "postalAddressIEID": {
             "type": "string",
@@ -3835,8 +4048,8 @@
             "nullable": true
           },
           "cdTown": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "password": {
             "type": "string",
@@ -3844,10 +4057,6 @@
           },
           "markFradulent": {
             "type": "boolean",
-            "nullable": true
-          },
-          "accountNumber": {
-            "type": "string",
             "nullable": true
           }
         },

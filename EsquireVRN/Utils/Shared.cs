@@ -2335,11 +2335,11 @@ namespace EsquireVRN.Utils
 
         public static Customer? UpdateCustomer(long id, Customer customer)
         {
-            string query = "UPDATE [dbo].[WEBCustomer] SET [FirstName] = @FirstName,[Surname] = @Surname,[Tel] = @Tel,[Tel2] = @Tel2,[Fax] = @Fax,[Email] = @Email,[Company]=@Company,[Title] = @Title,[CellNo] = @CellNo,[Notes] = @Notes,[IdNo] = @IdNo,[Password]=@Password,[PostalAdd]=@PostalAdd,[UserType]=@UserType,DateCreated=@DateCreated,[PostalCode]=@PostalCode,[PostalType]=@PostalType,[PostalCountry]=@PostalCountry,[PostalAddressIEID]=@PostalAddressIEID,[VatNo]=@VatNo,[BankName]=@BankName,[AccountType]=@AccountType,[AccountNo]=@AccountNo,[BranchNo]=@BranchNo,[DefaultOrgBranchID]=@DefaultOrgBranchID,[CDTown]=@CDTown,[AccountNumber]=@AccountNumber WHERE [CustID]=@CustomerId";
+            string query = "UPDATE [dbo].[WEBCustomer] SET [FirstName] = @FirstName,[Surname] = @Surname,[Tel] = @Tel,[Tel2] = @Tel2,[Fax] = @Fax,[Email] = @Email,[Company]=@Company,[Title] = @Title,[CellNo] = @CellNo,[Notes] = @Notes,[IdNo] = @IdNo,[Password]=@Password,[PostalAdd]=@PostalAdd,[UserType]=@UserType,DateCreated=@DateCreated,[PostalCode]=@PostalCode,[PostalType]=@PostalType,[PostalCountry]=@PostalCountry,[PostalAddressIEID]=@PostalAddressIEID,[VatNo]=@VatNo,[BankName]=@BankName,[AccountType]=@AccountType,[AccountNo]=@AccountNo,[BranchNo]=@BranchNo,[DefaultOrgBranchID]=@DefaultOrgBranchID,[CDTown]=@CDTown WHERE [CustID]=@CustomerId";
 
             using (var db = new SqlConnection(connString))
             {
-                var values = new { customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.Password, customer.UserType, CustomerId = id, customer.DateCreated, customer.PostalCode, customer.PostalType, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown, customer.AccountNumber };
+                var values = new { customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.Password, customer.UserType, CustomerId = id, customer.DateCreated, customer.PostalCode, customer.PostalType, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown };
                 db.Execute(query, values);
                 return GetCustomer(id);
             }
@@ -4105,11 +4105,11 @@ namespace EsquireVRN.Utils
 
         internal static Customer? AddCustomer(Customer customer)
         {
-            string query = "INSERT INTO [dbo].[WEBCustomer] ([OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[Password],[DateCreated],[Title],[CellNo],[Notes],[IdNo],[SendEmails],[UserType],[CommissionOnProfit],[Active],[IsCommissionActive],[PostalCountry],[PostalAddressIEID],[VatNo],[BankName],[AccountType],[AccountNo],[BranchNo],[DefaultOrgBranchID],[CDTown],[AccountNumber]) OUTPUT INSERTED.CustID VALUES (@OrgID,@AccountID,@FirstName,@Surname,@Tel,@Tel2,@Fax,@Email,@Company,@PostalAdd,@Password,@DateCreated,@Title,@CellNo,@Notes,@IdNo,@SendEmails,@UserType,@CommissionOnProfit,@Active,@IsCommissionActive,@PostalCountry,@PostalAddressIEID,@VatNo,@BankName,@AccountType,@AccountNo,@BranchNo,@DefaultOrgBranchID,@CDTown,@AccountNumber)";
+            string query = "INSERT INTO [dbo].[WEBCustomer] ([OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[Password],[DateCreated],[Title],[CellNo],[Notes],[IdNo],[SendEmails],[UserType],[CommissionOnProfit],[Active],[IsCommissionActive],[PostalCountry],[PostalAddressIEID],[VatNo],[BankName],[AccountType],[AccountNo],[BranchNo],[DefaultOrgBranchID],[CDTown]) OUTPUT INSERTED.CustID VALUES (@OrgID,@AccountID,@FirstName,@Surname,@Tel,@Tel2,@Fax,@Email,@Company,@PostalAdd,@Password,@DateCreated,@Title,@CellNo,@Notes,@IdNo,@SendEmails,@UserType,@CommissionOnProfit,@Active,@IsCommissionActive,@PostalCountry,@PostalAddressIEID,@VatNo,@BankName,@AccountType,@AccountNo,@BranchNo,@DefaultOrgBranchID,@CDTown)";
 
             using (var db = new SqlConnection(connString))
             {
-                var values = new { customer.OrgID, customer.AccountID, customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Password, customer.DateCreated, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.SendEmails, customer.UserType, customer.CommissionOnProfit, customer.Active, customer.IsCommissionActive, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown, customer.AccountNumber };
+                var values = new { customer.OrgID, customer.AccountID, customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Password, customer.DateCreated, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.SendEmails, customer.UserType, customer.CommissionOnProfit, customer.Active, customer.IsCommissionActive, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown };
                 var id = db.Query<long>(query, values).FirstOrDefault();
                 return GetCustomer(id);
             }
@@ -4204,9 +4204,9 @@ namespace EsquireVRN.Utils
             using (IDbConnection db = new SqlConnection(connString))
             {
                 string query = @"INSERT INTO ContactPage 
-            (Phone, Email, Address, Facebook, Twitter, Youtube, LinkedIn, Instagram, Map_IFrame, OrgId, Created_Date)
+            (Phone, Email, Address, Facebook, Twitter, Youtube, LinkedIn, Instagram, Map_IFrame, OrgId,WebsiteName,WebsiteDescription,Created_Date)
             VALUES 
-            (@Phone, @Email, @Address, @Facebook, @Twitter, @Youtube, @LinkedIn, @Instagram, @Map_IFrame, @OrgId, @Created_Date)";
+            (@Phone, @Email, @Address, @Facebook, @Twitter, @Youtube, @LinkedIn, @Instagram, @Map_IFrame, @OrgId,@WebsiteName,@WebsiteDescription, @Created_Date)";
 
                 model.Created_Date = DateTime.Now;
 
@@ -4246,8 +4246,10 @@ namespace EsquireVRN.Utils
                 Instagram = @Instagram,
                 Map_IFrame = @Map_IFrame,
                 OrgId = @OrgId,
+                WebsiteName=@WebsiteName,
+                WebsiteDescription=@WebsiteDescription,
                 Updated_Date = @Updated_Date
-            WHERE OrgId = @OrgId";
+                WHERE OrgId = @OrgId";
 
                 model.Updated_Date = DateTime.Now;
 
@@ -4353,6 +4355,44 @@ namespace EsquireVRN.Utils
                 error = "Items with Product Codes (" + string.Join(',', stocklessProducts) + ") has invalid stock quantity. Please check and try again.";
             }
             return error;
+        }
+
+        //ContentPageFAQ
+        public static async Task<int> CreatePageContentFAQ(ContentPageFAQ model)
+        {
+            using var _db = new SqlConnection(connString);
+            var query = @"INSERT INTO ContentPageFAQ 
+                      (Question, Answer, PageId, Created_Date, Updated_Date)
+                      VALUES (@Question, @Answer, @PageId, @Created_Date, @Updated_Date)";
+
+            return await _db.ExecuteAsync(query, model);
+        }
+
+        public static async Task<IEnumerable<ContentPageFAQ>> GetAllPageContentFAQByPageId(long pageId)
+        {
+            using var _db = new SqlConnection(connString);
+            var query = "SELECT * FROM ContentPageFAQ Where PageId=@PageId";
+            return await _db.QueryAsync<ContentPageFAQ>(query, new { PageId = pageId });
+        }
+
+        public static async Task<int> UpdatePageContentFAQ(ContentPageFAQ model)
+        {
+            using var _db = new SqlConnection(connString);
+            var query = @"UPDATE ContentPageFAQ
+                      SET Question = @Question,
+                          Answer = @Answer,
+                          PageId = @PageId,
+                          Updated_Date = @Updated_Date
+                      WHERE Id = @Id";
+
+            return await _db.ExecuteAsync(query, model);
+        }
+
+        public static async Task<int> DeletePageContentFAQ(long id)
+        {
+            using var _db = new SqlConnection(connString);
+            var query = "DELETE FROM ContentPageFAQ WHERE Id = @Id";
+            return await _db.ExecuteAsync(query, new { Id = id });
         }
     }
 }

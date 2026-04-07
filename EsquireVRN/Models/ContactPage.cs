@@ -16,6 +16,8 @@ namespace EsquireVRN.Models
         public string? Instagram { get; set; }
         public string? Map_IFrame { get; set; }
         public long OrgId { get; set; }
+        public string? WebsiteName { get; set; }
+        public string? WebsiteDescription { get; set; }
         public DateTime Created_Date { get; set; } = DateTime.Now;
         public DateTime? Updated_Date { get; set; }
     }

@@ -10,29 +10,6 @@ namespace EsquireVRN.Controllers
     [ApiController]
     public class AboutController : Controller
     {
-        //[HttpPost]
-        //public async Task<IActionResult> Post([FromBody] CreatePageDto dto)
-        //{
-        //    long orgId = Shared.GetOrgID();
-        //    var opage = await Shared.GetContentPageById(orgId, "about");
-        //    if (opage != null)
-        //    {
-        //        return StatusCode(StatusCodes.Status403Forbidden, new { error = "There is a About page. Please try updating if you want to make changes to it." });
-        //    }
-
-        //    var page = new ContentPage
-        //    {
-        //        Type = "about",
-        //        OrgId = Shared.GetOrgID(),
-        //        Content = dto.Content,
-        //        Created_Date = DateTime.UtcNow
-        //    };
-
-        //    var id = await Shared.AddContentPage(page);
-        //    var npage = await Shared.GetContentPageById(orgId, "about");
-        //    return Ok(npage?.Content);
-        //}
-
         [HttpGet]
         // GET: api/pages/{id}
         public async Task<IActionResult> Get()
@@ -44,7 +21,8 @@ namespace EsquireVRN.Controllers
             if (page == null)
                 return Ok(new { Content });
 
-            return Ok(new { content = page.Content });
+            var FAQs = await Shared.GetAllPageContentFAQByPageId(page.Id);
+            return Ok(new { content = page.Content, id=page.Id, faqs = FAQs });
         }
 
         [HttpPut]
