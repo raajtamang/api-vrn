@@ -29,6 +29,7 @@ namespace EsquireVRN.Utils
             StaticConfig = _configuration;
             StaticEnv = env;
             connString = StaticConfig.GetConnectionString("DefaultConnection");
+            Seedr(connString);
         }
 
         public const string IE_DESC_ID = "5";
@@ -4393,6 +4394,58 @@ namespace EsquireVRN.Utils
             using var _db = new SqlConnection(connString);
             var query = "DELETE FROM ContentPageFAQ WHERE Id = @Id";
             return await _db.ExecuteAsync(query, new { Id = id });
+        }
+
+        private static void Seedr(string conString)
+        {
+            var db = new SqlConnection(conString);
+            var now = DateTime.UtcNow;
+
+            var dummyData = new List<ContentPage>
+            {   
+             new() {Type = "about",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
+             new() {Type = "customer_information",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
+             new() {Type = "disclaimer",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
+             new() {Type = "faq",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
+             new() {Type = "general_information",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
+             new() {Type = "customer_information",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
+             new() {Type = "privacy_policy",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
+             new() {Type = "security_policy",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
+             new() {Type = "terms",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
+             new() {Type = "warrenty_centers",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now}
+            };
+
+
+            string sql = @"INSERT INTO ContentPages (Type, OrgId, Content, Created_Date, Updated_Date)
+            VALUES (@Type, @OrgId, @Content, @Created_Date, @Updated_Date);";
+            db.Open();
+            string fetch_sql = "Select * from ContentPages Where OrgId=" + GetOrgID();
+            List<ContentPage> pages = db.Query<ContentPage>(fetch_sql).ToList();
+
+            var newData = dummyData
+            .Where(d => !pages.Any(e => e.Type == d.Type && e.OrgId == d.OrgId))
+            .ToList();
+
+            if (newData.Count > 0)
+            {
+                using var transaction = db.BeginTransaction();
+                try
+                {
+                    foreach (var item in dummyData)
+                    {
+                        db.Execute(sql, item, transaction);
+                    }
+
+                    transaction.Commit();
+                    db.Close();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    db.Close();
+                    //throw;
+                }
+            }
         }
     }
 }

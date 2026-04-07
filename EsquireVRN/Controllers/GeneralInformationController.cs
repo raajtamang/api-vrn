@@ -15,7 +15,7 @@ namespace EsquireVRN.Controllers
         public async Task<IActionResult> Get()
         {
             long orgId = Shared.GetOrgID();
-            var page = await Shared.GetContentPageById(orgId, "customer_information");
+            var page = await Shared.GetContentPageById(orgId, "general_information");
 
             string? Content = null;
             if (page == null)
@@ -30,7 +30,7 @@ namespace EsquireVRN.Controllers
         public async Task<IActionResult> Put([FromBody] UpdatePageDto dto)
         {
             long OrgId = Shared.GetOrgID();
-            var existing = await Shared.GetContentPageById(OrgId, "customer_information");
+            var existing = await Shared.GetContentPageById(OrgId, "general_information");
 
             if (existing == null)
             {
