@@ -2340,7 +2340,7 @@ namespace EsquireVRN.Utils
 
             using (var db = new SqlConnection(connString))
             {
-                var values = new { customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.Password, customer.UserType, CustomerId = id, customer.DateCreated, customer.PostalCode, customer.PostalType, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown };
+                var values = new { customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.Password, customer.UserType, CustomerId = id, customer.DateCreated, customer.PostalCode, customer.PostalType, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown};
                 db.Execute(query, values);
                 return GetCustomer(id);
             }
@@ -4106,11 +4106,11 @@ namespace EsquireVRN.Utils
 
         internal static Customer? AddCustomer(Customer customer)
         {
-            string query = "INSERT INTO [dbo].[WEBCustomer] ([OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[Password],[DateCreated],[Title],[CellNo],[Notes],[IdNo],[SendEmails],[UserType],[CommissionOnProfit],[Active],[IsCommissionActive],[PostalCountry],[PostalAddressIEID],[VatNo],[BankName],[AccountType],[AccountNo],[BranchNo],[DefaultOrgBranchID],[CDTown]) OUTPUT INSERTED.CustID VALUES (@OrgID,@AccountID,@FirstName,@Surname,@Tel,@Tel2,@Fax,@Email,@Company,@PostalAdd,@Password,@DateCreated,@Title,@CellNo,@Notes,@IdNo,@SendEmails,@UserType,@CommissionOnProfit,@Active,@IsCommissionActive,@PostalCountry,@PostalAddressIEID,@VatNo,@BankName,@AccountType,@AccountNo,@BranchNo,@DefaultOrgBranchID,@CDTown)";
+            string query = "INSERT INTO [dbo].[WEBCustomer] ([OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[Password],[DateCreated],[Title],[CellNo],[Notes],[IdNo],[SendEmails],[UserType],[CommissionOnProfit],[Active],[IsCommissionActive],[PostalCountry],[PostalAddressIEID],[VatNo],[BankName],[AccountType],[AccountNo],[BranchNo],[DefaultOrgBranchID],[CDTown],[PostalCode]) OUTPUT INSERTED.CustID VALUES (@OrgID,@AccountID,@FirstName,@Surname,@Tel,@Tel2,@Fax,@Email,@Company,@PostalAdd,@Password,@DateCreated,@Title,@CellNo,@Notes,@IdNo,@SendEmails,@UserType,@CommissionOnProfit,@Active,@IsCommissionActive,@PostalCountry,@PostalAddressIEID,@VatNo,@BankName,@AccountType,@AccountNo,@BranchNo,@DefaultOrgBranchID,@CDTown,@PostalCode)";
 
             using (var db = new SqlConnection(connString))
             {
-                var values = new { customer.OrgID, customer.AccountID, customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Password, customer.DateCreated, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.SendEmails, customer.UserType, customer.CommissionOnProfit, customer.Active, customer.IsCommissionActive, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown };
+                var values = new { customer.OrgID, customer.AccountID, customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Password, customer.DateCreated, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.SendEmails, customer.UserType, customer.CommissionOnProfit, customer.Active, customer.IsCommissionActive, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown,customer.PostalCode };
                 var id = db.Query<long>(query, values).FirstOrDefault();
                 return GetCustomer(id);
             }
