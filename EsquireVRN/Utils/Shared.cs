@@ -2325,7 +2325,7 @@ namespace EsquireVRN.Utils
 
         public static Customer? GetCustomer(long id)
         {
-            string query = "SELECT [CustID],[OrgID],[AccountID],[FirstName],[Surname],[Tel],[Tel2],[Fax],[Email],[Company],[PostalAdd],[PostalCode],[DateCreated],[Title],[CellNo],[Notes],[PostalCountry],[PostalAddressIEID],[IdNo],[VatNo],[SendEmails],[ReferenceCode],[IsCommissionActive],[TimesToUseCommission],[FraudulentUserID],[UserType] FROM [dbo].[WEBCustomer] where [CustID]=@CustomerId";
+            string query = "SELECT * FROM [dbo].[WEBCustomer] where [CustID]=@CustomerId";
             using (var db = new SqlConnection(connString))
             {
                 var values = new { CustomerId = id };
