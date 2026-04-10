@@ -36,8 +36,6 @@ namespace EsquireVRN.Models
         public double? OrgWidth { get; set; }
         public double? OrgHeight { get; set; }
         public double? OrgMass { get; set; }
-        public string? WebsiteLogoURL { get; set; }
         public decimal? Margin { get; set; }
-        public IFormFile? Logo { get; set; }
     }
 }

@@ -206,9 +206,84 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "model",
-        "Type": "EsquireVRN.Models.ContactPage",
-        "IsRequired": true
+        "Name": "Phone",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Email",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Address",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Facebook",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Twitter",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Youtube",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "LinkedIn",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Instagram",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Map_IFrame",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgId",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "WebsiteName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "WebsiteDescription",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Created_Date",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "Updated_Date",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "WebsiteLogoURL",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Logo",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -1867,174 +1942,9 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "OrgName",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBEMailInfo",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBEMailOrders",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBOrgURL",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBPriceUsed",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBCustPriceUsed",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBStockOnly",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "isFranchise",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBMinStock",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBNoImg",
-        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBUseGroup",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBAutoOrder",
-        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "WEBProdOrderBy",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgRegNo",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgVATNo",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgTel1",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgTel2",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgFax",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgStreet1",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgStreet2",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgStreet3",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgStreet4",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgStreet5",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgProvince",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "VATRegistered",
-        "Type": "System.Boolean",
-        "IsRequired": false
-      },
-      {
-        "Name": "FromDoorID",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "FinType",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgLength",
-        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgWidth",
-        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgHeight",
-        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "OrgMass",
-        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "WebsiteLogoURL",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "Margin",
-        "Type": "System.Nullable\u00601[[System.Decimal, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "Logo",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
-        "IsRequired": false
+        "Name": "webDetail",
+        "Type": "EsquireVRN.Models.OrgWebDetail",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []

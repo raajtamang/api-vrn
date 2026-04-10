@@ -1,11 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace EsquireVRN.Models
+﻿namespace EsquireVRN.Models.DTO
 {
-    public class ContactPage
+    public class ContactPageDTO
     {
-        [Key]
-        public long Id { get; set; }
         public string? Phone { get; set; }
         public string? Email { get; set; }
         public string? Address { get; set; }

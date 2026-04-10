@@ -2340,7 +2340,7 @@ namespace EsquireVRN.Utils
 
             using (var db = new SqlConnection(connString))
             {
-                var values = new { customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.Password, customer.UserType, CustomerId = id, customer.DateCreated, customer.PostalCode, customer.PostalType, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown};
+                var values = new { customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.Password, customer.UserType, CustomerId = id, customer.DateCreated, customer.PostalCode, customer.PostalType, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown };
                 db.Execute(query, values);
                 return GetCustomer(id);
             }
@@ -3525,7 +3525,7 @@ namespace EsquireVRN.Utils
             string returnValue = "";
             try
             {
-                string query = "Select WebsiteLogoURL from Organisation Where OrgId=" + Shared.GetOrgID();
+                string query = "Select WebsiteLogoURL from ContactPage Where OrgId=" + Shared.GetOrgID();
                 using (var db = new SqlConnection(connString))
                 {
                     returnValue = db.Query<string>(query).FirstOrDefault();
@@ -4110,7 +4110,7 @@ namespace EsquireVRN.Utils
 
             using (var db = new SqlConnection(connString))
             {
-                var values = new { customer.OrgID, customer.AccountID, customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Password, customer.DateCreated, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.SendEmails, customer.UserType, customer.CommissionOnProfit, customer.Active, customer.IsCommissionActive, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown,customer.PostalCode };
+                var values = new { customer.OrgID, customer.AccountID, customer.FirstName, customer.Surname, customer.Tel, customer.Tel2, customer.Fax, customer.Email, customer.Company, customer.PostalAdd, customer.Password, customer.DateCreated, customer.Title, customer.CellNo, customer.Notes, customer.IdNo, customer.SendEmails, customer.UserType, customer.CommissionOnProfit, customer.Active, customer.IsCommissionActive, customer.PostalCountry, customer.PostalAddressIEID, customer.VatNo, customer.BankName, customer.AccountType, customer.AccountNo, customer.BranchNo, customer.DefaultOrgBranchID, customer.CDTown, customer.PostalCode };
                 var id = db.Query<long>(query, values).FirstOrDefault();
                 return GetCustomer(id);
             }
@@ -4204,10 +4204,7 @@ namespace EsquireVRN.Utils
         {
             using (IDbConnection db = new SqlConnection(connString))
             {
-                string query = @"INSERT INTO ContactPage 
-            (Phone, Email, Address, Facebook, Twitter, Youtube, LinkedIn, Instagram, Map_IFrame, OrgId,WebsiteName,WebsiteDescription,Created_Date)
-            VALUES 
-            (@Phone, @Email, @Address, @Facebook, @Twitter, @Youtube, @LinkedIn, @Instagram, @Map_IFrame, @OrgId,@WebsiteName,@WebsiteDescription, @Created_Date)";
+                string query = @"INSERT INTO ContactPage (Phone, Email, Address, Facebook, Twitter, Youtube, LinkedIn, Instagram, Map_IFrame, OrgId,WebsiteName,WebsiteDescription,Created_Date,WebsiteLogoURL) VALUES  (@Phone, @Email, @Address, @Facebook, @Twitter, @Youtube, @LinkedIn, @Instagram, @Map_IFrame, @OrgId,@WebsiteName,@WebsiteDescription, @Created_Date,@WebsiteLogoURL)";
 
                 model.Created_Date = DateTime.Now;
 
@@ -4234,6 +4231,7 @@ namespace EsquireVRN.Utils
         }
         public static int UpdateContactPage(ContactPage model)
         {
+            model.Updated_Date = DateTime.Now;
             using (IDbConnection db = new SqlConnection(connString))
             {
                 string query = @"UPDATE ContactPage SET
@@ -4249,11 +4247,9 @@ namespace EsquireVRN.Utils
                 OrgId = @OrgId,
                 WebsiteName=@WebsiteName,
                 WebsiteDescription=@WebsiteDescription,
-                Updated_Date = @Updated_Date
+                Updated_Date = @Updated_Date,
+                WebsiteLogoURL=@WebsiteLogoURL
                 WHERE OrgId = @OrgId";
-
-                model.Updated_Date = DateTime.Now;
-
                 return db.Execute(query, model);
             }
         }
@@ -4402,7 +4398,7 @@ namespace EsquireVRN.Utils
             var now = DateTime.UtcNow;
 
             var dummyData = new List<ContentPage>
-            {   
+            {
              new() {Type = "about",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
              new() {Type = "customer_information",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},
              new() {Type = "disclaimer",OrgId = GetOrgID(),Content = "",Created_Date = now,Updated_Date = now},

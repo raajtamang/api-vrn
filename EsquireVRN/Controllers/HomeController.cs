@@ -382,67 +382,10 @@ namespace EsquireVRN.Controllers
         [HttpPut]
         [Route("api/UpdateOrgDetail")]
         [Authorize(Roles = "Reseller")]
-        public IActionResult UpdateOrgDetail([FromForm] OrgWebDetail webDetail)
+        public IActionResult UpdateOrgDetail([FromBody] OrgWebDetail webDetail)
         {
             try
-            {
-                var requestUrl = $"{Request.Scheme}://{Request.Host.Value}/";
-                string imgUrl = "";
-                if (!string.IsNullOrEmpty(webDetail.WebsiteLogoURL))
-                {
-                    imgUrl = webDetail.WebsiteLogoURL;
-                }
-
-                if (webDetail.Logo != null && webDetail.Logo.Length > 0)
-                {
-                    var fileSize = webDetail.Logo.Length;
-                    if ((fileSize / 1048576.0) > 5)
-                    {
-                        return StatusCode(400, "Image exceeds 5mb size limit.");
-                    }
-                    else
-                    {
-                        var folderName = Path.Combine("Resources", "Images");
-                        var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                        if (!Directory.Exists(pathToSave))
-                        {
-                            Directory.CreateDirectory(pathToSave);
-                        }
-                        string imgname = webDetail.Logo.FileName;
-                        var can_continue = false;
-                        var extension = Path.GetExtension(imgname);
-                        int i = 1;
-                        while (!can_continue)
-                        {
-                            bool imgExists = System.IO.File.Exists(Path.Combine(pathToSave, imgname));
-                            if (!imgExists)
-                            {
-                                can_continue = true;
-                            }
-                            if (imgExists)
-                            {
-                                if (imgname.Contains("-" + (i - 1) + extension))
-                                {
-                                    imgname = imgname.Replace("-" + (i - 1) + extension, "") + "-" + i + extension;
-                                }
-                                else
-                                {
-                                    imgname = imgname.Replace(extension, "") + "-" + i + extension;
-                                }
-                                i++;
-
-                            }
-                        }
-                        string filePath = Path.Combine(pathToSave, imgname.Replace(" ", "-"));
-                        using (FileStream fs = new FileStream(filePath, FileMode.Create))
-                        {
-                            webDetail.Logo.CopyTo(fs);
-                        }
-                        imgUrl = requestUrl + "Resources/Images/" + imgname.Replace(" ", "-");
-                    }
-
-                }
-                webDetail.WebsiteLogoURL = imgUrl;
+            {               
                 OrgWebDetail detail = Shared.UpdateOrgDetail(webDetail);
                 return Ok(detail);
             }
