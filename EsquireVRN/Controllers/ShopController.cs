@@ -683,9 +683,6 @@ namespace EsquireVRN.Controllers
         }
 
 
-
-
-
         [HttpGet]
         [Route("GetPackingSlip")]
         public IActionResult GetPackingSlip(long o, string? c)
@@ -786,107 +783,6 @@ namespace EsquireVRN.Controllers
 
             //doc.Close();
             return StatusCode(200, new { message = "Email resent successfully" });
-        }
-
-
-        [HttpGet]
-        [Route("OrderCanceled/{id}")]
-        public IActionResult OrderCanceled(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return StatusCode(401, "Invalid Reference Key.");
-            }
-
-            long OrderId = 0;
-            try
-            {
-                string reqId = id.Split('!')[1];
-                OrderId = Convert.ToInt64(reqId);
-
-            }
-            catch (Exception)
-            {
-                return StatusCode(401, "Invalid Reference Key.");
-            }
-            Order order = Shared.GetOrder(OrderId);
-
-            if (order == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new { error = "Order doesn't exist." });
-            }
-
-            string sql = "Update WebOrders Set StatusID=10,DistOrdStatus=6,Notes='',PayID=3 Where OrderID=" + OrderId;
-            using (var db = new SqlConnection(Shared.connString))
-            {
-                db.Execute(sql);
-            }
-
-            string changeby = "" + order.CustID;
-
-            Shared.UpdateOrderStatus(OrderId, 10, changeby);
-
-            return StatusCode(200, new { message = "Order has been cancelled." });
-        }
-
-        [HttpGet]
-        [Route("PaymentMade/{id}")]
-        public IActionResult PaymentMade(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return StatusCode(401, "Invalid Reference Key.");
-            }
-            long OrderId = 0;
-            try
-            {
-                string reqId = id.Split('!')[1];
-                OrderId = Convert.ToInt64(reqId);
-            }
-            catch
-            {
-                return StatusCode(401, "Invalid Reference Key.");
-            }
-            Order order = Shared.GetOrder(OrderId);
-
-            if (order == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new { error = "Order doesn't exist." });
-            }
-            var cust = Shared.GetCustomer(order.CustID);
-            if (cust == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new { error = "Customer doesn't exist." });
-            }
-
-            Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.OrgBranchID);
-            string confrimMail = branchDetail.BranchEMail;
-            string branchName = branchDetail.OrgBraShort;
-
-            string sql = "Update ResellerOrders Set StatusID=3,PayID=3,PaymentDate=N'" + DateTime.Now + "' Where ResellerOrderID=" + OrderId;
-            using (var db = new SqlConnection(Shared.connString))
-            {
-                db.Execute(sql);
-            }
-
-            string changeby = "" + order.CustID;
-            Shared.UpdateResellerOrderStatus(OrderId, 3, changeby);
-
-            Shared.ClearCartWithCustId(order.CustID);
-
-            List<string> emails = PrepareResellerOrderEmail(order.OrderID, cust);
-            string emailbody = emails[0];
-            string doc = emails[1];
-
-            string subject = "Order Number: " + order.OrderID.ToString("D8") + " From " + Shared.GetOrgName() + " has been processed.";
-            string[] toEmail =
-            [
-                        new(cust.Email)
-            ];
-            List<string> bcc = [confrimMail];
-
-            BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(order.OrderID), "Order"));
-            return Ok(new { message = "Order confirmed successfully." });
         }
     }
 

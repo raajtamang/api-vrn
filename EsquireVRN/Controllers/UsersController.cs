@@ -142,7 +142,7 @@ namespace EsquireVRN.Controllers
             {
                 return StatusCode(404, new { error = "Customer doesn't exit. Please check and try again." });
             }
-            List<Order> custOrders = Shared.GetCustomerOrders(id);
+            List<ResellerOrder> custOrders = Shared.GetCustomerOrders(id);
             if (custOrders.Count() > 0)
             {
                 return StatusCode(500, new { error = "No Delete (Orders against user)" });

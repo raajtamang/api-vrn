@@ -16,28 +16,43 @@ namespace EsquireVRN.Controllers
     public class OrdersController : ControllerBase
     {
         [HttpGet]
-        [Authorize(Roles = "Customer")]
-        public IActionResult Get()
+        [Authorize]
+        public IActionResult Get(int? page_number, int? page_size)
         {
-            long CustomerID = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
-            List<Order> orders = Shared.GetCustomerOrders(CustomerID);
-            return Ok(orders);
+
+            if (User.IsInRole("Reseller"))
+            {
+                var orders = Shared.GetResellerOrders(page_number, page_size);
+                return Ok(orders);
+
+            }
+            else if (User.IsInRole("Customer"))
+            {
+                long CustomerID = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
+                var orders = Shared.GetPagedCustomerOrders(CustomerID, page_number, page_size);
+                return Ok(orders);
+            }
+            else
+            {
+                return Ok(new PagedOrders() { page_count = 1, Orders = [] });
+            }
+
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(long id)
         {
-            Order order = Shared.GetOrder(id);
+            var order = Shared.GetResellerOrder(id);
             if (order == null)
             {
                 return NotFound(new { error = "Order doesn't exist." });
             }
             string PaymentDate = Shared.GetPaymentDate(id);
-            var customer = Shared.GetCustomer(order.CustID);
-            List<OrderItem> items = Shared.GetOrderItems(id);
+            var customer = Shared.GetCustomer(order.CustomerID);
+            List<ResellerOrderItems> items = Shared.GetResellerOrderItems(id);
             List<OrderTracking> trackings = Shared.GetResellerOrderTracking(id);
             DeliveryAddress deliverAddress = Shared.GetDeliveryAddress(order.ShippingID);
-            string PaymentReference = EncryptionService.EncryptString(order.OrderID + "-" + order.CustID);
+            string PaymentReference = EncryptionService.EncryptString(order.ResellerOrderID + "-" + order.CustomerID);
             return Ok(new { OrderDetails = order, OrderItems = items, OrderTrackings = trackings, ShippingDetails = deliverAddress, CustomerDetail = customer, PaymentDate, PaymentReference });
         }
 
@@ -90,7 +105,7 @@ namespace EsquireVRN.Controllers
                     string body = model.Detail.Replace("{CustomerTitle}", custome.Title).Replace("{CustomerFirstName}", custome.FirstName).Replace("{CustomerSurname}", custome.Surname).Replace("{NewStatus}", statusList[req.StatusId - 1]).Replace("{OrderNumber}", "" + oldOrder.ResellerOrderID).Replace("{OrderDate}", oldOrder.OrderdDate.ToString("yyyy/MM/dd hh:mm:ss tt")).Replace("{OrderPayMethod}", paymentType).Replace("{OrderDelivery}", oldOrder.DeliveryMethod).Replace("{FromOrgName}", Shared.GetOrgName());
 
                     string[] toEmail = [new(custome.Email)];
-                    List<string> bcc = ["4me.suren@gmail.com",confrimMail];
+                    List<string> bcc = ["4me.suren@gmail.com", confrimMail];
 
                     BackgroundJob.Enqueue(() => Shared.SendMail(header, body, toEmail, confrimMail, bcc, false));
                 }
@@ -550,6 +565,6 @@ namespace EsquireVRN.Controllers
             return returnString;
         }
 
-       
+
     }
 }

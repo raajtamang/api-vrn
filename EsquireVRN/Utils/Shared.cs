@@ -252,10 +252,9 @@ namespace EsquireVRN.Utils
             return returnProducts;
         }
 
-        public static OrgWebDetail GetOrgWebDetail()
+        public static OrgWebDetail? GetOrgWebDetail()
         {
             string strOrgID = "" + GetOrgID();
-            OrgWebDetail detail = new();
             using (IDbConnection db = new SqlConnection(connString))
             {
                 string strSQL = @"SELECT TOP (1) Organisation.OrgName, Organisation.WEBEMailInfo, Organisation.WEBEMailOrders, Organisation.WEBOrgURL, Organisation.WEBPriceUsed,Organisation.WEBCustPriceUsed, 
@@ -266,14 +265,14 @@ namespace EsquireVRN.Utils
                 FROM Organisation INNER JOIN
                       Users ON Organisation.OrgID = Users.OrgID
                 WHERE (Organisation.OrgID = " + strOrgID + ");";
-                detail = db.Query<OrgWebDetail>(strSQL).FirstOrDefault();
+                var detail = db.Query<OrgWebDetail>(strSQL).FirstOrDefault();
+                return detail;
             }
-            return detail;
         }
 
-        internal static OrgWebDetail UpdateOrgDetail(OrgWebDetail webDetail)
+        internal static OrgWebDetail? UpdateOrgDetail(OrgWebDetail webDetail)
         {
-            string query = "Update Organisation SET OrgRegNo=@OrgRegNo,OrgVATNo=@OrgVATNo,OrgTel1=@OrgTel1,OrgTel2=@OrgTel2,OrgFax=@OrgFax,OrgStreet1=@OrgStreet1,OrgStreet2=@OrgStreet2,OrgStreet3=@OrgStreet3,OrgStreet4=@OrgStreet4,OrgStreet5=@OrgStreet5,OrgProvince=@OrgProvince,OrgLength=@OrgLength,OrgWidth=@OrgWidth,OrgHeight=@OrgHeight,OrgMass=@OrgMass,VATRegistered=@VATRegistered,WEBPriceUsed=@WEBPriceUsed,WEBCustPriceUsed=@WEBCustPriceUsed,Margin=@Margin,WebsiteLogoURL=@WebsiteLogoURL Where OrgID=" + GetOrgID();
+            string query = "Update Organisation SET OrgRegNo=@OrgRegNo,OrgVATNo=@OrgVATNo,OrgTel1=@OrgTel1,OrgTel2=@OrgTel2,OrgFax=@OrgFax,OrgStreet1=@OrgStreet1,OrgStreet2=@OrgStreet2,OrgStreet3=@OrgStreet3,OrgStreet4=@OrgStreet4,OrgStreet5=@OrgStreet5,OrgProvince=@OrgProvince,OrgLength=@OrgLength,OrgWidth=@OrgWidth,OrgHeight=@OrgHeight,OrgMass=@OrgMass,VATRegistered=@VATRegistered,WEBPriceUsed=@WEBPriceUsed,WEBCustPriceUsed=@WEBCustPriceUsed,Margin=@Margin Where OrgID=" + GetOrgID();
             using (var db = new SqlConnection(connString))
             {
                 var values = new { webDetail.OrgRegNo, webDetail.OrgVATNo, webDetail.OrgTel1, webDetail.OrgTel2, webDetail.OrgFax, webDetail.OrgStreet1, webDetail.OrgStreet2, webDetail.OrgStreet3, webDetail.OrgStreet4, webDetail.OrgStreet5, webDetail.OrgProvince, webDetail.OrgLength, webDetail.OrgWidth, webDetail.OrgHeight, webDetail.OrgMass, webDetail.VATRegistered, webDetail.WEBPriceUsed, webDetail.WEBCustPriceUsed };
@@ -3769,15 +3768,70 @@ namespace EsquireVRN.Utils
         }
 
         //Order Section
-        public static List<Order> GetCustomerOrders(long CustID)
+
+        public static PagedOrders GetResellerOrders(int? pageNumber, int? pageSize)
         {
-            string query = "SELECT [OrderID],[CustID],[OrderDate],[DeliveryMethod],[DeliveryDescID],[DeliveryCost],[PayID],[StatusID],[Notes],[ShippingID],[OrgID],[OrgBranchID],[Insurance],[DeliveryQuoteID],[DistOrdStatus],[ReviewEmailSent],[DeliveryWaybillID],[CustRef],[DiscountRefCode],[Discount],[DeliveryID],[FinconId],[ShippingInstruction] FROM [dbo].[WEBOrders] Where CustID=@CustID and OrgID IN (94,380,932,546) ORDER BY OrderDate";
-            List<Order> orders = [];
+            int pNum = (pageNumber ?? 1);
+            int pSize = (pageSize ?? 12);
+            string query = "SELECT * FROM [dbo].[ResellerOrders] Where OrgId=" + GetOrgID() + " ORDER BY DateCreated OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY; SELECT COUNT(1) From ResellerOrders Where OrgId="+GetOrgID()+";";
+            List<ResellerOrder> orders = [];
+            int pageCount = 1;
             using (var db = new SqlConnection(connString))
             {
-                orders = [.. db.Query<Order>(query, new { CustID })];
+                var result = db.QueryMultiple(query);
+                orders = [.. result.Read<ResellerOrder>()];
+                long orderCount = result.ReadFirstOrDefault<long>();
+                pageCount = Convert.ToInt32(orderCount / pSize);
+                decimal pageDivision = Convert.ToDecimal(orderCount) / Convert.ToDecimal(pSize);
+                if ((pageDivision - pageCount) > 0)
+                {
+                    pageCount += 1;
+                }
+            }
+            PagedOrders pagedOrders = new()
+            {
+                page_count = pageCount,
+                Orders = orders
+            };
+            return pagedOrders;
+        }
+        public static List<ResellerOrder> GetCustomerOrders(long CustID)
+        {           
+            string query = "SELECT * FROM [dbo].[ResellerOrders] WHERE CustID=@CustID and OrgID=" + GetOrgID() + " ORDER BY DateCreated";
+            List<ResellerOrder> orders = [];
+            using (var db = new SqlConnection(connString))
+            {
+                orders = [.. db.Query<ResellerOrder>(query, new { CustID })];
             }
             return orders;
+        }
+
+        public static PagedOrders GetPagedCustomerOrders(long CustID, int? pageNumber, int? pageSize)
+        {
+            int pNum = (pageNumber ?? 1);
+            int pSize = (pageSize ?? 12);
+
+            string query = "SELECT * FROM [dbo].[ResellerOrders] WHERE CustID=@CustID and OrgID=" + GetOrgID() + " ORDER BY DateCreated OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;SELECT COUNT(1) FROM ResellerOrders WHERE CustID=@CustID and OrgID=" + GetOrgID() + ";";
+            List<ResellerOrder> orders = [];
+            int pageCount = 1;
+            using (var db = new SqlConnection(connString))
+            {
+                var result = db.QueryMultiple(query);
+                orders = [.. result.Read<ResellerOrder>()];
+                long orderCount = result.ReadFirstOrDefault<long>();
+                pageCount = Convert.ToInt32(orderCount / pSize);
+                decimal pageDivision = Convert.ToDecimal(orderCount) / Convert.ToDecimal(pSize);
+                if ((pageDivision - pageCount) > 0)
+                {
+                    pageCount += 1;
+                }
+            }
+            PagedOrders pagedOrders = new()
+            {
+                page_count = pageCount,
+                Orders = orders
+            };
+            return pagedOrders;
         }
 
         internal static List<OrderTracking> GetOrderTracking(long orderId)

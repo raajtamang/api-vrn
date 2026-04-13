@@ -385,7 +385,53 @@ namespace EsquireVRN.Controllers
         public IActionResult UpdateOrgDetail([FromBody] OrgWebDetail webDetail)
         {
             try
-            {               
+            {
+                var oDetail = Shared.GetOrgWebDetail();
+                if (string.IsNullOrEmpty(webDetail.OrgRegNo))
+                {
+                    webDetail.OrgRegNo = oDetail?.OrgRegNo;
+                }
+                if (string.IsNullOrEmpty(webDetail.OrgVATNo))
+                {
+                    webDetail.OrgVATNo = oDetail?.OrgVATNo;
+                }
+                if (string.IsNullOrWhiteSpace(webDetail.OrgTel2))
+                {
+                    webDetail.OrgTel2= oDetail?.OrgTel2;
+                }
+                if (string.IsNullOrWhiteSpace(webDetail.OrgFax))
+                {
+                    webDetail.OrgFax = oDetail?.OrgFax;
+                }
+
+                if (string.IsNullOrWhiteSpace(webDetail.OrgStreet1))
+                {
+                    webDetail.OrgStreet1 = oDetail?.OrgStreet1;
+                }
+                if (string.IsNullOrWhiteSpace(webDetail.OrgStreet2))
+                {
+                    webDetail.OrgStreet2 = oDetail?.OrgStreet2;
+                }
+                if (string.IsNullOrWhiteSpace(webDetail.OrgStreet3))
+                {
+                    webDetail.OrgStreet3 = oDetail?.OrgStreet3;
+                }
+                if (string.IsNullOrWhiteSpace(webDetail.OrgStreet4))
+                {
+                    webDetail.OrgStreet4 = oDetail?.OrgStreet4;
+                }
+                if (string.IsNullOrWhiteSpace(webDetail.OrgStreet5))
+                {
+                    webDetail.OrgStreet5 = oDetail?.OrgStreet5;
+                }
+                if (string.IsNullOrWhiteSpace(webDetail.OrgProvince))
+                {
+                    webDetail.OrgProvince = oDetail?.OrgProvince;
+                }
+                if (webDetail.VATRegistered==null)
+                {
+                    webDetail.VATRegistered = oDetail?.VATRegistered;
+                }
                 OrgWebDetail detail = Shared.UpdateOrgDetail(webDetail);
                 return Ok(detail);
             }

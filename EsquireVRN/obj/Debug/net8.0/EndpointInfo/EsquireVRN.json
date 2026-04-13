@@ -1399,6 +1399,24 @@
         "tags": [
           "Orders"
         ],
+        "parameters": [
+          {
+            "name": "page_number",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -2712,50 +2730,6 @@
           {
             "name": "email",
             "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Shop/OrderCanceled/{id}": {
-      "get": {
-        "tags": [
-          "Shop"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Shop/PaymentMade/{id}": {
-      "get": {
-        "tags": [
-          "Shop"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -4223,6 +4197,16 @@
         "additionalProperties": false
       },
       "OrgWebDetail": {
+        "required": [
+          "margin",
+          "orgHeight",
+          "orgLength",
+          "orgMass",
+          "orgTel1",
+          "orgWidth",
+          "webCustPriceUsed",
+          "webPriceUsed"
+        ],
         "type": "object",
         "properties": {
           "orgName": {
@@ -4242,12 +4226,12 @@
             "nullable": true
           },
           "webPriceUsed": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "webCustPriceUsed": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "webStockOnly": {
             "type": "string",
@@ -4286,8 +4270,8 @@
             "nullable": true
           },
           "orgTel1": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "orgTel2": {
             "type": "string",
@@ -4322,10 +4306,7 @@
             "nullable": true
           },
           "vatRegistered": {
-            "type": "boolean"
-          },
-          "fromDoorID": {
-            "type": "string",
+            "type": "boolean",
             "nullable": true
           },
           "finType": {
@@ -4333,28 +4314,23 @@
           },
           "orgLength": {
             "type": "number",
-            "format": "double",
-            "nullable": true
+            "format": "double"
           },
           "orgWidth": {
             "type": "number",
-            "format": "double",
-            "nullable": true
+            "format": "double"
           },
           "orgHeight": {
             "type": "number",
-            "format": "double",
-            "nullable": true
+            "format": "double"
           },
           "orgMass": {
             "type": "number",
-            "format": "double",
-            "nullable": true
+            "format": "double"
           },
           "margin": {
             "type": "number",
-            "format": "double",
-            "nullable": true
+            "format": "double"
           }
         },
         "additionalProperties": false
