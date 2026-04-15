@@ -275,7 +275,7 @@ namespace EsquireVRN.Utils
             string query = "Update Organisation SET OrgRegNo=@OrgRegNo,OrgVATNo=@OrgVATNo,OrgTel1=@OrgTel1,OrgTel2=@OrgTel2,OrgFax=@OrgFax,OrgStreet1=@OrgStreet1,OrgStreet2=@OrgStreet2,OrgStreet3=@OrgStreet3,OrgStreet4=@OrgStreet4,OrgStreet5=@OrgStreet5,OrgProvince=@OrgProvince,OrgLength=@OrgLength,OrgWidth=@OrgWidth,OrgHeight=@OrgHeight,OrgMass=@OrgMass,VATRegistered=@VATRegistered,WEBPriceUsed=@WEBPriceUsed,WEBCustPriceUsed=@WEBCustPriceUsed,Margin=@Margin Where OrgID=" + GetOrgID();
             using (var db = new SqlConnection(connString))
             {
-                var values = new { webDetail.OrgRegNo, webDetail.OrgVATNo, webDetail.OrgTel1, webDetail.OrgTel2, webDetail.OrgFax, webDetail.OrgStreet1, webDetail.OrgStreet2, webDetail.OrgStreet3, webDetail.OrgStreet4, webDetail.OrgStreet5, webDetail.OrgProvince, webDetail.OrgLength, webDetail.OrgWidth, webDetail.OrgHeight, webDetail.OrgMass, webDetail.VATRegistered, webDetail.WEBPriceUsed, webDetail.WEBCustPriceUsed };
+                var values = new { webDetail.OrgRegNo, webDetail.OrgVATNo, webDetail.OrgTel1, webDetail.OrgTel2, webDetail.OrgFax, webDetail.OrgStreet1, webDetail.OrgStreet2, webDetail.OrgStreet3, webDetail.OrgStreet4, webDetail.OrgStreet5, webDetail.OrgProvince, webDetail.OrgLength, webDetail.OrgWidth, webDetail.OrgHeight, webDetail.OrgMass, webDetail.VATRegistered, webDetail.WEBPriceUsed, webDetail.WEBCustPriceUsed ,webDetail.Margin};
                 db.Execute(query, values);
                 var orgWebDetail = GetOrgWebDetail();
                 return orgWebDetail;
