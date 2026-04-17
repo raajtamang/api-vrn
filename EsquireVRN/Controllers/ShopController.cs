@@ -266,9 +266,7 @@ namespace EsquireVRN.Controllers
                 {
                     return StatusCode(422, new { result = iProducts });
                 }
-
-
-
+                
                 Customer CustomerDetails = Shared.GetCustomer(custId);
                 OrgWebDetail orgDetails = Shared.GetOrgWebDetail();
                 List<BankDetails> bandetails = Shared.GetBankDetails();

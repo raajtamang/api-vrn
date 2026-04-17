@@ -71,7 +71,7 @@ namespace EsquireVRN.Controllers
             {
                 hasDeliveryAddress = true;
             }
-            return Ok(new { token, name = lDetails.FirstName, HasDeliveryAddress = hasDeliveryAddress });
+            return Ok(new { token, name = lDetails.FirstName, HasDeliveryAddress = hasDeliveryAddress,UserID=lDetails.CustID });
         }
 
         [HttpPost]
@@ -363,7 +363,7 @@ namespace EsquireVRN.Controllers
                 {
                     hasDeliveryAddress = true;
                 }
-                return Ok(new { token, name = lDetails.FirstName, HasDeliveryAddress = hasDeliveryAddress, AccountNumber = lDetails.AccountNumber });
+                return Ok(new { token, name = lDetails.FirstName, HasDeliveryAddress = hasDeliveryAddress, AccountNumber = lDetails.AccountNumber, UserID = lDetails.CustID });
             }
             catch (Exception ex)
             {
