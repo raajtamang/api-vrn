@@ -318,14 +318,17 @@ namespace EsquireVRN.Controllers
 
                 string strBraID = "" + confirmModel.NearestBranchId;
                 string strOrdID = "";
-                string strCost = "";
+                string strCost = "0.00";
                 string custRef = "";
                 string strShippingInstruction = "";
                 if (!string.IsNullOrEmpty(confirmModel.ShippingInstruction))
                 {
                     strShippingInstruction = confirmModel.ShippingInstruction;
                 }
-                strCost = confirmModel.DeliveryCharge.ToString("0.00").Replace(",", ".");
+                if (confirmModel.DeliveryCharge > 0)
+                {
+                    strCost = confirmModel.DeliveryCharge.ToString("0.00").Replace(",", ".");
+                }
 
                 if (!string.IsNullOrWhiteSpace(confirmModel.CustRef))
                 {
@@ -372,13 +375,13 @@ namespace EsquireVRN.Controllers
                 {
                     discount = Convert.ToDecimal(confirmModel.Discount);
                 }
-                strSQL = "INSERT INTO ResellerOrders (CustID, DeliveryMethod, DeliveryDescID, DeliveryCost, PayID, " +
-                 "ShippingID, OrgID, OrgBranchID, DeliveryQuoteID, Notes, Discount,DiscountVoucher,DeliveryId,ShippingInstruction,StatusID) VALUES " +
+                strSQL = "INSERT INTO ResellerOrders (CustomerID, DeliveryMethod, DeliveryDescID, DeliveryCost, PayID, " +
+                 "ShippingID, OrgID, NearestBranchId, DeliveryQuoteID, Notes, Discount,DiscountVoucher,DeliveryID,ShippingInstruction,StatusID,DateCreated) VALUES " +
                  "(" + CustomerID + ", N'" +
                  details.DeliveryDesc.Replace("'", "''") + "'," +
                  details.DeliveryDescID.ToString() + "," + strCost + "," + confirmModel.PaymentId + "," + strShipID + "," + Shared.GetOrgID() +
                  "," + strBraID + ",N'" + strDeliveryQuoteId + "', N'" + notes + "'," +
-                discount + ",N'" + confirmModel.DiscountVoucher + ",N'" + details.DeliveryID + "',N'" + strShippingInstruction + "',2); SELECT SCOPE_IDENTITY();";
+                discount + ",N'" + confirmModel.DiscountVoucher + ",N'" + details.DeliveryID + "',N'" + strShippingInstruction + "',2,N'"+DateTime.Now+"'); SELECT SCOPE_IDENTITY();";
                 if (Conn.State == ConnectionState.Closed)
                 {
                     Conn.Open();
