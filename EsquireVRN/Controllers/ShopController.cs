@@ -381,7 +381,7 @@ namespace EsquireVRN.Controllers
                  details.DeliveryDesc.Replace("'", "''") + "'," +
                  details.DeliveryDescID.ToString() + "," + strCost + "," + confirmModel.PaymentId + "," + strShipID + "," + Shared.GetOrgID() +
                  "," + strBraID + ",N'" + strDeliveryQuoteId + "', N'" + notes + "'," +
-                discount + ",N'" + confirmModel.DiscountVoucher + ",N'" + details.DeliveryID + "',N'" + strShippingInstruction + "',2,N'"+DateTime.Now+"'); SELECT SCOPE_IDENTITY();";
+                discount + ",N'" + confirmModel.DiscountVoucher + "',N'" + details.DeliveryID + "',N'" + strShippingInstruction + "',2,N'"+DateTime.Now+"'); SELECT SCOPE_IDENTITY();";
                 if (Conn.State == ConnectionState.Closed)
                 {
                     Conn.Open();
