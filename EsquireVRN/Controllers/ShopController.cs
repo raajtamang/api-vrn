@@ -238,7 +238,7 @@ namespace EsquireVRN.Controllers
                     return StatusCode(500, new { error = "Something went wrong with the servers. Please try again. If error persists please contact the administrators." });
                 }
 
-                List<InactiveProducts> iProducts = new();
+                List<InactiveProducts> iProducts = [];
                 foreach (var item in cartItems)
                 {
                     var newCheck = await Shared.CheckProductStatus(connectId, item.ProdCode);
@@ -339,8 +339,8 @@ namespace EsquireVRN.Controllers
                 string strSQL = "";
                 long CustomerID = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
                 strSQL = @"SELECT ResellerWEBBasket.*, Products.PurchasePrice 
-                            FROM WEBBasket INNER JOIN Products ON WEBBasket.ProdID = Products.ProdID
-                            WHERE WEBBasket.OrgID=" + Shared.GetOrgID() + " AND WEBBasket.CustId=" + CustomerID;
+                            FROM ResellerWEBBasket INNER JOIN Products ON ResellerWEBBasket.ProdID = Products.ProdID
+                            WHERE ResellerWEBBasket.OrgID=" + Shared.GetOrgID() + " AND ResellerWEBBasket.CustId=" + CustomerID;
                 DataTable dtBasket = new DataTable();
                 using (SqlDataAdapter adapter = new SqlDataAdapter(strSQL, Shared.connString))
                 {

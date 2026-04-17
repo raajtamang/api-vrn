@@ -3,6 +3,6 @@
     public class PagedOrders
     {
         public int page_count { get; set; } = 1;
-        public List<ResellerOrder>? Orders { get; set; }
+        public List<OrderWithCustomer>? Orders { get; set; }
     }
 }

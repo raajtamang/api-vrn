@@ -12,29 +12,24 @@ namespace EsquireVRN.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class OrdersController : ControllerBase
     {
         [HttpGet]
-        [Authorize]
-        public IActionResult Get(int? page_number, int? page_size)
+        //[Authorize]
+        public IActionResult Get(int? page_number, int? page_size, string? search,string?start_date,string?end_date)
         {
 
-            if (User.IsInRole("Reseller"))
-            {
-                var orders = Shared.GetResellerOrders(page_number, page_size);
-                return Ok(orders);
-
-            }
-            else if (User.IsInRole("Customer"))
+            if (User.IsInRole("Customer"))
             {
                 long CustomerID = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
-                var orders = Shared.GetPagedCustomerOrders(CustomerID, page_number, page_size);
+                var orders = Shared.GetPagedCustomerOrders(CustomerID, page_number, page_size, search,start_date,end_date);
                 return Ok(orders);
             }
             else
             {
-                return Ok(new PagedOrders() { page_count = 1, Orders = [] });
+                var orders = Shared.GetResellerOrders(page_number, page_size, search, start_date, end_date);
+                return Ok(orders);
             }
 
         }

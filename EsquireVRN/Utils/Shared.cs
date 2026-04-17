@@ -275,7 +275,7 @@ namespace EsquireVRN.Utils
             string query = "Update Organisation SET OrgRegNo=@OrgRegNo,OrgVATNo=@OrgVATNo,OrgTel1=@OrgTel1,OrgTel2=@OrgTel2,OrgFax=@OrgFax,OrgStreet1=@OrgStreet1,OrgStreet2=@OrgStreet2,OrgStreet3=@OrgStreet3,OrgStreet4=@OrgStreet4,OrgStreet5=@OrgStreet5,OrgProvince=@OrgProvince,OrgLength=@OrgLength,OrgWidth=@OrgWidth,OrgHeight=@OrgHeight,OrgMass=@OrgMass,VATRegistered=@VATRegistered,WEBPriceUsed=@WEBPriceUsed,WEBCustPriceUsed=@WEBCustPriceUsed,Margin=@Margin Where OrgID=" + GetOrgID();
             using (var db = new SqlConnection(connString))
             {
-                var values = new { webDetail.OrgRegNo, webDetail.OrgVATNo, webDetail.OrgTel1, webDetail.OrgTel2, webDetail.OrgFax, webDetail.OrgStreet1, webDetail.OrgStreet2, webDetail.OrgStreet3, webDetail.OrgStreet4, webDetail.OrgStreet5, webDetail.OrgProvince, webDetail.OrgLength, webDetail.OrgWidth, webDetail.OrgHeight, webDetail.OrgMass, webDetail.VATRegistered, webDetail.WEBPriceUsed, webDetail.WEBCustPriceUsed ,webDetail.Margin};
+                var values = new { webDetail.OrgRegNo, webDetail.OrgVATNo, webDetail.OrgTel1, webDetail.OrgTel2, webDetail.OrgFax, webDetail.OrgStreet1, webDetail.OrgStreet2, webDetail.OrgStreet3, webDetail.OrgStreet4, webDetail.OrgStreet5, webDetail.OrgProvince, webDetail.OrgLength, webDetail.OrgWidth, webDetail.OrgHeight, webDetail.OrgMass, webDetail.VATRegistered, webDetail.WEBPriceUsed, webDetail.WEBCustPriceUsed, webDetail.Margin };
                 db.Execute(query, values);
                 var orgWebDetail = GetOrgWebDetail();
                 return orgWebDetail;
@@ -3769,17 +3769,33 @@ namespace EsquireVRN.Utils
 
         //Order Section
 
-        public static PagedOrders GetResellerOrders(int? pageNumber, int? pageSize)
+        public static PagedOrders GetResellerOrders(int? pageNumber, int? pageSize, string? searchText, string? startDate, string? endDate)
         {
             int pNum = (pageNumber ?? 1);
             int pSize = (pageSize ?? 12);
-            string query = "SELECT * FROM [dbo].[ResellerOrders] Where OrgId=" + GetOrgID() + " ORDER BY DateCreated OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY; SELECT COUNT(1) From ResellerOrders Where OrgId="+GetOrgID()+";";
-            List<ResellerOrder> orders = [];
+            string WhereClause = "";
+            if (!string.IsNullOrEmpty(startDate))
+            {
+                WhereClause += " AND x.DateCreated>=N'" + startDate + "'";
+            }
+            if (!string.IsNullOrEmpty(endDate))
+            {
+                WhereClause += " AND x.DateCreated<=N'" + endDate + "'";
+            }
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                string fixedSearchText = Regex.Replace(searchText, "^0+", "");
+
+                WhereClause += " AND ((x.AccountNo like '%" + fixedSearchText + "%') OR (Convert(varchar,x.ResellerOrderID) like '%" + fixedSearchText + "%') OR (x.Company Like '%" + fixedSearchText + "%') OR (x.OrderStatus like '%" + fixedSearchText + "%') OR (x.Email like '%" + fixedSearchText + "%') OR (x.Customer like '%" + fixedSearchText + "%') OR (Convert(varchar,x.TotalAmount) like '%" + fixedSearchText + "%'))";
+            }
+
+            string query = "Select x.* from (Select O.*,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price*ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID=o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID=c.CustID where O.OrgID=" + GetOrgID() + WhereClause + ") as x Order By x.OrderdDate Desc OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) From ResellerOrders Where OrgId=" + GetOrgID() + WhereClause+";";
+            List<OrderWithCustomer> orders = [];
             int pageCount = 1;
             using (var db = new SqlConnection(connString))
             {
                 var result = db.QueryMultiple(query);
-                orders = [.. result.Read<ResellerOrder>()];
+                orders = [.. result.Read<OrderWithCustomer>()];
                 long orderCount = result.ReadFirstOrDefault<long>();
                 pageCount = Convert.ToInt32(orderCount / pSize);
                 decimal pageDivision = Convert.ToDecimal(orderCount) / Convert.ToDecimal(pSize);
@@ -3796,8 +3812,8 @@ namespace EsquireVRN.Utils
             return pagedOrders;
         }
         public static List<ResellerOrder> GetCustomerOrders(long CustID)
-        {           
-            string query = "SELECT * FROM [dbo].[ResellerOrders] WHERE CustID=@CustID and OrgID=" + GetOrgID() + " ORDER BY DateCreated";
+        {
+            string query = "SELECT * FROM [dbo].[ResellerOrders] WHERE CustomerID=@CustID and OrgID=" + GetOrgID() + " ORDER BY DateCreated";
             List<ResellerOrder> orders = [];
             using (var db = new SqlConnection(connString))
             {
@@ -3806,18 +3822,33 @@ namespace EsquireVRN.Utils
             return orders;
         }
 
-        public static PagedOrders GetPagedCustomerOrders(long CustID, int? pageNumber, int? pageSize)
+        public static PagedOrders GetPagedCustomerOrders(long CustID, int? pageNumber, int? pageSize, string? searchText, string? startDate, string? endDate)
         {
             int pNum = (pageNumber ?? 1);
             int pSize = (pageSize ?? 12);
+            string WhereClause = "";
+            if (!string.IsNullOrEmpty(startDate))
+            {
+                WhereClause += " AND x.DateCreated>=N'" + startDate + "'";
+            }
+            if (!string.IsNullOrEmpty(endDate))
+            {
+                WhereClause += " AND x.DateCreated<=N'" + endDate + "'";
+            }
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                string fixedSearchText = Regex.Replace(searchText, "^0+", "");
 
-            string query = "SELECT * FROM [dbo].[ResellerOrders] WHERE CustID=@CustID and OrgID=" + GetOrgID() + " ORDER BY DateCreated OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;SELECT COUNT(1) FROM ResellerOrders WHERE CustID=@CustID and OrgID=" + GetOrgID() + ";";
-            List<ResellerOrder> orders = [];
+                WhereClause += " AND ((x.AccountNo like '%" + fixedSearchText + "%') OR (Convert(varchar,x.ResellerOrderID) like '%" + fixedSearchText + "%') OR (x.Company Like '%" + fixedSearchText + "%') OR (x.OrderStatus like '%" + fixedSearchText + "%') OR (x.Email like '%" + fixedSearchText + "%') OR (x.Customer like '%" + fixedSearchText + "%') OR (Convert(varchar,x.TotalAmount) like '%" + fixedSearchText + "%'))";
+            }
+
+            string query = "Select x.* from (Select O.*,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price*ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID=o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID=c.CustID where O.OrgID=" + GetOrgID() + " AND O.CustomerID=" + CustID + WhereClause + ") as x Order By x.OrderdDate Desc OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) From ResellerOrders Where OrgId=" + GetOrgID()+ WhereClause + " AND CusomterID="+CustID+";";
+            List<OrderWithCustomer> orders = [];
             int pageCount = 1;
             using (var db = new SqlConnection(connString))
             {
                 var result = db.QueryMultiple(query);
-                orders = [.. result.Read<ResellerOrder>()];
+                orders = [.. result.Read<OrderWithCustomer>()];
                 long orderCount = result.ReadFirstOrDefault<long>();
                 pageCount = Convert.ToInt32(orderCount / pSize);
                 decimal pageDivision = Convert.ToDecimal(orderCount) / Convert.ToDecimal(pSize);
