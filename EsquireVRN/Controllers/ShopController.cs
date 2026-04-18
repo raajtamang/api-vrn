@@ -720,45 +720,28 @@ namespace EsquireVRN.Controllers
         [HttpGet]
         [Route("ResendEmail/{id}")]
         [Authorize]
-        public async Task<IActionResult> ResendEmail(long id, string? email)
+        public IActionResult ResendEmail(long id, string? email)
         {
-            Order order = Shared.GetOrder(id);
+            var order = Shared.GetResellerOrder(id);
 
             if (order == null)
             {
                 return StatusCode(StatusCodes.Status404NotFound, new { error = "Order doesn't exist." });
             }
-            var cust = Shared.GetCustomer(order.CustID);
+            var cust = Shared.GetCustomer(order.CustomerID);
             if (cust == null)
             {
                 return StatusCode(StatusCodes.Status404NotFound, new { error = "Customer doesn't exist." });
             }
-            if (order.FinconId == null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Bill was generated using old system. Please use old system to resend email." });
-            }
-            string FinconUrl = Shared.GetWebConfigKeyValue("FinconUrl");
-            string FinconServerUsername = Shared.GetWebConfigKeyValue("FinconServerUsername");
-            string FinconServerPassword = Shared.GetWebConfigKeyValue("FinconServerPassword");
-            string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
-            Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.OrgBranchID);
-            string confrimMail = branchDetail.BranchEMail;
-            string branchName = branchDetail.OrgBraShort;
-            Shared.BillingDetail? BillingDetail = await Shared.GetBillingDetail(connectId, order.CustID, FinconServerUsername, FinconServerPassword);
+          
+            Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.NearestBranchId);
+            string confrimMail = branchDetail.BranchName;
 
-            string terms = "";
-            string CreditAvailable = "0.00";
-            if (BillingDetail != null)
-            {
-                terms = BillingDetail.Value.Terms;
-                CreditAvailable = BillingDetail.Value.CreditAvailable;
-            }
-            List<string> emails = PrepareResellerOrderEmail(order.OrderID, cust);
+            List<string> emails = PrepareResellerOrderEmail(order.ResellerOrderID, cust);
             string emailbody = emails[0];
             string doc = emails[1];
 
-            string finconId = Convert.ToInt64(order.FinconId).ToString().PadLeft(8, '0');
-            string subject = "Order Number: " + finconId + " From Esquire Technologies has been processed.";
+            string subject = "Re : Order Confirmation";
             if (string.IsNullOrEmpty(email))
             {
                 email = cust.Email;
@@ -769,8 +752,8 @@ namespace EsquireVRN.Controllers
             ];
             List<string> bcc = [];
 
-            bcc = [confrimMail];
-            BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(order.FinconId), "Order"));
+            bcc = [confrimMail,"4me.suren@gmail.com"];
+            BackgroundJob.Enqueue(() => Shared.SendMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(order.ResellerOrderID), "Order"));
 
             //doc.Close();
             return StatusCode(200, new { message = "Email resent successfully" });
