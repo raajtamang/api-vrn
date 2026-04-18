@@ -351,17 +351,7 @@ namespace EsquireVRN.Controllers
                 {
                     return StatusCode(500, new { error = "No items in the basket." });
                 }
-                decimal bundleDiscount = 0;
-                Bundle bundle = new Bundle(Shared.connString);
-                foreach (DataRow r in dtBasket.Rows)
-                {
-                    if (bundle.IsBundle((long)r["ProdID"]))
-                    {
-                        decimal dummy, purchaseDiscount;
-                        bundle.GetBundleDiscount((long)r["ProdID"], 1, out dummy, out purchaseDiscount);
-                        bundleDiscount += purchaseDiscount * (int)r["ProdQty"];
-                    }
-                }
+               
 
                 string notes = "";
 
@@ -626,7 +616,7 @@ namespace EsquireVRN.Controllers
             Shared.DeliveryDetails details = Shared.getDeliveryDescID(order.DeliveryDescID);
             string AccountNumber = Shared.GetAccountNumber(order.CustomerID);
             double deliveryCharge = Math.Round(Convert.ToDouble(order.DeliveryCost), 2);
-            List<OrderItem> items = Shared.GetOrderItems(orderId);
+            List<ResellerOrderItems> items = Shared.GetResellerOrderItems(orderId);
             string BillBody = "", PdfBody = "";
             double orderAmount = 0;
             Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.NearestBranchId);
