@@ -4366,7 +4366,7 @@ namespace EsquireVRN.Utils
         {
             OrgWebDetail detail = GetOrgWebDetail();
             string strWEBStockOnly = detail.WEBStockOnly.ToString();
-            string query = "SELECT wO.[ItemID],wO.[OrderID],wO.[ProdID],wO.[ProdQty],wO.[Price],wO.[ProdDesc],wO.[ProdCode],dbo.GetProductStockCount(p.ProdID, p.Status, 'A') as StockCount,p.ImgURL as Image FROM [dbo].[ResellerOrderItems] wO JOIN [dbo].[Products] p on wO.ProdID=p.ProdID WHERE ResellerOrderID=@OrderId";
+            string query = "SELECT wO.[ItemID],wO.[ResellerOrderID],wO.[ProdID],wO.[ProdQty],wO.[Price],wO.[ProdDesc],wO.[ProdCode],dbo.GetProductStockCount(p.ProdID, p.Status, 'A') as StockCount,p.ImgURL as Image FROM [dbo].[ResellerOrderItems] wO JOIN [dbo].[Products] p on wO.ProdID=p.ProdID WHERE ResellerOrderID=@OrderId";
             List<ResellerOrderItems> items = new();
             using (var db = new SqlConnection(connString))
             {

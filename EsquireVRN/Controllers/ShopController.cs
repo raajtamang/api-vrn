@@ -625,7 +625,7 @@ namespace EsquireVRN.Controllers
 
             foreach (var detail in items)
             {
-                BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><p style='white-space:pre-wrap;max-width: 650px;'>" + detail.ProdDesc + "</p></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + detail.ProdQty + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>" + detail.Price + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + Math.Round((detail.Price * detail.ProdQty), 2).ToString(currencyFormat) + "</td></tr>";
+                BillBody += "<tr><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'><p style='white-space:pre-wrap;max-width: 650px;'>" + detail.ProdDesc + "</p></td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>" + Math.Round(detail.Price, 2).ToString(currencyFormat) + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>" + detail.ProdQty + "</td><td style='white-space: nowrap;padding: 10px;border-bottom: 2px solid #077ea2;'>R " + Math.Round((detail.Price * detail.ProdQty), 2).ToString(currencyFormat) + "</td></tr>";
                 orderAmount += Math.Round((Math.Round(detail.Price, 2) * detail.ProdQty), 2);
             }
             string strDeliveryQuoteId = requestUrl + "/GetWayBill" + "?c=" + order.DeliveryQuoteID;
@@ -660,7 +660,7 @@ namespace EsquireVRN.Controllers
                 string MailFormat = Shared.GetWebConfigKeyValue("ResellerOrderConfirmMail");
 
                 string oAmount = orderAmount.ToString(currencyFormat);
-                emailbody = MailFormat.Replace("{customer_name}", customer.FirstName + ' ' + customer.Surname).Replace("{order_id}", order.ResellerOrderID.ToString("D8")).Replace("{order_date}", order.DateCreated.ToString("yyyy/MM/dd")).Replace("{payment_method}", "EFT").Replace("{order_items}", BillBody).Replace("{subtotal}", oAmount).Replace("{shipping}", deliveryCharge.ToString("00")).Replace("{total}", oAmount).Replace("{shipping_address}", deliveryAddress).Replace("{orgname}", Shared.GetOrgName()).Replace("{website}", Shared.GetWebConfigKeyValue("Website"));
+                emailbody = MailFormat.Replace("{customer_name}", customer.FirstName + ' ' + customer.Surname).Replace("{order_id}", order.ResellerOrderID.ToString("D8")).Replace("{order_date}", order.DateCreated.ToString("yyyy/MM/dd")).Replace("{payment_method}", "EFT").Replace("{order_items}", BillBody).Replace("{subtotal}", oAmount).Replace("{shipping}", deliveryCharge.ToString("00")).Replace("{total}", oAmount).Replace("{shipping_address}", deliveryAddress).Replace("{orgname}", Shared.GetOrgName()).Replace("{website}", Shared.GetWebConfigKeyValue("Website")).Replace("{year}",DateTime.Now.ToString("yyyy"));
 
             }
             List<string> returnString = new()
