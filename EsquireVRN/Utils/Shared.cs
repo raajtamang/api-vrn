@@ -2817,12 +2817,12 @@ namespace EsquireVRN.Utils
 
             SmtpClient client = new()
             {
-                Port = Convert.ToInt32(StaticConfig["SMTPSetting:Port"]),
-                Host = StaticConfig["SMTPSetting:Host"],
-                EnableSsl = Convert.ToBoolean(StaticConfig["SMTPSetting:EnableSsl"]),
-                Timeout = Convert.ToInt32(StaticConfig["SMTPSetting:Timeout"]),
-                Credentials = new System.Net.NetworkCredential(StaticConfig["SMTPSetting:Email"], StaticConfig["SMTPSetting:Password"]),
-                UseDefaultCredentials = Convert.ToBoolean(StaticConfig["SMTPSetting:UseDefaultCredentials"])
+                Port = 587,
+                Host = "mail.uselect.co.za",
+                EnableSsl = true,
+                Timeout = 25000,
+                Credentials = new NetworkCredential("info@uselect.co.za", "6%nQ$Qlyj^?+"),
+                UseDefaultCredentials = true
             };
             return client;
         }
