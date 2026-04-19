@@ -2405,10 +2405,6 @@ namespace EsquireVRN.Utils
 
                         }
                     }
-                    else
-                    {
-                        details.DeliveryDesc = details.DeliveryDesc.ToString();
-                    }
                     details.DeliveryID = details.DeliveryID;
                     details.DeliveryDescID = (int)details.DeliveryDescID;
 
