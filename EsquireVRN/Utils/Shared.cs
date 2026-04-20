@@ -2813,12 +2813,12 @@ namespace EsquireVRN.Utils
 
             SmtpClient client = new()
             {
-                Port = 587,
+                Port = 25,
                 Host = "mail.uselect.co.za",
                 EnableSsl = true,
                 Timeout = 25000,
-                Credentials = new NetworkCredential("info@uselect.co.za", "6%nQ$Qlyj^?+"),
-                UseDefaultCredentials = true
+                Credentials = new NetworkCredential("info@uselect.co.za", "id0CWrghkKNf*Mh5"),
+                UseDefaultCredentials = false
             };
             return client;
         }

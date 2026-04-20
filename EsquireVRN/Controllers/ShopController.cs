@@ -413,7 +413,7 @@ namespace EsquireVRN.Controllers
 
                 long OrderId = Convert.ToInt64(strOrdID);
                 Shared.BranchDetail branchDetail = Shared.getBranchName("" + confirmModel.NearestBranchId);
-                string confrimMail = branchDetail.BranchEMail;
+                string confrimMail = Shared.GetWebConfigKeyValue("AdminEmail");
                 string branchName = branchDetail.OrgBraShort;
 
                 Shared.ClearCartWithCustId(CustomerID);
@@ -518,7 +518,7 @@ namespace EsquireVRN.Controllers
                 emailbody = MailFormat.Replace("{customer_name}", customer.FirstName + ' ' + customer.Surname).Replace("customer_email", customer.Email).Replace("{invoice_no}", order.ResellerOrderID.ToString("D8")).Replace("{invoice_date}", DateTime.Now.ToString("yyyy/MM/dd")).Replace("{payment_method}", "EFT").Replace("{invoice_items}", BillBody).Replace("{subtotal}", orderAmount.ToString("00")).Replace("{tax}", taxAmount.ToString("00")).Replace("{shipping}", (deliveryCharge / 1.15).ToString("00")).Replace("{total}", tAmount).Replace("{shipping_address}", deliveryAddress).Replace("{orgname}", Shared.GetOrgName()).Replace("{website}", Shared.GetWebConfigKeyValue("Website")).Replace("{logo_url}", Shared.GetOrgLogo());
 
                 Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.NearestBranchId);
-                string confrimMail = branchDetail.BranchEMail;
+                string confrimMail = Shared.GetWebConfigKeyValue("AdminEmail");
                 string branchName = branchDetail.OrgBraShort;
 
                 string subject = "Invoice";
@@ -589,7 +589,7 @@ namespace EsquireVRN.Controllers
                 emailbody = MailFormat.Replace("{orgname}", Shared.GetOrgName()).Replace("{customer_name}", customer.FirstName + " " + customer.Surname).Replace("{order_id}", order.ResellerOrderID.ToString("D8")).Replace("{order_date}", order.DateCreated.ToString("yyyy/MM/dd")).Replace("{cancel_reason}", rejection_reason).Replace("{support_link}", SupportUrl).Replace("{year}", DateTime.Now.ToString("yyyy")).Replace("{canceled_items}", BillBody).Replace("{subtotal}", "" + orderAmount).Replace("{shipping}", "" + deliveryCharge).Replace("{total}", "" + tAmount);
 
                 Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.NearestBranchId);
-                string confrimMail = branchDetail.BranchEMail;
+                string confrimMail = Shared.GetWebConfigKeyValue("AdminEmail");
                 string branchName = branchDetail.OrgBraShort;
 
                 string subject = "Order Canceled";
@@ -735,7 +735,7 @@ namespace EsquireVRN.Controllers
             }
           
             Shared.BranchDetail branchDetail = Shared.getBranchName("" + order.NearestBranchId);
-            string confrimMail = branchDetail.BranchName;
+            string confrimMail = Shared.GetWebConfigKeyValue("AdminEmail");
 
             List<string> emails = PrepareResellerOrderEmail(order.ResellerOrderID, cust);
             string emailbody = emails[0];

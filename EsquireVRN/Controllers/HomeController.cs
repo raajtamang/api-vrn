@@ -190,7 +190,7 @@ namespace EsquireVRN.Controllers
                     sbBody.Replace("{Password}", registration.Password);
                     sbBody.Replace("{EMail}", registration.Email);
                     sbBody.Replace("{Title}", strTitle);
-                    string strFromEMail = Shared.GetOrgEmail();
+                    string strFromEMail = Shared.GetWebConfigKeyValue("AdminEmail");
                     List<MailAddress> bcc = new() { new MailAddress("test@esquire.co.za"), new MailAddress("info@esquire.co.za"), new MailAddress("asgar@esquire.co.za") };
 
                     Shared.sendMail(Shared.GetOrgName() + " registration - Thank You!", sbBody.ToString(), Shared.splitEMailTo(registration.Email, registration.FirstName + " " + registration.Surname),

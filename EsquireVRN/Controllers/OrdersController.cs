@@ -87,7 +87,7 @@ namespace EsquireVRN.Controllers
                 if (model != null)
                 {
                     Shared.BranchDetail branchDetail = Shared.getBranchName("" + oldOrder.NearestBranchId);
-                    string confrimMail = branchDetail.BranchEMail;
+                    string confrimMail =Shared.GetWebConfigKeyValue("AdminEmail");
                     string branchName = branchDetail.OrgBraShort;
                     var custome = Shared.GetCustomer(oldOrder.CustomerID);
                     if (custome == null)
@@ -220,7 +220,7 @@ namespace EsquireVRN.Controllers
                         List<string> Emails = new() { tempcustomer.Email };
                         List<string> cc = new() { "syanthan1st@gmail.com", confrimMail };
                         string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
-                        BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails, cc, "quote@esquire.co.za ", false));
+                        BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za ", false));
 
 
                         return StatusCode(200, new { message = "Order confirmed successfully." });
@@ -245,7 +245,7 @@ namespace EsquireVRN.Controllers
                             List<string> Emails = new() { tempcustomer.Email };
                             List<string> cc = new() { "syanthan1st@gmail.com", confrimMail };
                             string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
-                            BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails, cc, "quote@esquire.co.za ", false));
+                            BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za ", false));
 
 
 
