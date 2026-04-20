@@ -12,5 +12,6 @@ namespace EsquireVRN.Models
         public double Price { get; set; }
         public string? ProdDesc { get; set; }
         public required string ProdCode { get; set; }
+        public string? Image { get; set; }
     }
 }
