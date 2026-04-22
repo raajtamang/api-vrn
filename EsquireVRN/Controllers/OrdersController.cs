@@ -125,7 +125,7 @@ namespace EsquireVRN.Controllers
         [Authorize(Roles = "Reseller")]
         public async Task<IActionResult> ConvertToOrder([FromBody] ConvertResellerOrderToOrderModel model)
         {
-            var quotations = Shared.GetOrder(model.ResellerOrderId);
+            var quotations = Shared.GetResellerOrder(model.ResellerOrderId);
             if (quotations == null)
             {
                 return StatusCode(404, new { error = "Quotation doesn't exist" });
@@ -163,7 +163,7 @@ namespace EsquireVRN.Controllers
                      "(" + userId + ", N'" +
                      details.DeliveryDesc.Replace("'", "''") + "'," +
                      details.DeliveryDescID.ToString() + "," + deliveryCost + "," + model.PaymentId + "," + quotations.ShippingID + ",2," + Shared.GetOrgID() +
-                     "," + quotations.OrgBranchID + ",N'" + quotations.DeliveryQuoteID + "',1 ,N'', N'" + quotations.Notes + "'," +
+                     "," + quotations.NearestBranchId + ",N'" + quotations.DeliveryQuoteID + "',1 ,N'', N'" + quotations.Notes + "'," +
                      bundleDiscount.ToString("0.00").Replace(",", ".") + "," + details.DeliveryID + ",N'" + quotations.ShippingInstruction + "'); SELECT SCOPE_IDENTITY();";
                 double TotalAmount = 0;
 
@@ -193,7 +193,7 @@ namespace EsquireVRN.Controllers
                 Shared.UpdateOrderStatus(Convert.ToInt64(strOrdID), 2, "" + userId);
                 Shared.UpdateResellerOrderStatus(strOrdID, model.ResellerOrderId);
                 long OrderId = Convert.ToInt64(strOrdID);
-                Shared.BranchDetail branchDetail = Shared.getBranchName("" + quotations.OrgBranchID);
+                Shared.BranchDetail branchDetail = Shared.getBranchName("" + quotations.NearestBranchId);
                 string confrimMail = branchDetail.BranchEMail;
                 string branchName = branchDetail.OrgBraShort;
                 string custID = "" + userId;
