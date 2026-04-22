@@ -97,7 +97,7 @@ namespace EsquireVRN.Controllers
                     }
                     string paymentType = Shared.GetpaymentType(oldOrder.PayId ?? 0);
                     string header = model.Header.Replace("{OrderNumber}", "" + oldOrder.ResellerOrderID).Replace("{NewStatus}", statusList[req.StatusId - 1]);
-                    string body = model.Detail.Replace("{CustomerTitle}", custome.Title).Replace("{CustomerFirstName}", custome.FirstName).Replace("{CustomerSurname}", custome.Surname).Replace("{NewStatus}", statusList[req.StatusId - 1]).Replace("{OrderNumber}", "" + oldOrder.ResellerOrderID).Replace("{OrderDate}", oldOrder.OrderdDate.ToString("yyyy/MM/dd hh:mm:ss tt")).Replace("{OrderPayMethod}", paymentType).Replace("{OrderDelivery}", oldOrder.DeliveryMethod).Replace("{FromOrgName}", Shared.GetOrgName());
+                    string body = model.Detail.Replace("{CustomerTitle}", custome.Title).Replace("{CustomerFirstName}", custome.FirstName).Replace("{CustomerSurname}", custome.Surname).Replace("{NewStatus}", statusList[req.StatusId - 1]).Replace("{OrderNumber}", "" + oldOrder.ResellerOrderID).Replace("{OrderDate}", oldOrder.DateCreated.ToString("yyyy/MM/dd hh:mm:ss tt")).Replace("{OrderPayMethod}", paymentType).Replace("{OrderDelivery}", oldOrder.DeliveryMethod).Replace("{FromOrgName}", Shared.GetOrgName());
 
                     string[] toEmail = [new(custome.Email)];
                     List<string> bcc = ["4me.suren@gmail.com", confrimMail];
