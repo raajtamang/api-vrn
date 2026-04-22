@@ -33,6 +33,7 @@ namespace EsquireVRN.Models
         public string? Company { get; set; }
         public string? Email { get; set; }
         public string? AccountNo { get; set; }
+        public string? OrderStatus { get; set; }
         public decimal? TotalAmount { get; set; } = 0;
     }
 }

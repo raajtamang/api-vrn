@@ -4381,6 +4381,10 @@ namespace EsquireVRN.Utils
                     string q2 = @"INSERT INTO [dbo].[ResellerOrderTracking] ([ResellerOrderID],[StatusID],[UpdatedDate],[UpdatedBy]) OUTPUT Inserted.Id VALUES (@OrderID,@NewStatusID,@ChangeDateTime,@ChangeBy)";
                     var values = new { OrderID = OrderId, NewStatusID = StatusId, ChangeDateTime = DateTime.UtcNow.AddHours(2), ChangeBy = Updater };
                     var changeId = db.Query(q2, values).FirstOrDefault();
+
+                    string q1 = "Update ResellerOrders Set StatusId=" + StatusId + " WHERE ResellerOrderId=" + OrderId;
+                    db.Execute(q1);
+
                 }
                 return true;
             }
@@ -4396,6 +4400,8 @@ namespace EsquireVRN.Utils
             string q2 = @"INSERT INTO [dbo].[ResellerOrderTracking] ([ResellerOrderID],[StatusID],[UpdatedDate],[UpdatedBy]) OUTPUT Inserted.Id VALUES (@OrderID,@NewStatusID,@ChangeDateTime,@ChangeBy)";
             var values = new { OrderID = resellerOrderID, NewStatusID = statusId, ChangeDateTime = DateTime.UtcNow.AddHours(2), ChangeBy = userId };
             var changeId = db.Query(q2, values).FirstOrDefault();
+            string q1 = "Update ResellerOrders Set StatusId=" + statusId + " WHERE ResellerOrderId=" + resellerOrderID;
+            db.Execute(q1);
         }
 
         public static OrderStatusEmailModel GetStatusEmail(int status)

@@ -12,11 +12,11 @@ namespace EsquireVRN.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class OrdersController : ControllerBase
     {
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public IActionResult Get(int? page_number, int? page_size, string? search,string?start_date,string?end_date)
         {
 
