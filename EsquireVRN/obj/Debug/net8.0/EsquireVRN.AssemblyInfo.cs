@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EsquireVRN")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7d22af5ab4035fcc2d7290bdd01ef6605adb871e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2747c45db0dd54f8ed1e4a56bb7565ff5f4f0823")]
 [assembly: System.Reflection.AssemblyProductAttribute("EsquireVRN")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EsquireVRN")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
