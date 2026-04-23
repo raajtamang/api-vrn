@@ -35,5 +35,6 @@ namespace EsquireVRN.Models
         public string? AccountNo { get; set; }
         public string? OrderStatus { get; set; }
         public decimal? TotalAmount { get; set; } = 0;
+        public long? FinconId { get; set; }
     }
 }
