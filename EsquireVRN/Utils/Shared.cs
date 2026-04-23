@@ -2921,7 +2921,7 @@ namespace EsquireVRN.Utils
 
         public static ResellerOrder? GetResellerOrder(long id)
         {
-            string query = "SELECT * FROM [dbo].[ResellerOrders] WHERE [ResellerOrderID]=@OrderId";
+            string query = "SELECT *,(Select FinconId from WebOrders Where WebOrders.OrderId=O.WebOrderId) as FinconId FROM [dbo].[ResellerOrders] WHERE [ResellerOrderID]=@OrderId";
             using (var db = new SqlConnection(connString))
             {
                 var values = new { OrderId = id };
