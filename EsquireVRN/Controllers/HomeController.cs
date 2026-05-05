@@ -460,5 +460,12 @@ namespace EsquireVRN.Controllers
             }
             return Unauthorized(new { error = "Token is invalid" });
         }
+
+        [HttpGet("/GetDashboardCards")]
+        [Authorize(Roles ="Reseller")]
+        public IActionResult GetDashBoardCards()
+        {
+            return Ok(Shared.GetDashboardCards());
+        }
     }
 }

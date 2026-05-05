@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using EsquireVRN.Models;
+using EsquireVRN.Models.DTO;
 using EsquireVRN.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,13 @@ namespace EsquireVRN.Controllers
         public IEnumerable<SubCategory> Get()
         {
             return Shared.GetSubCategories();
+        }
+
+        [HttpGet("GetAllSubCategories")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult GetAllSubCategories()
+        {
+            return Ok(Shared.GetAllSubCategories());
         }
 
         [HttpGet]
@@ -65,6 +73,44 @@ namespace EsquireVRN.Controllers
             }
             return Ok(new { SubCategory = oSubCategory, Products, Brands });
 
+        }
+
+        [HttpPost("UpdateSubCategoryList")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult UpdateCategories([FromBody] UpdateCategoryModel reqModel)
+        {
+            try
+            {
+                var orgId = Shared.GetOrgID();
+                if (reqModel?.AddIdList?.Count > 0)
+                {
+                    long position = Shared.GetVRNLastPosition(orgId);
+                    List<VRNSubCategories> subCategories = [];
+                    foreach (var item in reqModel.AddIdList)
+                    {
+                        long subCategoryId = Shared.GetSubCategoryId(item.SubCategory);
+                        VRNSubCategories sCategory = new()
+                        {
+                            SubCategoryId = subCategoryId,
+                            CategoryID = item.CategoryID,
+                            OrgId = orgId,
+                            Position = position
+                        };
+                        subCategories.Add(sCategory);
+                        position++;
+                    }
+                    Shared.AddVRNCategories(subCategories);
+                }
+                if (reqModel?.RemoveIdList?.Count > 0)
+                {
+                    Shared.RemoveVRNCategories(reqModel.RemoveIdList, Shared.GetOrgID());
+                }
+                return Ok(new { message = "Category list updated successfully." });
+            }
+            catch
+            {
+                return StatusCode(500, new { error = "Something went wrong. Please try again." });
+            }
         }
     }
 }

@@ -1059,6 +1059,18 @@
         }
       }
     },
+    "/GetDashboardCards": {
+      "get": {
+        "tags": [
+          "Home"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Menu": {
       "get": {
         "tags": [
@@ -2915,6 +2927,18 @@
         }
       }
     },
+    "/api/SubCategory/GetAllSubCategories": {
+      "get": {
+        "tags": [
+          "SubCategory"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/SubCategory/ByCategory": {
       "get": {
         "tags": [
@@ -3001,6 +3025,37 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/SubCategory/UpdateSubCategoryList": {
+      "post": {
+        "tags": [
+          "SubCategory"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryModel"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -4801,6 +4856,27 @@
         },
         "additionalProperties": false
       },
+      "UpdateCategoryModel": {
+        "type": "object",
+        "properties": {
+          "addIdList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VRNSubCategoryDTO"
+            },
+            "nullable": true
+          },
+          "removeIdList": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateOrderStatusDTO": {
         "required": [
           "resellerOrderID",
@@ -4825,6 +4901,24 @@
           "content": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VRNSubCategoryDTO": {
+        "required": [
+          "categoryID",
+          "subCategory"
+        ],
+        "type": "object",
+        "properties": {
+          "categoryID": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "subCategory": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false

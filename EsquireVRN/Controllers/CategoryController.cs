@@ -35,13 +35,13 @@ namespace EsquireVRN.Controllers
                 return NotFound(new { error = "Category doesn't exist." });
             }
             return Ok(category);
-        }        
+        }
 
         [HttpGet]
         [Route("Products")]
         public IActionResult GetProducts(long id)
         {
-            Category Category=Shared.GetCategory(id);
+            Category Category = Shared.GetCategory(id);
             if (Category == null)
             {
                 return StatusCode(404, new { error = "Category doesn't exist anymore." });
@@ -58,7 +58,8 @@ namespace EsquireVRN.Controllers
                 {
                     sb.Append("Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo],[ManufURL] as Link,[MetaTitle],[MetaDescription],[Description] from [dbo].[Manufacturers] WHERE [ManufacturerName] IN (" + brandIds + ");");
                 }
-                if (!string.IsNullOrEmpty(subcategories)) {
+                if (!string.IsNullOrEmpty(subcategories))
+                {
                     sb.Append("SELECT sCategory.ProdGroupID as Id,sCategory.GroupName as Title,link.GroupHeadID as Category_Id,sCategory.MetaTitle,sCategory.MetaDescription,sCategory.ImageUrl,sCategory.[Description] from ProductGroups sCategory  Join ProdGroupLInk link on sCategory.GroupName=link.ProdGroupName join ProductGroupHead Category on link.GroupHeadID=Category.GroupHeadID Where Category.OrgID IN (94,380,932,546) AND sCategory.GroupName IN (" + subcategories + ");");
                 }
                 string strBrandQuery = sb.ToString();
@@ -72,9 +73,10 @@ namespace EsquireVRN.Controllers
                     }
                 }
             }
-            return Ok(new { Category, Products, Brands,SubCategories });
+            return Ok(new { Category, Products, Brands, SubCategories });
 
         }
 
+       
     }
 }
