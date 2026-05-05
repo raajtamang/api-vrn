@@ -574,6 +574,16 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "GetDashBoardCards",
+    "RelativePath": "api/GetDashboardCards",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
     "Method": "GetHomepageSetup",
     "RelativePath": "api/GetHomepageSetup",
     "HttpMethod": "GET",
@@ -2246,16 +2256,6 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "EsquireVRN.Controllers.HomeController",
-    "Method": "GetDashBoardCards",
-    "RelativePath": "GetDashboardCards",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
     "ReturnTypes": []
   }
 ]
