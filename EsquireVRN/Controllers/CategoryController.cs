@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EsquireVRN.Models;
 using EsquireVRN.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Text;
@@ -18,6 +19,12 @@ namespace EsquireVRN.Controllers
             return Shared.GetCategories();
         }
 
+        [HttpGet("All")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult GetAllCategories(string?search)
+        {
+            return Ok(Shared.GetAllCategories(search));
+        }
         [HttpGet]
         [Route("Popular")]
         public IActionResult GetPopularCategory(int page_number, int page_size)
@@ -77,6 +84,6 @@ namespace EsquireVRN.Controllers
 
         }
 
-       
+
     }
 }

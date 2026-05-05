@@ -21,13 +21,6 @@ namespace EsquireVRN.Controllers
             return Shared.GetSubCategories();
         }
 
-        [HttpGet("GetAllSubCategories")]
-        [Authorize(Roles = "Reseller")]
-        public IActionResult GetAllSubCategories()
-        {
-            return Ok(Shared.GetAllSubCategories());
-        }
-
         [HttpGet]
         [Route("ByCategory")]
         public IEnumerable<SubCategory> ByCategory(long id)
@@ -75,6 +68,15 @@ namespace EsquireVRN.Controllers
 
         }
 
+
+
+        [HttpGet("All/{CategoryId}")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult GetAllSubCategories(string? search, long CategoryId)
+        {
+            return Ok(Shared.GetAllWebSubCategories(search, CategoryId));
+        }
+
         [HttpPost("UpdateSubCategoryList")]
         [Authorize(Roles = "Reseller")]
         public IActionResult UpdateCategories([FromBody] UpdateCategoryModel reqModel)
@@ -88,18 +90,25 @@ namespace EsquireVRN.Controllers
                     List<VRNSubCategories> subCategories = [];
                     foreach (var item in reqModel.AddIdList)
                     {
-                        long subCategoryId = Shared.GetSubCategoryId(item.SubCategory);
-                        VRNSubCategories sCategory = new()
+                        if (!Shared.VRNCategoriesExists(item.SubCategoryId))
                         {
-                            SubCategoryId = subCategoryId,
-                            CategoryID = item.CategoryID,
-                            OrgId = orgId,
-                            Position = position
-                        };
-                        subCategories.Add(sCategory);
-                        position++;
+                            var title = Shared.GetSubCategoryTitle(item.SubCategoryId);
+                            VRNSubCategories sCategory = new()
+                            {
+                                SubCategoryId = item.SubCategoryId,
+                                CategoryID = item.CategoryID,
+                                OrgId = orgId,
+                                Position = position,
+                                Title = title
+                            };
+                            subCategories.Add(sCategory);
+                            position++;
+                        }
                     }
-                    Shared.AddVRNCategories(subCategories);
+                    if (subCategories.Count > 0)
+                    {
+                        Shared.AddVRNCategories(subCategories);
+                    }
                 }
                 if (reqModel?.RemoveIdList?.Count > 0)
                 {

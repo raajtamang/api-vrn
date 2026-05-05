@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EsquireVRN.Models;
 using EsquireVRN.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
@@ -264,7 +265,7 @@ namespace EsquireVRN.Utils
                       Organisation.WEBStockOnly, Organisation.isFranchise, Organisation.WEBMinStock, Organisation.WEBNoImg, Organisation.WEBUseGroup, 
                       Organisation.WEBAutoOrder, Organisation.WEBProdOrderBy, Organisation.OrgRegNo, Organisation.OrgVATNo, Organisation.OrgTel1, Organisation.OrgFax, 
                       Organisation.OrgStreet1, Organisation.OrgStreet2, Organisation.OrgStreet3, Organisation.OrgStreet4, Organisation.OrgStreet5, Organisation.VATRegistered, 
-                      Organisation.FromDoorID,Organisation.FinType, Users.UserID,Organisation.OrgLength,Organisation.OrgWidth,Organisation.OrgHeight,Organisation.OrgMass,Organisation.WebsiteLogoURL,Organisation.Margin
+                      Organisation.FromDoorID,Organisation.FinType, Users.UserID,Organisation.OrgLength,Organisation.OrgWidth,Organisation.OrgHeight,Organisation.OrgMass,Organisation.Margin
                 FROM Organisation INNER JOIN
                       Users ON Organisation.OrgID = Users.OrgID
                 WHERE (Organisation.OrgID = " + strOrgID + ");";
@@ -390,6 +391,25 @@ namespace EsquireVRN.Utils
             {
                 string strQuery = "Select x.* from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title,pgH.MetaTitle,pgH.MetaDescription,pgH.ImageUrl,pgH.[Description],pgH.[Featured],pgH.[Position] FROM ProductGroupHead pgH JOIN VRNSubCategories VSC on pgH.GroupHeadID=VSC.CategoryID WHERE VSC.OrgId=" + GetOrgID() + ") as x ORDER BY x.Title";
                 categories = [.. db.Query<Category>(strQuery)];
+            }
+            return categories;
+        }
+
+        public static IEnumerable<CategoryDTO> GetAllCategories(string? searchText)
+        {
+            List<CategoryDTO> categories = [];
+            string whereConditon = "WHERE (1=1)";
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                string fixedSearchText = Regex.Replace(searchText, "^0+", "");
+                fixedSearchText = fixedSearchText.Replace("'", "''");
+
+                whereConditon += " AND (x.Title like '%'+@SearchText+'%')";
+            }
+            using (var db = new SqlConnection(connString))
+            {
+                string strQuery = "Select x.* from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title FROM ProductGroupHead PGH WHERE PGH.OrgId IN (94,380,932,546)) as x " + whereConditon + " ORDER BY x.Title";
+                categories = [.. db.Query<CategoryDTO>(strQuery, new { SearchText = searchText })];
             }
             return categories;
         }
@@ -1264,7 +1284,8 @@ namespace EsquireVRN.Utils
             {
                 pSize = 12;
             }
-            List<Product_View> products = new();
+            strWhere += " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
+            List<Product_View> products = [];
             OrgWebDetail detail = GetOrgWebDetail();
             string strWEBProdOrderBy = detail.WEBProdOrderBy.ToString();
             string strWEBStockOnly = detail.WEBStockOnly.ToString();
@@ -1285,10 +1306,10 @@ namespace EsquireVRN.Utils
                                  "dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') AS StockQty, (Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=Products.ProdID) as Rating" +
                                  " FROM Products INNER JOIN Organisation ON Products.OrgID= Organisation.OrgID WHERE (Products.OrgID IN (94,380,932,546) AND dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A')>0 AND Products.Active=1) " + strWhere + " ORDER BY Price Desc" +
                                  " OFFSET " + (pSize * (pNum - 1)) + @" ROWS FETCH NEXT " + pSize + @" ROWS ONLY;";
-                products = db.Query<Product_View>(strQuery).ToList();
+                products = [.. db.Query<Product_View>(strQuery)];
             }
             long pCount = GetProductCount(pSize, strWhere);
-            List<Product_View> returnProducts = new();
+            List<Product_View> returnProducts = [];
             foreach (var item in products)
             {
                 item.Special_Price = GetSpecialPrice(item.ProductCode);
@@ -1394,9 +1415,9 @@ namespace EsquireVRN.Utils
 
                 //keyword = searchText.Trim().Split(" ").ToList();
                 //strWhere = " AND ((Products.ProductCode Like '%" + keyword[0].Replace("'", "''") + "%') OR (Products.ProductCode='" + keyword[0] + "') OR (Products.ProductName LIKE N'%" + keyword[0].Replace("'", "''") + "%') OR (Products.GroupName LIKE N'%" + keyword[0].Replace("'", "''") + "%') OR (Products.Description LIKE N'%" + keyword[0].Replace("'", "''") + "%'))";
-                strWhere = " AND ((Products.Tag like N'%" + searchText.Replace("\'", "\'\'") + "%') OR (Products.ProductName like N'%" + searchText.Replace("\'", "\'\'") + "%') OR (Products.ProductCode Like '%" + searchText.Replace("\'", "\'\'") + "%') OR (Products.ProductCode='" + searchText.Replace("\'", "\'\'") + "'))";
+                strWhere += " AND ((Products.Tag like N'%" + searchText.Replace("\'", "\'\'") + "%') OR (Products.ProductName like N'%" + searchText.Replace("\'", "\'\'") + "%') OR (Products.ProductCode Like '%" + searchText.Replace("\'", "\'\'") + "%') OR (Products.ProductCode='" + searchText.Replace("\'", "\'\'") + "'))";
             }
-
+            strWhere += " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
             List<Product_View> products = new();
             List<SubCategory> sub_categories = new();
             List<Brand> brands = new();
@@ -1500,6 +1521,8 @@ namespace EsquireVRN.Utils
                 strWhere = " AND ((Products.Tag Like '%" + searchText.Replace("'", "''") + "%') OR (Products.ProductName LIKE N'%" + searchText.Replace("'", "''") + "%')  OR (Products.ProductCode Like '%" + searchText.Replace("\'", "\'\'") + "%') OR (Products.ProductCode='" + searchText.Replace("\'", "\'\'") + "'))";
             }
 
+            strWhere += " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
+
             PagedProduct PagedProducts = new();
             PagedProducts = GetPagedProducts(strWhere, pageNum, pageSize);
             PagedProducts.Products = PagedProducts.Products.DistinctBy(x => x.ProdID).ToList();
@@ -1522,6 +1545,7 @@ namespace EsquireVRN.Utils
         {
             var oneMonthAgo = DateTime.UtcNow.AddHours(2).AddMonths(-1).ToString("yyyy/MM/dd");
             string strWhere = " AND (Products.CreateDate>='" + oneMonthAgo + "')";
+            strWhere += " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
             List<Product_View> products = new();
             OrgWebDetail detail = GetOrgWebDetail();
             string strWEBProdOrderBy = detail.WEBProdOrderBy.ToString();
@@ -1560,6 +1584,7 @@ namespace EsquireVRN.Utils
 
         internal static List<Product_View> GetLatestProducts()
         {
+            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
             List<Product_View> products = new();
             OrgWebDetail detail = GetOrgWebDetail();
             string strWEBProdOrderBy = detail.WEBProdOrderBy.ToString();
@@ -1582,7 +1607,7 @@ namespace EsquireVRN.Utils
                                  " FROM Manufacturers RIGHT OUTER JOIN SourceList INNER JOIN OrganisationSource" +
                                  " ON SourceList.SourceID = OrganisationSource.SourceID INNER JOIN Organisation ON SourceList.SourceOrgID = Organisation.OrgID RIGHT OUTER JOIN Products" +
                                  " ON OrganisationSource.OrgSourceID = Products.OrgSourceID ON Manufacturers.ManufID = Products.ManufID WHERE (Products.Active = 1) AND (Products.OutputMe = 1)  AND Products.OrgID IN (94,380,932,546)" +
-                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') ORDER BY NEWID()";
+                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') " + strWhere + " ORDER BY NEWID()";
                 products = db.Query<Product_View>(strQuery).ToList();
             }
 
@@ -1600,6 +1625,7 @@ namespace EsquireVRN.Utils
 
         internal static List<Product_View> GetMostViewedProducts()
         {
+            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
 
             List<Product_View> products = new();
             OrgWebDetail detail = GetOrgWebDetail();
@@ -1623,7 +1649,7 @@ namespace EsquireVRN.Utils
                                  " FROM Manufacturers RIGHT OUTER JOIN SourceList INNER JOIN OrganisationSource" +
                                  " ON SourceList.SourceID = OrganisationSource.SourceID INNER JOIN Organisation ON SourceList.SourceOrgID = Organisation.OrgID RIGHT OUTER JOIN Products" +
                                  " ON OrganisationSource.OrgSourceID = Products.OrgSourceID ON Manufacturers.ManufID = Products.ManufID WHERE (Products.Active = 1) AND (Products.OutputMe = 1)  AND Products.OrgID IN (94,380,932,546)" +
-                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') AND (Products.MostViewed=1) ORDER BY NEWID();";
+                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') AND (Products.MostViewed=1) " + strWhere + "ORDER BY NEWID();";
                 products = db.Query<Product_View>(strQuery).ToList();
             }
             List<Product_View> returnProducts = new();
@@ -1637,6 +1663,7 @@ namespace EsquireVRN.Utils
 
         internal static List<Product_View> GetTrendingProducts()
         {
+            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
 
             List<Product_View> products = [];
             OrgWebDetail detail = GetOrgWebDetail();
@@ -1660,7 +1687,7 @@ namespace EsquireVRN.Utils
                                  " FROM Manufacturers RIGHT OUTER JOIN SourceList INNER JOIN OrganisationSource" +
                                  " ON SourceList.SourceID = OrganisationSource.SourceID INNER JOIN Organisation ON SourceList.SourceOrgID = Organisation.OrgID RIGHT OUTER JOIN Products" +
                                  " ON OrganisationSource.OrgSourceID = Products.OrgSourceID ON Manufacturers.ManufID = Products.ManufID WHERE (Products.Active = 1) AND (Products.OutputMe = 1)  AND Products.OrgID IN (94,380,932,546)" +
-                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') AND (Products.Trending=1) ORDER BY NEWID();";
+                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') AND (Products.Trending=1) " + strWhere + " ORDER BY NEWID();";
                 products = db.Query<Product_View>(strQuery).ToList();
             }
             List<Product_View> returnProducts = new();
@@ -1674,6 +1701,8 @@ namespace EsquireVRN.Utils
 
         internal static List<Product_View> GetBestSellerProducts()
         {
+            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
+
             List<Product_View> products = new();
             OrgWebDetail detail = GetOrgWebDetail();
             string strWEBProdOrderBy = detail.WEBProdOrderBy.ToString();
@@ -1696,7 +1725,7 @@ namespace EsquireVRN.Utils
                                  " FROM Manufacturers RIGHT OUTER JOIN SourceList INNER JOIN OrganisationSource" +
                                  " ON SourceList.SourceID = OrganisationSource.SourceID INNER JOIN Organisation ON SourceList.SourceOrgID = Organisation.OrgID RIGHT OUTER JOIN Products" +
                                  " ON OrganisationSource.OrgSourceID = Products.OrgSourceID ON Manufacturers.ManufID = Products.ManufID WHERE (Products.Active = 1) AND (Products.OutputMe = 1)  AND Products.OrgID IN (94,380,932,546)" +
-                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') AND (Products.BestSeller=1) ORDER BY NEWID();";
+                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') AND (Products.BestSeller=1) " + strWhere + " ORDER BY NEWID();";
                 products = db.Query<Product_View>(strQuery).ToList();
             }
             List<Product_View> returnProducts = new();
@@ -1710,6 +1739,8 @@ namespace EsquireVRN.Utils
 
         public static List<Product_View> GetFeaturedProducts()
         {
+            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
+
             List<Product_View> products = new();
             OrgWebDetail detail = GetOrgWebDetail();
             string strWEBProdOrderBy = detail.WEBProdOrderBy.ToString();
@@ -1732,7 +1763,7 @@ namespace EsquireVRN.Utils
                                  " FROM Manufacturers RIGHT OUTER JOIN SourceList INNER JOIN OrganisationSource" +
                                  " ON SourceList.SourceID = OrganisationSource.SourceID INNER JOIN Organisation ON SourceList.SourceOrgID = Organisation.OrgID RIGHT OUTER JOIN Products" +
                                  " ON OrganisationSource.OrgSourceID = Products.OrgSourceID ON Manufacturers.ManufID = Products.ManufID WHERE (Products.Active = 1) AND (Products.OutputMe = 1)  AND Products.OrgID IN (94,380,932,546)" +
-                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') AND (Products.Featured=1) ORDER BY NEWID();";
+                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') AND (Products.Featured=1) " + strWhere + " ORDER BY NEWID();";
                 products = db.Query<Product_View>(strQuery).ToList();
             }
             List<Product_View> returnProducts = new();
@@ -1752,8 +1783,9 @@ namespace EsquireVRN.Utils
             string query = "";
 
             double margin = GetMargin();
+            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = p.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
 
-            query = "Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15 *" + margin + " as PublicPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock, (Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=p.ProdID) as Rating From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and ([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A'))>1 and spp.StartDate<='" + today + "' and spp.EndDate>='" + today + "' Order By NEWID() OFFSET 0 ROWS FETCH NEXT 40 ROWS ONLY";
+            query = "Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15 *" + margin + " as PublicPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock, (Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=p.ProdID) as Rating From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and ([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A'))>1 and spp.StartDate<='" + today + "' and spp.EndDate>='" + today + "' " + strWhere + " Order By NEWID() OFFSET 0 ROWS FETCH NEXT 40 ROWS ONLY";
             List<SpecialPageProduct> pageList = new();
             using (var db = new SqlConnection(connString))
             {
@@ -3968,10 +4000,11 @@ namespace EsquireVRN.Utils
 
         internal static List<SpecialPageProduct> GetDealsOfTheDay(int pNum, int pSize)
         {
+            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = p.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
             Pricing prices = GetPriceUsed(null);
             double margin = GetMargin();
             string strWEBPriceUsed = Val(prices.UsePriceNumber.ToString());
-            string query = "Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + " as PublicPrice,(spp.SpecialPrice*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,p.Active,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and spp.StartDate<=GETDATE() and spp.EndDate>=(SELECT DATEADD(day, 1, GETDATE())) ORDER BY p.ProductName OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY";
+            string query = "Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + " as PublicPrice,(spp.SpecialPrice*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,p.Active,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and spp.StartDate<=GETDATE() and spp.EndDate>=(SELECT DATEADD(day, 1, GETDATE())) " + strWhere + " ORDER BY p.ProductName OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY";
             List<SpecialPageProduct> products = [];
             using (var db = new SqlConnection(connString))
             {
@@ -3982,10 +4015,12 @@ namespace EsquireVRN.Utils
 
         internal static List<SpecialPageProduct> GetDealsOfTheDayHomepage()
         {
+            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = p.GroupName AND b.OrgId IN (" + GetOrgID() + "))";
+
             Pricing prices = GetPriceUsed(null);
             double margin = GetMargin();
             string strWEBPriceUsed = Val(prices.UsePriceNumber.ToString());
-            string query = "With  x as (Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + " as PublicPrice,(spp.SpecialPrice*1.15*" + margin + ") as Special_Price,((p.PriceExclVat" + strWEBPriceUsed + "-spp.SpecialPrice)*1.15*" + margin + ") as Discount,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,p.Active,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and spp.StartDate<=GETDATE() and spp.EndDate>=(SELECT DATEADD(day, 1, GETDATE()))) SELECT TOP 5 * FROM X  Order by Discount Desc";
+            string query = "With  x as (Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + " as PublicPrice,(spp.SpecialPrice*1.15*" + margin + ") as Special_Price,((p.PriceExclVat" + strWEBPriceUsed + "-spp.SpecialPrice)*1.15*" + margin + ") as Discount,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,p.Active,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID Where p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and spp.StartDate<=GETDATE() and spp.EndDate>=(SELECT DATEADD(day, 1, GETDATE())) " + strWhere + ") SELECT TOP 5 * FROM X  Order by Discount Desc";
             List<SpecialPageProduct> products = [];
             using (var db = new SqlConnection(connString))
             {
@@ -4556,7 +4591,7 @@ namespace EsquireVRN.Utils
 
         internal static void AddVRNCategories(List<VRNSubCategories> subCategories)
         {
-            string query = "INSERT INTO [dbo].[VRNSubCategories] ([SubCategoryId],[OrgId],[Position],[CreatedAt]) VALUES (@SubCategoryId,@OrgId,@Position,@CreatedAt)";
+            string query = "INSERT INTO [dbo].[VRNSubCategories] ([SubCategoryId],[OrgId],[Position],[Title],[CategoryId],[CreatedAt]) VALUES (@SubCategoryId,@OrgId,@Position,@Title,@CategoryID,@CreatedAt)";
             using var db = new SqlConnection(connString);
             db.Execute(query, subCategories);
         }
@@ -4584,9 +4619,34 @@ namespace EsquireVRN.Utils
             return subCategories;
         }
 
+        internal static IEnumerable<CategoryDTO> GetAllWebSubCategories(string? searchText, long id)
+        {
+            List<CategoryDTO> categories = [];
+            string whereConditon = "";
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                string fixedSearchText = Regex.Replace(searchText, "^0+", "");
+                fixedSearchText = fixedSearchText.Replace("'", "''");
+
+                whereConditon += " AND (pGs.GroupName like '%'+@SearchText+'%')";
+            }
+            string query = "Select pGs.ProdGroupID as Id,pGs.GroupName as Title From ProdGroupLink pGL Join ProductGroups pGs ON pgL.ProdGroupName=pGs.GroupName JOIN ProductGroupHead pGH On pGH.GroupHeadID=pGL.GroupHeadID Where pGH.OrgID IN (94,380,932,546)" + whereConditon + " AND pGL.GroupHeadID=@GroupHeadId  AND NOT EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.SubCategoryId = pGs.ProdGroupID)";
+            using var db = new SqlConnection(connString);
+            var subCategories = db.Query<CategoryDTO>(query, new { SearchText = searchText, GroupHeadId = id }).ToList();
+            return subCategories;
+        }
+
+        public static string? GetSubCategoryTitle(long id)
+        {
+            string query = "Select GroupName from ProductGroups WHERE ProdGroupId=@GroupId";
+            using var db = new SqlConnection(connString);
+            var title = db.Query<string>(query, new { GroupId = id }).FirstOrDefault();
+            return title;
+        }
+
         public static DashboardCard GetDashboardCards()
         {
-            string query = @"Select Count(ManufID) as Brands from Manufacturers;Select Count(CategoryId) as Categories from VRNSubCategories where OrgID IN (" + GetOrgID() + ");Select Count(OrderID) as Orders from WebOrders where OrgID IN (" + GetOrgID() + ");Select Count(DISTINCT Email) from WebCustomer Where UserType='Customer' AND OrgID IN (" + GetOrgID() + ");Select Sum(wI.Price*wI.ProdQty)-SUM(wO.Discount) as Sales from WEBOrderItems wI join WEBOrders wO on wI.OrderID=wo.OrderID  where (wO.OrgID IN (" + GetOrgID() + "));";
+            string query = @"Select Count(ManufID) as Brands from Manufacturers;Select Count(CategoryId) as Categories from VRNSubCategories where OrgID IN (" + GetOrgID() + ");Select Count(ResellerOrderID) as Orders from ResellerOrders where OrgID IN (" + GetOrgID() + ");Select Count(DISTINCT Email) from WebCustomer Where UserType='Customer' AND OrgID IN (" + GetOrgID() + ");Select Sum(wI.Price*wI.ProdQty)-SUM(wO.Discount) as Sales from ResellerOrderItems wI join ResellerOrders wO on wI.ResellerOrderID=wo.ResellerOrderID  where (wO.OrgID IN (" + GetOrgID() + "));";
             DashboardCard dCard = new();
             using (var db = new SqlConnection(connString))
             {
@@ -4621,7 +4681,7 @@ namespace EsquireVRN.Utils
                 WhereClause += " AND ((x.AccountNo like '%" + fixedSearchText + "%') OR (Convert(varchar,x.ResellerOrderID) like '%" + fixedSearchText + "%') OR (x.Company Like '%" + fixedSearchText + "%') OR (x.OrderStatus like '%" + fixedSearchText + "%') OR (x.Email like '%" + fixedSearchText + "%') OR (x.Customer like '%" + fixedSearchText + "%') OR (Convert(varchar,x.TotalAmount) like '%" + fixedSearchText + "%'))";
             }
 
-            string query = "Select x.* from (Select O.*,(Select ResellerOrderID from ResellerOrders Where ResellerOrders.ResellerOrderID=O.OrderID) as ResellerOrderId,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(WEBOrderItems.Price*WEBOrderItems.ProdQty) from WEBOrderItems Where WEBOrderItems.OrderID=o.OrderID) as TotalAmount  from WEBCustomer c join WEBOrders O on o.CustID=c.CustID JOIN ResellerOrders RO on RO.WEBOrderID=O.OrderId where O.OrgID="+GetOrgID() + ") as x WHERE (1=1) " + WhereClause + " Order By x.OrderdDate Desc OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) from (Select O.*,(Select ResellerOrderID from ResellerOrders Where ResellerOrders.ResellerOrderID=O.OrderID) as ResellerOrderId,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(WEBOrderItems.Price*WEBOrderItems.ProdQty) from WEBOrderItems Where WEBOrderItems.OrderID=o.OrderID) as TotalAmount  from WEBCustomer c join WEBOrders O on o.CustID=c.CustID JOIN ResellerOrders RO on RO.WEBOrderID=O.OrderId where O.OrgID=" + GetOrgID() + ") as x WHERE (1=1) " + WhereClause + ";";
+            string query = "Select x.* from (Select O.*,(Select ResellerOrderID from ResellerOrders Where ResellerOrders.ResellerOrderID=O.OrderID) as ResellerOrderId,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(WEBOrderItems.Price*WEBOrderItems.ProdQty) from WEBOrderItems Where WEBOrderItems.OrderID=o.OrderID) as TotalAmount  from WEBCustomer c join WEBOrders O on o.CustID=c.CustID JOIN ResellerOrders RO on RO.WEBOrderID=O.OrderId where O.OrgID=" + GetOrgID() + ") as x WHERE (1=1) " + WhereClause + " Order By x.OrderdDate Desc OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) from (Select O.*,(Select ResellerOrderID from ResellerOrders Where ResellerOrders.ResellerOrderID=O.OrderID) as ResellerOrderId,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(WEBOrderItems.Price*WEBOrderItems.ProdQty) from WEBOrderItems Where WEBOrderItems.OrderID=o.OrderID) as TotalAmount  from WEBCustomer c join WEBOrders O on o.CustID=c.CustID JOIN ResellerOrders RO on RO.WEBOrderID=O.OrderId where O.OrgID=" + GetOrgID() + ") as x WHERE (1=1) " + WhereClause + ";";
             List<WebOrderWithCustomer> orders = [];
             int pageCount = 1;
             using (var db = new SqlConnection(connString))
@@ -4642,6 +4702,18 @@ namespace EsquireVRN.Utils
                 Orders = orders
             };
             return pagedOrders;
+        }
+
+        internal static bool VRNCategoriesExists(long subCategoryId)
+        {
+            string query = "Select * from VRNSubCategories Where Id=@Id AND OrgId=" + GetOrgID();
+            using var db = new SqlConnection(connString);
+            var result = db.Query<VRNSubCategories>(query, new { Id = subCategoryId }).FirstOrDefault();
+            if (result == null)
+            {
+                return true;
+            }
+            return true;
         }
     }
 }

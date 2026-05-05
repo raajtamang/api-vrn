@@ -10,6 +10,7 @@ namespace EsquireVRN.Models
         public long OrgId { get; set; }
         public long Position { get; set; } = 1;
         public long CategoryID { get; set; }
+        public string? Title { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

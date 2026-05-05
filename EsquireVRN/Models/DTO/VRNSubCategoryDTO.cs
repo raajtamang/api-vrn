@@ -7,6 +7,6 @@ namespace EsquireVRN.Models.DTO
         [Required]
         public long CategoryID { get; set; }
         [Required]
-        public required string SubCategory { get; set; }
+        public long SubCategoryId { get; set; }
     }
 }

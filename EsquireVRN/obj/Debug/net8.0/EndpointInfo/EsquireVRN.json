@@ -197,6 +197,27 @@
         }
       }
     },
+    "/api/Category/All": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Category/Popular": {
       "get": {
         "tags": [
@@ -2927,18 +2948,6 @@
         }
       }
     },
-    "/api/SubCategory/GetAllSubCategories": {
-      "get": {
-        "tags": [
-          "SubCategory"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/SubCategory/ByCategory": {
       "get": {
         "tags": [
@@ -3019,6 +3028,36 @@
           {
             "name": "id",
             "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/SubCategory/All/{CategoryId}": {
+      "get": {
+        "tags": [
+          "SubCategory"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CategoryId",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "integer",
               "format": "int64"
@@ -3281,6 +3320,102 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/WebOrders": {
+      "get": {
+        "tags": [
+          "WebOrders"
+        ],
+        "parameters": [
+          {
+            "name": "page_number",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "StartDate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/WebOrders/{id}": {
+      "get": {
+        "tags": [
+          "WebOrders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/WebOrders/GetTracking": {
+      "get": {
+        "tags": [
+          "WebOrders"
+        ],
+        "parameters": [
+          {
+            "name": "OrderId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -4908,7 +5043,7 @@
       "VRNSubCategoryDTO": {
         "required": [
           "categoryID",
-          "subCategory"
+          "subCategoryId"
         ],
         "type": "object",
         "properties": {
@@ -4916,9 +5051,9 @@
             "type": "integer",
             "format": "int64"
           },
-          "subCategory": {
-            "minLength": 1,
-            "type": "string"
+          "subCategoryId": {
+            "type": "integer",
+            "format": "int64"
           }
         },
         "additionalProperties": false

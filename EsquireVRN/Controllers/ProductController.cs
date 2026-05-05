@@ -11,7 +11,7 @@ namespace EsquireVRN.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
-    {             
+    {
         // GET: api/<ProductController>
         [HttpGet]
         public IActionResult Get(int page_number, int page_size)
@@ -180,7 +180,7 @@ namespace EsquireVRN.Controllers
             List<Product_View> Products = Shared.GetTrendingProducts();
             List<SubCategory> SubCategories = [];
             List<Brand> Brands = [];
-            if (Products != null && Products.Count>0)
+            if (Products != null && Products.Count > 0)
             {
                 string subcategories = string.Join(',', Products.Where(x => x.GroupName != null).Select(y => new { x = "N'" + y.GroupName.Replace("\'", "\'\'") + "'" }).Select(x => x.x).Distinct());
                 string brandIds = string.Join(',', Products.Where(x => x.ManufacturerName != null).Select(x => new { y = "N'" + x.ManufacturerName.Replace("\'", "\'\'") + "'" }).Select(x => x.y).Distinct());
@@ -310,18 +310,18 @@ namespace EsquireVRN.Controllers
         [Route("GetDealsOfTheDay")]
         public IActionResult GetDealsOfTheDay()
         {
-            var products= Shared.GetDealsOfTheDayHomepage();
+            var products = Shared.GetDealsOfTheDayHomepage();
             return Ok(products);
 
         }
 
         [HttpGet]
         [Route("GetAllDealsOfTheDay")]
-        public IActionResult GetAllDealsOfTheDay(int? page_number,int? page_size)
+        public IActionResult GetAllDealsOfTheDay(int? page_number, int? page_size)
         {
             int pNum = (page_number ?? 1);
             int pSize = (page_size ?? 16);
-            var products = Shared.GetDealsOfTheDay(pNum,pSize);
+            var products = Shared.GetDealsOfTheDay(pNum, pSize);
             return Ok(products);
 
         }
@@ -330,15 +330,17 @@ namespace EsquireVRN.Controllers
         [Route("TopSales")]
         public IActionResult GetTopSalesProducts()
         {
-            List<TopSale> topSales = new();
-            string query = "WITH CTE as (Select Products.ProdId,Products.ImgURL,Products.ProductName,Sum(WebOrderItems.ProdQty) as Sales from WEBOrderItems JOin Products on WEBOrderItems.ProdID=Products.ProdID Where Products.OrgID IN (94,380,932,546) AND Products.Active=1 AND Products.OutputMe=1 AND dbo.[GetProductStockCount](Products.ProdId,Products.Status,N'A')>0 Group By Products.ProdID,Products.ImgURL,Products.ProductName) Select Top 10 * from CTE Order By Sales desc;";
+            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + Shared.GetOrgID() + "))";
+            List<TopSale> topSales = [];
+            string query = "WITH CTE as (Select Products.ProdId,Products.ImgURL,Products.ProductName,Sum(ResellerOrderItems.ProdQty) as Sales from ResellerOrderItems JOIN Products on ResellerOrderItems.ProdID=Products.ProdID Where Products.OrgID IN (" + Shared.GetOrgID()+") AND Products.Active=1 AND Products.OutputMe=1 AND dbo.[GetProductStockCount](Products.ProdId,Products.Status,N'A')>0 " + strWhere + " Group By Products.ProdID,Products.ImgURL,Products.ProductName) Select Top 10 * from CTE Order By Sales desc;";
             using (var db = new SqlConnection(Shared.connString))
             {
-                topSales = db.Query<TopSale>(query).ToList();
+                topSales = [.. db.Query<TopSale>(query)];
             }
+
             return Ok(topSales);
 
         }
 
-    }   
+    }
 }
