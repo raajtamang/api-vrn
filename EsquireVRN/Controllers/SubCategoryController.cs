@@ -72,9 +72,9 @@ namespace EsquireVRN.Controllers
 
         [HttpGet("All/{CategoryId}")]
         [Authorize(Roles = "Reseller")]
-        public IActionResult GetAllSubCategories(string? search, long CategoryId)
+        public IActionResult GetAllSubCategories(string? search, long CategoryId, long? page_number, long? page_size)
         {
-            return Ok(Shared.GetAllWebSubCategories(search, CategoryId));
+            return Ok(Shared.GetAllWebSubCategories(search, CategoryId, page_size, page_number));
         }
 
         [HttpPost("UpdateSubCategoryList")]

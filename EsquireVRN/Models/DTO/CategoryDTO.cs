@@ -4,5 +4,6 @@
     {
         public long Id { get; set; }
         public required string Title { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

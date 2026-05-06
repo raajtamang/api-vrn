@@ -11,6 +11,7 @@ using NPOI.SS.Formula.Functions;
 using SelectPdf;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.Metrics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
@@ -395,8 +396,11 @@ namespace EsquireVRN.Utils
             return categories;
         }
 
-        public static IEnumerable<CategoryDTO> GetAllCategories(string? searchText)
+        public static PagedCategories GetAllCategories(string? searchText, long? pageNumber, long? pageSize)
         {
+            long pNum = (pageNumber ?? 1);
+            long pSize = (pageSize ?? 12);
+            long pCount = 1;
             List<CategoryDTO> categories = [];
             string whereConditon = "WHERE (1=1)";
             if (!string.IsNullOrEmpty(searchText))
@@ -408,10 +412,21 @@ namespace EsquireVRN.Utils
             }
             using (var db = new SqlConnection(connString))
             {
-                string strQuery = "Select x.* from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title FROM ProductGroupHead PGH WHERE PGH.OrgId IN (94,380,932,546)) as x " + whereConditon + " ORDER BY x.Title";
-                categories = [.. db.Query<CategoryDTO>(strQuery, new { SearchText = searchText })];
+                string strQuery = "Select x.* from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title,pgH.ImageUrl FROM ProductGroupHead PGH WHERE PGH.OrgId IN (94,380,932,546)) as x " + whereConditon + " ORDER BY x.Title OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select count(1) from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title FROM ProductGroupHead PGH WHERE PGH.OrgId IN (94,380,932,546)) as x " + whereConditon + "";
+                var result = db.QueryMultiple(strQuery, new { SearchText = searchText });
+                categories = [.. result.Read<CategoryDTO>()];
+                long counts = result.Read<long>().FirstOrDefault();
+                if (counts > 0)
+                {
+                    pCount = (int)Math.Ceiling((double)counts / pSize);
+                }
             }
-            return categories;
+            PagedCategories pCategories = new()
+            {
+                page_count = pCount,
+                Categories = categories
+            };
+            return pCategories;
         }
 
         public static List<Category> GetFeaturedCategories()
@@ -4619,9 +4634,12 @@ namespace EsquireVRN.Utils
             return subCategories;
         }
 
-        internal static IEnumerable<CategoryDTO> GetAllWebSubCategories(string? searchText, long id)
+        internal static PagedSubCategories GetAllWebSubCategories(string? searchText, long id, long? pageSize, long? pageNumber)
         {
-            List<CategoryDTO> categories = [];
+            long pNum = (pageNumber ?? 1);
+            long pSize = (pageSize ?? 12);
+            long pCount = 1;
+            List<CategoryDTO> subCategories = [];
             string whereConditon = "";
             if (!string.IsNullOrEmpty(searchText))
             {
@@ -4630,10 +4648,22 @@ namespace EsquireVRN.Utils
 
                 whereConditon += " AND (pGs.GroupName like '%'+@SearchText+'%')";
             }
-            string query = "Select pGs.ProdGroupID as Id,pGs.GroupName as Title From ProdGroupLink pGL Join ProductGroups pGs ON pgL.ProdGroupName=pGs.GroupName JOIN ProductGroupHead pGH On pGH.GroupHeadID=pGL.GroupHeadID Where pGH.OrgID IN (94,380,932,546)" + whereConditon + " AND pGL.GroupHeadID=@GroupHeadId  AND NOT EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.SubCategoryId = pGs.ProdGroupID)";
+            string query = "Select pGs.ProdGroupID as Id,pGs.GroupName as Title,pGs.ImageUrl From ProdGroupLink pGL Join ProductGroups pGs ON pgL.ProdGroupName=pGs.GroupName JOIN ProductGroupHead pGH On pGH.GroupHeadID=pGL.GroupHeadID Where pGH.OrgID IN (94,380,932,546)" + whereConditon + " AND pGL.GroupHeadID=@GroupHeadId  AND NOT EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.SubCategoryId = pGs.ProdGroupID) ORDER BY pGS.GroupName OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) From ProdGroupLink pGL Join ProductGroups pGs ON pgL.ProdGroupName=pGs.GroupName JOIN ProductGroupHead pGH On pGH.GroupHeadID=pGL.GroupHeadID Where pGH.OrgID IN (94,380,932,546)" + whereConditon + " AND pGL.GroupHeadID=@GroupHeadId  AND NOT EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.SubCategoryId = pGs.ProdGroupID)";
             using var db = new SqlConnection(connString);
-            var subCategories = db.Query<CategoryDTO>(query, new { SearchText = searchText, GroupHeadId = id }).ToList();
-            return subCategories;
+            var result = db.QueryMultiple(query, new { SearchText = searchText, GroupHeadId = id });
+            subCategories = [.. result.Read<CategoryDTO>()];
+            long counts = result.Read<long>().FirstOrDefault();
+            if (counts > 0)
+            {
+                pCount = (int)Math.Ceiling((double)counts / pSize);
+            }
+            PagedSubCategories categories = new()
+            {
+                page_count = pCount,
+                SubCategories = subCategories,
+                CategoryID = id
+            };
+            return categories;
         }
 
         public static string? GetSubCategoryTitle(long id)

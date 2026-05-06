@@ -21,9 +21,9 @@ namespace EsquireVRN.Controllers
 
         [HttpGet("All")]
         [Authorize(Roles = "Reseller")]
-        public IActionResult GetAllCategories(string?search)
+        public IActionResult GetAllCategories(string? search, long? page_number, long? page_size)
         {
-            return Ok(Shared.GetAllCategories(search));
+            return Ok(Shared.GetAllCategories(search, page_number, page_size));
         }
         [HttpGet]
         [Route("Popular")]

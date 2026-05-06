@@ -209,6 +209,22 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
           }
         ],
         "responses": {
@@ -3058,6 +3074,22 @@
             "name": "CategoryId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
             "schema": {
               "type": "integer",
               "format": "int64"
