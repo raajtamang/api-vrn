@@ -1,8 +1,8 @@
 ﻿namespace EsquireVRN.Models.DTO
 {
-    public class PagedSubCategories
+    public class PagedCategoriesDTO
     {
         public long page_count { get; set; } = 1;
-        public List<SubCategory>? SubCategories { get; set; }
+        public List<CategoryDTO>? Categories { get; set; }
     }
 }

@@ -16,13 +16,13 @@ namespace EsquireVRN.Controllers
     {
         // GET: api/<SubCategoryController>
         [HttpGet]
-        public IEnumerable<SubCategory> Get()
+        public IActionResult Get(long?page_number,long?page_size)
         {
-            return Shared.GetSubCategories();
+            return Ok(Shared.GetSubCategories(page_number,page_size));
         }
 
         [HttpGet]
-        [Route("ByCategory")]
+        [Route("ByCategory/{id}")]
         public IEnumerable<SubCategory> ByCategory(long id)
         {
             return Shared.GetSubGetCategoriesByCategory(id);

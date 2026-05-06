@@ -385,18 +385,34 @@ namespace EsquireVRN.Utils
         }
 
         //Categories Section
-        public static IEnumerable<Category> GetCategories()
+        public static PagedCategories GetCategories(long? pageNum, long? pageSize)
         {
+            long pNum = (pageNum ?? 1);
+            long pSize = (pageSize ?? 12);
             List<Category> categories = [];
+            long pCount = 1;
             using (var db = new SqlConnection(connString))
             {
-                string strQuery = "Select x.* from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title,pgH.MetaTitle,pgH.MetaDescription,pgH.ImageUrl,pgH.[Description],pgH.[Featured],pgH.[Position] FROM ProductGroupHead pgH JOIN VRNSubCategories VSC on pgH.GroupHeadID=VSC.CategoryID WHERE VSC.OrgId=" + GetOrgID() + ") as x ORDER BY x.Title";
-                categories = [.. db.Query<Category>(strQuery)];
+                string strQuery = "Select x.* from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title,pgH.MetaTitle,pgH.MetaDescription,pgH.ImageUrl,pgH.[Description],pgH.[Featured],pgH.[Position] FROM ProductGroupHead pgH JOIN VRNSubCategories VSC on pgH.GroupHeadID=VSC.CategoryID WHERE VSC.OrgId=" + GetOrgID() + ") as x ORDER BY x.Title OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY; Select  Count(1) FROM ProductGroupHead pgH JOIN VRNSubCategories VSC on pgH.GroupHeadID=VSC.CategoryID WHERE VSC.OrgId=" + GetOrgID() + ";";
+                var result = db.QueryMultiple(strQuery);
+                categories = [.. result.Read<Category>().DistinctBy(x => x.Title)];
+                long counts = result.Read<long>().FirstOrDefault();
+                if (counts > 0)
+                {
+                    pCount = (long)Math.Ceiling((double)counts / pSize);
+                }
+
             }
-            return categories;
+            PagedCategories pCategories = new()
+            {
+                page_count = pCount,
+                Categories = categories
+            };
+
+            return pCategories;
         }
 
-        public static PagedCategories GetAllCategories(string? searchText, long? pageNumber, long? pageSize)
+        public static PagedCategoriesDTO GetAllCategories(string? searchText, long? pageNumber, long? pageSize)
         {
             long pNum = (pageNumber ?? 1);
             long pSize = (pageSize ?? 12);
@@ -414,14 +430,15 @@ namespace EsquireVRN.Utils
             {
                 string strQuery = "Select x.* from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title,pgH.ImageUrl FROM ProductGroupHead PGH WHERE PGH.OrgId IN (94,380,932,546)) as x " + whereConditon + " ORDER BY x.Title OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select count(1) from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title FROM ProductGroupHead PGH WHERE PGH.OrgId IN (94,380,932,546)) as x " + whereConditon + "";
                 var result = db.QueryMultiple(strQuery, new { SearchText = searchText });
-                categories = [.. result.Read<CategoryDTO>()];
+                categories = [.. result.Read<CategoryDTO>().DistinctBy(x => x.Title)];
                 long counts = result.Read<long>().FirstOrDefault();
                 if (counts > 0)
                 {
                     pCount = (int)Math.Ceiling((double)counts / pSize);
                 }
             }
-            PagedCategories pCategories = new()
+
+            PagedCategoriesDTO pCategories = new()
             {
                 page_count = pCount,
                 Categories = categories
@@ -520,22 +537,36 @@ namespace EsquireVRN.Utils
         }
 
         //Sub Categories Section
-        public static List<SubCategory> GetSubCategories()
+        public static PagedSubCategories GetSubCategories(long? pageNumber, long? pageSize)
         {
+            long pNum = (pageNumber ?? 1);
+            long pSize = (pageSize ?? 12);
+            long pCount = 1;
             List<SubCategory> categories = [];
             using (var db = new SqlConnection(connString))
             {
-                string strQuery = "SELECT sCategory.ProdGroupID as Id,sCategory.GroupName as Title,link.GroupHeadID as Category_Id,sCategory.MetaTitle,sCategory.MetaDescription,sCategory.ImageUrl,sCategory.[Description] from ProductGroups sCategory  Join ProdGroupLInk link on sCategory.GroupName=link.ProdGroupName join ProductGroupHead Category on link.GroupHeadID=Category.GroupHeadID Where Category.OrgID IN (94,380,932,546)";
-                categories = db.Query<SubCategory>(strQuery).ToList();
+                string strQuery = "SELECT sCategory.ProdGroupID as Id,sCategory.GroupName as Title,VCS.CategoryId as Category_Id,sCategory.MetaTitle,sCategory.MetaDescription,sCategory.ImageUrl,sCategory.[Description] from ProductGroups sCategory  Join VRNSubCategories VCS on sCategory.ProdGroupId=VCS.SubCategoryId WHERE VCS.OrgId IN (" + GetOrgID() + ");SELECT Count(1) FROM VRNSubCategories WHERE OrgId IN (" + GetOrgID() + ")";
+                var result = db.QueryMultiple(strQuery);
+                categories = [.. result.Read<SubCategory>().DistinctBy(x => x.Title)];
+                long counts = result.Read<long>().FirstOrDefault();
+                if (counts > 0)
+                {
+                    pCount = (long)Math.Ceiling((double)counts / pSize);
+                }
             }
-            return [.. categories.DistinctBy(x => x.Title)];
+            PagedSubCategories pSubCategories = new()
+            {
+                page_count = pCount,
+                SubCategories = categories
+            };
+            return pSubCategories;
         }
         public static List<SubCategory> GetSubGetCategoriesByCategory(long? category_id)
         {
             List<SubCategory> categories = [];
             using (var db = new SqlConnection(connString))
             {
-                string strQuery = "SELECT sCategory.ProdGroupID as Id,sCategory.GroupName as Title,VSCategory.CategoryID as Category_Id,sCategory.MetaTitle,sCategory.MetaDescription,sCategory.ImageUrl,sCategory.[Description] from ProductGroups sCategory Join VRNSubCategories VSCategory ON sCategory.ProdGroupID=VSCategory.SubCategoryId Where VSCategory.OrgID=" + GetOrgID() + " AND VSCategory.CategoryID=" + category_id;
+                string strQuery = "SELECT sCategory.ProdGroupID as Id,sCategory.GroupName as Title,VSCategory.CategoryID as Category_Id,sCategory.MetaTitle,sCategory.MetaDescription,sCategory.ImageUrl,sCategory.[Description] from ProductGroups sCategory Join VRNSubCategories VSCategory ON sCategory.ProdGroupID=VSCategory.SubCategoryId Where VSCategory.OrgID IN (" + GetOrgID() + ") AND VSCategory.CategoryID=" + category_id;
                 var values = new { Id = category_id };
                 categories = [.. db.Query<SubCategory>(strQuery, category_id)];
             }
@@ -4634,7 +4665,7 @@ namespace EsquireVRN.Utils
             return subCategories;
         }
 
-        internal static PagedSubCategories GetAllWebSubCategories(string? searchText, long id, long? pageSize, long? pageNumber)
+        internal static PagedSubCategoriesDTO GetAllWebSubCategories(string? searchText, long id, long? pageSize, long? pageNumber)
         {
             long pNum = (pageNumber ?? 1);
             long pSize = (pageSize ?? 12);
@@ -4651,13 +4682,13 @@ namespace EsquireVRN.Utils
             string query = "Select pGs.ProdGroupID as Id,pGs.GroupName as Title,pGs.ImageUrl From ProdGroupLink pGL Join ProductGroups pGs ON pgL.ProdGroupName=pGs.GroupName JOIN ProductGroupHead pGH On pGH.GroupHeadID=pGL.GroupHeadID Where pGH.OrgID IN (94,380,932,546)" + whereConditon + " AND pGL.GroupHeadID=@GroupHeadId  AND NOT EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.SubCategoryId = pGs.ProdGroupID) ORDER BY pGS.GroupName OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) From ProdGroupLink pGL Join ProductGroups pGs ON pgL.ProdGroupName=pGs.GroupName JOIN ProductGroupHead pGH On pGH.GroupHeadID=pGL.GroupHeadID Where pGH.OrgID IN (94,380,932,546)" + whereConditon + " AND pGL.GroupHeadID=@GroupHeadId  AND NOT EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.SubCategoryId = pGs.ProdGroupID)";
             using var db = new SqlConnection(connString);
             var result = db.QueryMultiple(query, new { SearchText = searchText, GroupHeadId = id });
-            subCategories = [.. result.Read<CategoryDTO>()];
+            subCategories = [.. result.Read<CategoryDTO>().DistinctBy(x => x.Title)];
             long counts = result.Read<long>().FirstOrDefault();
             if (counts > 0)
             {
-                pCount = (int)Math.Ceiling((double)counts / pSize);
+                pCount = (long)Math.Ceiling((double)counts / pSize);
             }
-            PagedSubCategories categories = new()
+            PagedSubCategoriesDTO categories = new()
             {
                 page_count = pCount,
                 SubCategories = subCategories,

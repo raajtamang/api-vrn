@@ -14,9 +14,9 @@ namespace EsquireVRN.Controllers
     {
         // GET: api/<CategoryController>
         [HttpGet]
-        public IEnumerable<Category> Get()
+        public IActionResult Get(long?page_number,long?page_size)
         {
-            return Shared.GetCategories();
+            return Ok(Shared.GetCategories(page_number,page_size));
         }
 
         [HttpGet("All")]

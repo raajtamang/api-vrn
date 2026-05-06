@@ -164,35 +164,27 @@
         "tags": [
           "Category"
         ],
+        "parameters": [
+          {
+            "name": "page_number",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Category"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Category"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Category"
-                  }
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
@@ -2931,40 +2923,32 @@
         "tags": [
           "SubCategory"
         ],
+        "parameters": [
+          {
+            "name": "page_number",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SubCategory"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SubCategory"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SubCategory"
-                  }
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
     },
-    "/api/SubCategory/ByCategory": {
+    "/api/SubCategory/ByCategory/{id}": {
       "get": {
         "tags": [
           "SubCategory"
@@ -2972,7 +2956,8 @@
         "parameters": [
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "integer",
               "format": "int64"
@@ -3642,56 +3627,6 @@
           },
           "product": {
             "$ref": "#/components/schemas/Product"
-          }
-        },
-        "additionalProperties": false
-      },
-      "Category": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "readOnly": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "metaTitle": {
-            "type": "string",
-            "nullable": true
-          },
-          "metaDescription": {
-            "type": "string",
-            "nullable": true
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "imageUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "image": {
-            "type": "string",
-            "format": "binary",
-            "nullable": true
-          },
-          "itemCount": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "featured": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "position": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
           }
         },
         "additionalProperties": false

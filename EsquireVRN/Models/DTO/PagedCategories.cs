@@ -3,6 +3,6 @@
     public class PagedCategories
     {
         public long page_count { get; set; } = 1;
-        public List<CategoryDTO>? Categories { get; set; }
+        public List<Category>? Categories { get; set; }
     }
 }
