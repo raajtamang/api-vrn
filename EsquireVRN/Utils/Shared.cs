@@ -4642,9 +4642,9 @@ namespace EsquireVRN.Utils
             db.Execute(query, subCategories);
         }
 
-        internal static void RemoveVRNCategories(List<long> removeIdList, long v)
+        internal static void RemoveVRNCategories(List<long> removeIdList, long OrgId)
         {
-            string query = "DELETE FROM [dbo].[VRNSubCategories] WHERE Id IN @Ids";
+            string query = "DELETE FROM [dbo].[VRNSubCategories] WHERE SubCategoryId IN @Ids AND ORGID=" + OrgId;
             using var db = new SqlConnection(connString);
             db.Execute(query, new { Ids = removeIdList });
         }
