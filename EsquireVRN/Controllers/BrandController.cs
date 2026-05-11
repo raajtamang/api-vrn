@@ -1,8 +1,10 @@
 ﻿using Dapper;
 using EsquireVRN.Models;
+using EsquireVRN.Models.DTO;
 using EsquireVRN.Utils;
-using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,9 +16,9 @@ namespace EsquireVRN.Controllers
     {
         // GET: api/Brand
         [HttpGet]
-        public IEnumerable<Brand> Get()
+        public IActionResult Get(long?page_number,long?page_size,string?search)
         {
-            return Shared.GetBrands();
+            return Ok(Shared.GetBrands(page_number,page_size,search));
         }
        
         [HttpGet]
@@ -38,7 +40,56 @@ namespace EsquireVRN.Controllers
             return Ok(brand);
         }
 
-       
+        [HttpGet("GetAllBrands")]
+        [Authorize(Roles ="Reseller")]
+        public IActionResult GetAllBrands(long? page_number, long? page_size, string? search)
+        {
+            return Ok(Shared.GetAllBrands(page_number,page_size,search));
+
+        }
+
+        [HttpPost("UpdateBrandList")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult UpdateBrands([FromBody] UpdateBrandModel reqModel)
+        {
+            try
+            {
+                var orgId = Shared.GetOrgID();
+                if (reqModel?.AddIdList?.Count > 0)
+                {
+                    long position = Shared.GetVRNBrandLastPosition(orgId);
+                    List<VRNBrands> subCategories = [];
+                    foreach (var item in reqModel.AddIdList)
+                    {
+                        if (!Shared.VRNBrandsExists(item))
+                        {
+                            VRNBrands sCategory = new()
+                            {
+                                BrandId = item,
+                                OrgId = orgId,
+                                Position = position,
+                                CreatedDate=DateTime.Now
+                            };
+                            subCategories.Add(sCategory);
+                            position++;
+                        }
+                    }
+                    if (subCategories.Count > 0)
+                    {
+                        Shared.AddVRNBrands(subCategories);
+                    }
+                }
+                if (reqModel?.RemoveIdList?.Count > 0)
+                {
+                    Shared.RemoveVRNBrands(reqModel.RemoveIdList, Shared.GetOrgID());
+                }
+                return Ok(new { message = "Brand list updated successfully." });
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new { error = "Something went wrong. Please try again." });
+            }
+        }
 
         [HttpGet]
         [Route("Products")]

@@ -7,5 +7,6 @@
         public long Orders { get; set; }= 0;
         public long Customers { get; set; } = 0;
         public decimal Sales { get; set; } = 0;
+        public long SubCategories { get; set; } = 0;
     }
 }

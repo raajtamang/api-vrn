@@ -139,26 +139,72 @@ namespace EsquireVRN.Utils
 
         //Brands Section
 
-        public static List<Brand> GetBrands()
+        public static PagedBrands GetBrands(long? pageNum, long? pageSize, string? searchText)
         {
-            List<Brand> brands = new();
+            long pNum = (pageNum ?? 1);
+            long pSize = (pageSize ?? 12);
+            long pCount = 1;
+            List<Brand> brands = [];
+            string whereConditon = "";
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                string fixedSearchText = Regex.Replace(searchText, "^0+", "");
+                fixedSearchText = fixedSearchText.Replace("'", "''");
+
+                whereConditon += " AND (m.ManufacturerName like '%'+@SearchText+'%')";
+            }
             using (var db = new SqlConnection(connString))
             {
-                string queryStr = "Select x.Id,x.Name,x.Logo,x.Link,x.MetaTitle,x.MetaDescription,x.Description,x.Featured,x.Position from (Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo],[ManufURL] as Link,[MetaTitle],[MetaDescription],[Description],[Featured],[Position],(SELECT Count(p.ProdID) from Products p  where dbo.GetProductStockCount(p.ProdID, p.Status, N'A')>0 and p.ManufID=m.ManufID and p.OutputMe=1 and p.Active=1 and p.OrgID IN (94,380,932,546) and p.ImgURL IS NOT NULL and p.ImgURL!='') as ItemCount from [dbo].[Manufacturers]  m) as x where x.ItemCount>0 ORDER BY x.Name";
-                brands = [.. db.Query<Brand>(queryStr)];
+                string strQuery = "Select m.ManufID AS Id, m.ManufacturerName AS Name, m.Logo, m.ManufURL AS Link,m.MetaTitle, m.MetaDescription, m.Description FROM dbo.Manufacturers m JOIN VRNBrands VRNB ON m.ManufID = VRNB.BrandId WHERE VRNB.OrgId=" + GetOrgID() + whereConditon + " ORDER BY VRNB.Position OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select COUNT(1) FROM Manufacturers m JOIN VRNBrands VRNB on m.ManufID=VRNB.BrandId WHERE VRNB.OrgId=" + GetOrgID() + whereConditon + ";";
+                var result = db.QueryMultiple(strQuery, new { SearchText = searchText });
+                brands = [.. result.Read<Brand>().DistinctBy(x => x.Name)];
+                long counts = result.Read<long>().FirstOrDefault();
+                if (counts > 0)
+                {
+                    pCount = (int)Math.Ceiling((double)counts / pSize);
+                }
             }
-            return brands;
+
+            PagedBrands pagedBrands = new()
+            {
+                page_count = pCount,
+                Brands = brands
+            };
+            return pagedBrands;
         }
 
-        public static List<Brand> GetAllBrands()
+        public static PagedBrandsDTO GetAllBrands(long? pageNumber, long? pageSize, string? searchText)
         {
-            List<Brand> brands = new();
+            long pNum = (pageNumber ?? 1);
+            long pSize = (pageSize ?? 12);
+            long pCount = 1;
+            List<BrandDTO> brands = [];
+            string whereConditon = "WHERE (1=1)";
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                string fixedSearchText = Regex.Replace(searchText, "^0+", "");
+                fixedSearchText = fixedSearchText.Replace("'", "''");
+
+                whereConditon += " AND (x.Name like '%'+@SearchText+'%')";
+            }
             using (var db = new SqlConnection(connString))
             {
-                string queryStr = "Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo],[ManufURL] as Link,[MetaTitle],[MetaDescription],[Description],[Featured],[Position] from Manufacturers ORDER BY [ManufID] DESC";
-                brands = db.Query<Brand>(queryStr).ToList();
+                string strQuery = "Select x.* from (Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo] FROM Manufacturers) as x " + whereConditon + " AND NOT EXISTS (SELECT 1 FROM VRNBrands b WHERE b.BrandId = X.Id AND OrgID=" + GetOrgID() + ") ORDER BY x.Name OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select count(1) from (Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo] FROM Manufacturers) as x " + whereConditon + " AND NOT EXISTS (SELECT 1 FROM VRNBrands b WHERE b.BrandId = X.Id AND OrgID=" + GetOrgID() + ")";
+                var result = db.QueryMultiple(strQuery, new { SearchText = searchText });
+                brands = [.. result.Read<BrandDTO>().DistinctBy(x => x.Name)];
+                long counts = result.Read<long>().FirstOrDefault();
+                if (counts > 0)
+                {
+                    pCount = (int)Math.Ceiling((double)counts / pSize);
+                }
             }
-            return brands;
+
+            PagedBrandsDTO pagedBrands = new()
+            {
+                page_count = pCount,
+                Brands = brands
+            };
+            return pagedBrands;
         }
 
         public static List<Brand> GetFeaturedBrands(int? pNum, int? pSize)
@@ -192,7 +238,7 @@ namespace EsquireVRN.Utils
             List<Brand> brands = new();
             using (var db = new SqlConnection(connString))
             {
-                string queryStr = @"WITH ProductCounts AS (SELECT ManufID, COUNT(1) AS ItemCount FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.OutputMe = 1 AND p.Active = 1 AND p.OrgID IN (94, 380, 932, 546) GROUP BY ManufID) SELECT m.ManufID AS Id, m.ManufacturerName AS Name, m.Logo, m.ManufURL AS Link,m.MetaTitle, m.MetaDescription, m.Description FROM dbo.Manufacturers m JOIN ProductCounts pc ON m.ManufID = pc.ManufID WHERE pc.ItemCount > 0 ORDER BY NEWID() OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY";
+                string queryStr = @"Select m.ManufID AS Id, m.ManufacturerName AS Name, m.Logo, m.ManufURL AS Link,m.MetaTitle, m.MetaDescription, m.Description FROM dbo.Manufacturers m JOIN VRNBrands VRNB ON m.ManufID = VRNB.BrandId ORDER BY NEWID() OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY";
                 brands = db.Query<Brand>(queryStr).ToList();
             }
             return brands;
@@ -202,7 +248,7 @@ namespace EsquireVRN.Utils
             Brand brands = new();
             using (var db = new SqlConnection(connString))
             {
-                string queryStr = "Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo],[ManufURL] as Link,[MetaTitle],[MetaDescription],[Description],[Featured],[Position] from [dbo].[Manufacturers] where [ManufID]=@MfdId";
+                string queryStr = "Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo],[ManufURL] as Link,[MetaTitle],[MetaDescription],[Description],[Featured],m.[Position] from [dbo].[Manufacturers] m JOIN VRNBrands VRNB on m.ManufID=VRNB.BrandId WHERE [ManufID]=@MfdId";
                 var values = new { MfdId = id };
                 brands = db.Query<Brand>(queryStr, values).FirstOrDefault();
             }
@@ -4707,7 +4753,7 @@ namespace EsquireVRN.Utils
 
         public static DashboardCard GetDashboardCards()
         {
-            string query = @"Select Count(ManufID) as Brands from Manufacturers;Select Count(CategoryId) as Categories from VRNSubCategories where OrgID IN (" + GetOrgID() + ");Select Count(ResellerOrderID) as Orders from ResellerOrders where OrgID IN (" + GetOrgID() + ");Select Count(DISTINCT Email) from WebCustomer Where UserType='Customer' AND OrgID IN (" + GetOrgID() + ");Select Sum(wI.Price*wI.ProdQty)-SUM(wO.Discount) as Sales from ResellerOrderItems wI join ResellerOrders wO on wI.ResellerOrderID=wo.ResellerOrderID  where (wO.OrgID IN (" + GetOrgID() + "));";
+            string query = @"Select Count(ManufID) as Brands from Manufacturers;Select Count(CategoryId) as Categories from VRNSubCategories where OrgID IN (" + GetOrgID() + ");Select Count(ResellerOrderID) as Orders from ResellerOrders where OrgID IN (" + GetOrgID() + ");Select Count(DISTINCT Email) from WebCustomer Where UserType='Customer' AND OrgID IN (" + GetOrgID() + ");Select Sum(wI.Price*wI.ProdQty)-SUM(wO.Discount) as Sales from ResellerOrderItems wI join ResellerOrders wO on wI.ResellerOrderID=wo.ResellerOrderID  where (wO.OrgID IN (" + GetOrgID() + "));SELECT COUNT(1) FROM ProductGroups pg JOIN VRNSubCategories VRNs on pg.ProdGroupId=VRNs.SubCategoryId AND VRNs.OrgId=" + GetOrgID();
             DashboardCard dCard = new();
             using (var db = new SqlConnection(connString))
             {
@@ -4717,6 +4763,7 @@ namespace EsquireVRN.Utils
                 dCard.Orders = Cards.Read<long>().FirstOrDefault();
                 dCard.Customers = Cards.Read<long>().FirstOrDefault();
                 dCard.Sales = Math.Round(Cards.Read<decimal>().FirstOrDefault(), 2);
+                dCard.SubCategories = Cards.Read<long>().FirstOrDefault();
             }
             return dCard;
         }
@@ -4775,6 +4822,46 @@ namespace EsquireVRN.Utils
                 return false;
             }
             return true;
+        }
+
+        internal static long GetVRNBrandLastPosition(long orgId)
+        {
+            string query = "SELECT TOP 1 Position FROM VRNBrands WHERE OrgID=@OrgID ORDER BY Position DESC";
+            long position = 1;
+            var value = new { OrgID = orgId };
+            using var db = new SqlConnection(connString);
+            var result = db.Query<long>(query, value).FirstOrDefault();
+            if (result > 0)
+            {
+                position = result + 1;
+            }
+            return position;
+        }
+
+        internal static bool VRNBrandsExists(long brandId)
+        {
+            string query = "Select * from VRNBrands Where Id=@Id AND OrgId=" + GetOrgID();
+            using var db = new SqlConnection(connString);
+            var result = db.Query<VRNSubCategories>(query, new { Id = brandId }).FirstOrDefault();
+            if (result == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        internal static void AddVRNBrands(List<VRNBrands> brands)
+        {
+            string query = "INSERT INTO [dbo].[VRNBrands] ([BrandId],[OrgId],[Position],[CreatedDate]) VALUES (@BrandId,@OrgId,@Position,@CreatedDate)";
+            using var db = new SqlConnection(connString);
+            db.Execute(query, brands);
+        }
+
+        internal static void RemoveVRNBrands(List<long> brands, long OrgId)
+        {
+            string query = "DELETE FROM [dbo].[VRNBrands] WHERE BrandId in @Ids AND OrgId=" + OrgId;
+            using var db = new SqlConnection(connString);
+            db.Execute(query, new { Ids = brands });
         }
     }
 }

@@ -31,6 +31,7 @@ namespace EsquireVRN.Models.DTO
         public string? Company { get; set; }
         public string? Email { get; set; }
         public string? AccountNo { get; set; }
+        public string? OrderStatus { get; set; }
         public decimal? TotalAmount { get; set; }
         public string? PaymentReference { get; set; }
     }
