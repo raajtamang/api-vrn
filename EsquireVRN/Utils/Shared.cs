@@ -4772,7 +4772,7 @@ namespace EsquireVRN.Utils
             var result = db.Query<VRNSubCategories>(query, new { Id = subCategoryId }).FirstOrDefault();
             if (result == null)
             {
-                return true;
+                return false;
             }
             return true;
         }
