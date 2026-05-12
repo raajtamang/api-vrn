@@ -34,5 +34,6 @@ namespace EsquireVRN.Models.DTO
         public string? OrderStatus { get; set; }
         public decimal? TotalAmount { get; set; }
         public string? PaymentReference { get; set; }
+        public string? ResellerOrderId { get; set; }
     }
 }
