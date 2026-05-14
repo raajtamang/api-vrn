@@ -12,6 +12,12 @@ namespace EsquireVRN.Controllers
 {
     public class HomeController : ControllerBase
     {
+        public PasswordEncryptionService encryptionService;
+        public HomeController(PasswordEncryptionService _encryptionService)
+        {
+            encryptionService = _encryptionService;
+        }
+
         [HttpPost]
         [Route("api/login")]
         public IActionResult Login([FromBody] LoginModel loginModel)
@@ -71,7 +77,7 @@ namespace EsquireVRN.Controllers
             {
                 hasDeliveryAddress = true;
             }
-            return Ok(new { token, name = lDetails.FirstName, HasDeliveryAddress = hasDeliveryAddress,UserID=lDetails.CustID });
+            return Ok(new { token, name = lDetails.FirstName, HasDeliveryAddress = hasDeliveryAddress, UserID = lDetails.CustID });
         }
 
         [HttpPost]
@@ -397,7 +403,7 @@ namespace EsquireVRN.Controllers
                 }
                 if (string.IsNullOrWhiteSpace(webDetail.OrgTel2))
                 {
-                    webDetail.OrgTel2= oDetail?.OrgTel2;
+                    webDetail.OrgTel2 = oDetail?.OrgTel2;
                 }
                 if (string.IsNullOrWhiteSpace(webDetail.OrgFax))
                 {
@@ -428,7 +434,7 @@ namespace EsquireVRN.Controllers
                 {
                     webDetail.OrgProvince = oDetail?.OrgProvince;
                 }
-                if (webDetail.VATRegistered==null)
+                if (webDetail.VATRegistered == null)
                 {
                     webDetail.VATRegistered = oDetail?.VATRegistered;
                 }
@@ -462,10 +468,11 @@ namespace EsquireVRN.Controllers
         }
 
         [HttpGet("api/GetDashboardCards")]
-        [Authorize(Roles ="Reseller")]
+        [Authorize(Roles = "Reseller")]
         public IActionResult GetDashBoardCards()
         {
             return Ok(Shared.GetDashboardCards());
         }
+       
     }
 }

@@ -61,7 +61,7 @@ builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection
 // Add services for rate limiting
 builder.Services.AddInMemoryRateLimiting();
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-
+builder.Services.AddSingleton(new PasswordEncryptionService(builder.Configuration["EncryptionSettings:MasterKey"]));
 Log.Logger = new LoggerConfiguration().MinimumLevel.Warning().ReadFrom.Configuration(builder.Configuration).CreateLogger();
 builder.Host.UseSerilog();
 var app = builder.Build();

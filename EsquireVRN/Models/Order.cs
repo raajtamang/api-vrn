@@ -28,6 +28,6 @@ namespace EsquireVRN.Models
         public long DeliveryID { get; set; }
         public long? FinconId { get; set; }
         public string? ShippingInstruction { get; set; }
-        public long? ResellerOrderId { get; set; }
+        public long? ResellerOrderID { get; set; }
     }
 }
