@@ -49,7 +49,7 @@ namespace EsquireVRN.Controllers
         }
 
         [HttpPost("UpdateBrandList")]
-        [Authorize(Roles = "Reseller")]
+        //[Authorize(Roles = "Reseller")]
         public IActionResult UpdateBrands([FromBody] UpdateBrandModel reqModel)
         {
             try

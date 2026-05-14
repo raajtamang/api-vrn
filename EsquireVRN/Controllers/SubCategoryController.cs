@@ -78,7 +78,7 @@ namespace EsquireVRN.Controllers
         }
 
         [HttpPost("UpdateSubCategoryList")]
-        [Authorize(Roles = "Reseller")]
+       // [Authorize(Roles = "Reseller")]
         public IActionResult UpdateCategories([FromBody] UpdateCategoryModel reqModel)
         {
             try

@@ -23,7 +23,7 @@ namespace EsquireVRN.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(long id)
         {
-            Models.Product p_Detail = Shared.GetProduct(id);
+            Product p_Detail = Shared.GetProduct(id);
             if (p_Detail == null)
             {
                 return NotFound("Product doesn't exist.");
@@ -36,7 +36,7 @@ namespace EsquireVRN.Controllers
             var features = Shared.GetProductFeatures(id);
             var reviews = Shared.GetProductReviews(id);
             var images = Shared.GetProductImages(id);
-            List<Product_View> youMayLike = Shared.GetYouMayLike(p_Detail.GroupName);
+            List<Product_View> youMayLike = Shared.GetYouMayLike(p_Detail.GroupName,id);
             List<CategoryFAQ> faqs = Shared.GetFAQByCategory(categoryId);
             return Ok(new { Product = p_Detail, Specs = ProductSpecs, Features = features, Reviews = reviews, Images = images, youMayLike, CategoryId = categoryId, Category, Brand, FAQs = faqs });
         }
@@ -45,7 +45,7 @@ namespace EsquireVRN.Controllers
         [Route("ProductDetail/{meta_title}/{id}")]
         public IActionResult GetProductDetail(string meta_title, long id)
         {
-            Models.Product p_Detail = Shared.GetProduct(id);
+            Product p_Detail = Shared.GetProduct(id);
             if (p_Detail == null)
             {
                 return NotFound("Product doesn't exist.");
@@ -58,7 +58,7 @@ namespace EsquireVRN.Controllers
             var features = Shared.GetProductFeatures(id);
             var reviews = Shared.GetProductReviews(id);
             var images = Shared.GetProductImages(id);
-            List<Product_View> youMayLike = Shared.GetYouMayLike(p_Detail.GroupName);
+            List<Product_View> youMayLike = Shared.GetYouMayLike(p_Detail.GroupName,id);
             return Ok(new { Product = p_Detail, Specs = ProductSpecs, Features = features, Reviews = reviews, Images = images, youMayLike, CategoryId = categoryId, Category, Brand });
         }
 
@@ -330,9 +330,8 @@ namespace EsquireVRN.Controllers
         [Route("TopSales")]
         public IActionResult GetTopSalesProducts()
         {
-            string strWhere = " AND EXISTS (SELECT 1 FROM VRNSubCategories b WHERE b.Title = Products.GroupName AND b.OrgId IN (" + Shared.GetOrgID() + "))";
             List<TopSale> topSales = [];
-            string query = "WITH CTE as (Select Products.ProdId,Products.ImgURL,Products.ProductName,Sum(ResellerOrderItems.ProdQty) as Sales from ResellerOrderItems JOIN Products on ResellerOrderItems.ProdID=Products.ProdID Where Products.OrgID IN (" + Shared.GetOrgID()+") AND Products.Active=1 AND Products.OutputMe=1 AND dbo.[GetProductStockCount](Products.ProdId,Products.Status,N'A')>0 " + strWhere + " Group By Products.ProdID,Products.ImgURL,Products.ProductName) Select Top 10 * from CTE Order By Sales desc;";
+            string query = "WITH CTE as (Select Products.ProdId,Products.ImgURL,Products.ProductName,Sum(ResellerOrderItems.ProdQty) as Sales from ResellerOrderItems JOIN Products on ResellerOrderItems.ProdID=Products.ProdID JOIN VRNSubCategories ON Products.GroupName=VRNSubCategories.Title JOIN VRNBrands on Products.ManufID=VRNBrands.BrandId WHERE VRNBrands.OrgId="+Shared.GetOrgID()+" AND VRNSubCategories.OrgId="+Shared.GetOrgID()+" AND Products.OrgID IN (" + Shared.GetOrgID()+") AND Products.Active=1 AND Products.OutputMe=1 AND dbo.[GetProductStockCount](Products.ProdId,Products.Status,N'A')>0 Group By Products.ProdID,Products.ImgURL,Products.ProductName) Select Top 10 * from CTE Order By Sales desc;";
             using (var db = new SqlConnection(Shared.connString))
             {
                 topSales = [.. db.Query<TopSale>(query)];

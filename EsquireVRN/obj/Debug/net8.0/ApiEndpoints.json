@@ -580,22 +580,6 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "EsquireVRN.Controllers.HomeController",
-    "Method": "EncryptPassword",
-    "RelativePath": "api/EncryptPassword/{password}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "password",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "EsquireVRN.Controllers.FAQController",
     "Method": "Get",
     "RelativePath": "api/FAQ",

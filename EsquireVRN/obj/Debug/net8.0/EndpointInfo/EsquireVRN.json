@@ -1167,28 +1167,6 @@
         }
       }
     },
-    "/api/EncryptPassword/{password}": {
-      "get": {
-        "tags": [
-          "Home"
-        ],
-        "parameters": [
-          {
-            "name": "password",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Menu": {
       "get": {
         "tags": [
