@@ -173,12 +173,13 @@ namespace EsquireVRN.Controllers
                     StringBuilder sbSql = new StringBuilder();
                     foreach (var item in quotationDetails)
                     {
+                        double price = Shared.GetPriceByProductId(item.ProdID);
                         sbSql.Append(@"INSERT INTO WEBOrderItems (OrderID, ProdID, ProdQty, Price, ProdDesc, ProdCode)
                                 VALUES (" + strOrdID + "," + item.ProdID + "," +
-                            item.ProdQty + "," + Convert.ToDouble(item.Price).ToString("0.00").Replace(",", ".") +
+                            item.ProdQty + "," + Convert.ToDouble(price).ToString("0.00").Replace(",", ".") +
                             ",'" + item.ProdDesc.Replace("\'", "\'\'") + "','" +
                             item.ProdCode.Replace("\'", "\'\'") + "');");
-                        TotalAmount += Math.Round((Math.Round(Convert.ToDouble(item.Price), 2) * Convert.ToDouble(item.ProdQty)), 2);
+                        TotalAmount += Math.Round((Math.Round(Convert.ToDouble(price), 2) * Convert.ToDouble(item.ProdQty)), 2);
                     }
                     if (quotations.DeliveryCost > 0)
                     {
