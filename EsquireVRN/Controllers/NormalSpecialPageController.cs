@@ -88,7 +88,11 @@ namespace EsquireVRN.Controllers
                 return StatusCode(404, new { error = "Normal Special Page product doesn't exist anymore." });
             }
             SpecialPageProductDetail pageProducts = Shared.GetSpecialPageProductDetail(id);
-            if ((pageProducts.StockQty < 1))
+            if(pageProducts == null)
+            {
+                return StatusCode(404, new { error = "Normal Special Page product doesn't exist anymore." });
+            }
+            if (pageProducts.StockQty < 1)
             {
                 return NotFound(new { error = "Special Page Product doesn't exist." });
             }
