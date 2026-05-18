@@ -32,7 +32,7 @@ namespace EsquireVRN.Controllers
 
         // PUT api/<MenuController>/5
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Reseller")]
+        [Authorize(Roles = "Reseller")]
         public IActionResult Put(int id, [FromBody] Menu menu)
         {
             Menu oldMenu = Shared.GetMenuDetail(id);
