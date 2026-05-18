@@ -32,7 +32,7 @@ namespace EsquireVRN.Controllers
 
         // PUT api/<MenuController>/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Reseller")]
+        //[Authorize(Roles = "Reseller")]
         public IActionResult Put(int id, [FromBody] Menu menu)
         {
             Menu oldMenu = Shared.GetMenuDetail(id);
@@ -40,7 +40,34 @@ namespace EsquireVRN.Controllers
             {
                 return StatusCode(404, new { error = "Menu doesn't exist anymore." });
             }
-
+            if (menu.OrgId == null)
+            {
+                menu.OrgId = oldMenu.OrgId;
+            }
+            if (menu.Date == null)
+            {
+                menu.Date = oldMenu.Date;
+            }
+            if (menu.Position == null)
+            {
+                menu.Position = oldMenu.Position;
+            }
+            if (menu.ImageUrl == null)
+            {
+                menu.ImageUrl = oldMenu.ImageUrl;
+            }
+            if (menu.Contents == null)
+            {
+                menu.Contents = oldMenu.Contents;
+            }
+            if (menu.Department == null)
+            {
+                menu.Department = oldMenu.Department;
+            }
+            if (menu.ImageUrl == null)
+            {
+                menu.ImageUrl = oldMenu.ImageUrl;
+            }
             Menu sMenu = Shared.UpdateMenu(id, menu);
             return Ok(sMenu);
         }
