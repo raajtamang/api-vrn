@@ -651,6 +651,64 @@ namespace EsquireVRN.Utils
             return menu;
         }
 
+        public static Menu GetMenuDetail(int id)
+        {
+            string sqlQuery = "Select * From FrontMenu Where Id=" + id;
+            Menu menu = new();
+            using (var db = new SqlConnection(connString))
+            {
+                menu = db.Query<Menu>(sqlQuery).FirstOrDefault();
+            }
+            return menu;
+        }
+
+        internal static Menu SaveMenu(Menu menu)
+        {
+            string sqlQuery = "INSERT INTO [dbo].[FrontMenu]([Department],[Contents],[Date],[OrgId],[ImageUrl],[Position]) OUTPUT Inserted.Id VALUES (@Department,@Contents,@Date,@OrgId,@ImageUrl,@Position)";
+            int MenuId = 0;
+            using (var db = new SqlConnection(connString))
+            {
+                MenuId = db.Query<int>(sqlQuery, menu).FirstOrDefault();
+            }
+            menu.Id = MenuId;
+            return menu;
+        }
+
+        internal static Menu UpdateMenu(int id, Menu menu)
+        {
+            string sqlQuery = "UPDATE [dbo].[FrontMenu] SET [Department] = @Department,[Contents] = @Contents,[Date] = @Date,[OrgId] = @OrgId,[ImageUrl]=@ImageUrl,[Position]=@Position WHERE Id=" + id;
+
+            using (var db = new SqlConnection(connString))
+            {
+                db.Execute(sqlQuery, menu);
+            }
+            Menu New_Menu = GetMenuDetail(id);
+            return New_Menu;
+        }
+
+        internal static List<Menu> UpdateMenuOrder(List<MenuIdPositionPair> IdPositionPair)
+        {
+            string sqlQuery = "UPDATE [dbo].[FrontMenu] SET [Position]=@Position WHERE Id=@Id AND OrgID=" + GetOrgID();
+
+            using (var db = new SqlConnection(connString))
+            {
+                db.Execute(sqlQuery, IdPositionPair);
+            }
+            List<Menu> New_Menu = GetMenu();
+            return New_Menu;
+        }
+
+        internal static void DeleteMenu(int id)
+        {
+            string sqlQuery = "Delete from [dbo].[FrontMenu] WHERE Id=" + id;
+
+            using (var db = new SqlConnection(connString))
+            {
+                db.Execute(sqlQuery);
+            }
+        }
+
+
         internal static IEnumerable<News> GetNews()
         {
             string strQuery = "SELECT [Id],[Title],[ShortDescription],[Description],[MetaTitle],[CreatedDate],[ImageUrl],[CreatedBy],[LastUpdateDate],[LastUpdatedBy] FROM [dbo].[News]";

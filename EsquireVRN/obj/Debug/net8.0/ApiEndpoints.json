@@ -718,6 +718,85 @@
     ]
   },
   {
+    "ContainingType": "EsquireVRN.Controllers.MenuController",
+    "Method": "Post",
+    "RelativePath": "api/Menu",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "menu",
+        "Type": "EsquireVRN.Models.Menu",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "EsquireVRN.Models.Menu",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.MenuController",
+    "Method": "Put",
+    "RelativePath": "api/Menu/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "menu",
+        "Type": "EsquireVRN.Models.Menu",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.MenuController",
+    "Method": "Delete",
+    "RelativePath": "api/Menu/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.MenuController",
+    "Method": "OrderMenu",
+    "RelativePath": "api/Menu/OrderMenu",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "menuIdList",
+        "Type": "EsquireVRN.Models.MenuIdList",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EsquireVRN.Controllers.NewsAndUpdatesController",
     "Method": "Get",
     "RelativePath": "api/NewsAndUpdates",
