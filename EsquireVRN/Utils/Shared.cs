@@ -3985,7 +3985,7 @@ namespace EsquireVRN.Utils
             PagedOrders pagedOrders = new()
             {
                 page_count = pageCount,
-                Orders = orders
+                Orders = orders.OrderByDescending(x => x.OrderdDate).ToList()
             };
             return pagedOrders;
         }
@@ -4039,7 +4039,7 @@ namespace EsquireVRN.Utils
             PagedOrders pagedOrders = new()
             {
                 page_count = pageCount,
-                Orders = orders
+                Orders = orders.OrderByDescending(x=>x.OrderdDate).ToList()
             };
             return pagedOrders;
         }
@@ -4856,7 +4856,7 @@ namespace EsquireVRN.Utils
             PagedWebOrderWithCustomer pagedOrders = new()
             {
                 page_count = pageCount,
-                Orders = orders
+                Orders = orders.OrderByDescending(x => x.OrderDate).ToList()
             };
             return pagedOrders;
         }

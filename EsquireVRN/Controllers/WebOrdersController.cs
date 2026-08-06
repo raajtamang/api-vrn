@@ -26,7 +26,7 @@ namespace EsquireVRN.Controllers
             }
             string PaymentDate = Shared.GetPaymentDate(id);
             var customer = Shared.GetCustomer(order.CustID);
-            List<ResellerOrderItems> items = Shared.GetResellerOrderItems(id);
+            List<OrderItem> items = Shared.GetOrderItems(id);
             List<OrderTracking> trackings = Shared.GetResellerOrderTracking(id);
             DeliveryAddress deliverAddress = Shared.GetDeliveryAddress(order.ShippingID);
             string PaymentReference = EncryptionService.EncryptString(order.OrderID + "-" + order.CustID);
