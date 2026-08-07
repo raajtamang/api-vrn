@@ -1401,6 +1401,22 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.ProductController",
+    "Method": "GetProductPrice",
+    "RelativePath": "api/Product/GetProductPrice",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ids",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.ProductController",
     "Method": "GetLatestProducts",
     "RelativePath": "api/Product/Latest",
     "HttpMethod": "GET",

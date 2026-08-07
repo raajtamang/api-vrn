@@ -341,5 +341,19 @@ namespace EsquireVRN.Controllers
 
         }
 
+        [HttpGet("GetProductPrice")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult GetProductPrice(string ids)
+        {
+            List<Shared.ProductPriceId> priceList = [];
+            if (string.IsNullOrEmpty(ids))
+            {
+                return Ok(priceList);
+            }
+            List<long> productIds = [.. ids.Split(',').Select(id => long.TryParse(id, out long parsedId) ? parsedId : 0).Where(id => id > 0)];
+            var prices = Shared.GetProductPriceList(productIds);
+            return Ok(prices);
+        }
+
     }
 }

@@ -1,17 +1,12 @@
 ﻿using Dapper;
 using EsquireVRN.Models;
 using EsquireVRN.Models.DTO;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Data.SqlClient;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NPOI.SS.Formula.Functions;
 using SelectPdf;
-using System.ComponentModel;
 using System.Data;
-using System.Diagnostics.Metrics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
@@ -20,7 +15,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
-using static NPOI.HSSF.Util.HSSFColor;
 
 namespace EsquireVRN.Utils
 {
@@ -86,6 +80,13 @@ namespace EsquireVRN.Utils
             public string? ProductCode { get; set; }
             public string? ErrorMessage { get; set; }
             public bool Active { get; set; }
+        }
+
+        public struct ProductPriceId
+        {
+            public long ProductId { get; set; }
+            public decimal Price { get; set; }
+            public decimal? SpecialPrice { get; set; }
         }
 
         public enum FinType
@@ -864,10 +865,10 @@ namespace EsquireVRN.Utils
             double margin = GetMargin();
 
             string whereQuery = string.Join(',', pages);
-            string query = "Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15 *" + margin + " as PublicPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock, (Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=p.ProdID) as Rating From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID JOIN VRNSubCategories ON p.GroupName=VRNSubCategories.Title JOIN VRNBrands on p.ManufID=VRNBrands.BrandId WHERE VRNBrands.OrgId="+GetOrgID()+" AND VRNSubCategories.OrgId="+GetOrgID()+" AND p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and ([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A'))>1 and spp.StartDate<='" + today + "' and spp.EndDate>='" + today + "' And spp.PageType='Normal Special' And PageId=" + id;
+            string query = "Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15 *" + margin + " as PublicPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock, (Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=p.ProdID) as Rating From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID JOIN VRNSubCategories ON p.GroupName=VRNSubCategories.Title JOIN VRNBrands on p.ManufID=VRNBrands.BrandId WHERE VRNBrands.OrgId=" + GetOrgID() + " AND VRNSubCategories.OrgId=" + GetOrgID() + " AND p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and ([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A'))>1 and spp.StartDate<='" + today + "' and spp.EndDate>='" + today + "' And spp.PageType='Normal Special' And PageId=" + id;
             if (pages.Count > 0)
             {
-                query += @"UNION Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15 *" + margin + " as PublicPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock, (Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=p.ProdID) as Rating From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID JOIN VRNSubCategories ON p.GroupName=VRNSubCategories.Title JOIN VRNBrands on p.ManufID=VRNBrands.BrandId WHERE VRNBrands.OrgId="+GetOrgID()+" AND VRNSubCategories.OrgId="+GetOrgID()+" AND p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and ([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A'))>1 and spp.StartDate<='" + today + "' and spp.EndDate>='" + today + "' And spp.PageType = 'Promotion Special' and spp.PageId In(" + whereQuery + ")";
+                query += @"UNION Select spp.Id,spp.ProductCode,p.PriceExclVat" + strWEBPriceUsed + "*1.15 *" + margin + " as PublicPrice,(p.PriceExclVat" + strWEBPriceUsed + "*1.15*" + margin + ") as Special_Price,spp.Margin, spp.Date,spp.StartDate,spp.EndDate,spp.PageType,p.ProdID,p.ProductName,p.GroupName,m.ManufacturerName,p.ImgURL,p.Description,([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A')) as Stock, (Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=p.ProdID) as Rating From SpecialPageProduct spp left Join Products p on spp.ProductCode=p.ProductCode  join Manufacturers m on p.ManufID=m.ManufID JOIN VRNSubCategories ON p.GroupName=VRNSubCategories.Title JOIN VRNBrands on p.ManufID=VRNBrands.BrandId WHERE VRNBrands.OrgId=" + GetOrgID() + " AND VRNSubCategories.OrgId=" + GetOrgID() + " AND p.Active=1 and p.OutputMe=1 and p.OrgID IN (94,380,932,546) and ([dbo].[GetProductStockCount](p.ProdID,p.Status,N'A'))>1 and spp.StartDate<='" + today + "' and spp.EndDate>='" + today + "' And spp.PageType = 'Promotion Special' and spp.PageId In(" + whereQuery + ")";
             }
             List<SpecialPageProduct> pageList = new();
             using (var db = new SqlConnection(connString))
@@ -4039,7 +4040,7 @@ namespace EsquireVRN.Utils
             PagedOrders pagedOrders = new()
             {
                 page_count = pageCount,
-                Orders = orders.OrderByDescending(x=>x.OrderdDate).ToList()
+                Orders = orders.OrderByDescending(x => x.OrderdDate).ToList()
             };
             return pagedOrders;
         }
@@ -4918,9 +4919,32 @@ namespace EsquireVRN.Utils
             Pricing prices = GetPriceUsed(null);
             string strWEBPriceUsed = Shared.Val(prices.UsePriceNumber.ToString());
             string query = "Select TOP 1 PriceExclVat" + strWEBPriceUsed + "*1.15 from Products WHERE ProdID=@Id";
-            using var db=new SqlConnection(connString);
+            using var db = new SqlConnection(connString);
             double price = db.Query<double>(query, new { Id = prodID }).FirstOrDefault();
             return price;
+        }
+
+        internal static List<ProductPriceId> GetProductPriceList(List<long> ids)
+        {
+            Pricing prices = GetPriceUsed(null);
+            string strWEBPriceUsed = Val(prices.UsePriceNumber.ToString());
+
+            DateTime sToday = Convert.ToDateTime(DateTime.UtcNow.AddHours(2).Date), eToday = DateTime.UtcNow.AddHours(2).Date.AddDays(1).AddSeconds(-1);
+            string query = "Select ProdID as ProductId,PriceExclVat" + strWEBPriceUsed + "*1.15 as Price,(SELECT TOP 1 SpecialPrice FROM SpecialPageProduct Where ProductCode=Products.ProductCode AND StartDate>=N'" + sToday + "' AND EndDate<=N'" + eToday + "') as SpecialPrice From Products Where ProdID IN @Ids";
+            using var db = new SqlConnection(connString);
+            var result = db.Query<ProductPriceId>(query, new { @Ids = ids }).ToList();
+            List<ProductPriceId> returnList = [];
+            foreach (var item in result)
+            {
+                ProductPriceId productPriceId = new()
+                {
+                    ProductId = item.ProductId,
+                    Price = Math.Round(item.Price, 2),
+                    SpecialPrice = Math.Round(Convert.ToDecimal(item.SpecialPrice), 2)
+                };
+                returnList.Add(productPriceId);
+            }
+            return returnList;
         }
     }
 }

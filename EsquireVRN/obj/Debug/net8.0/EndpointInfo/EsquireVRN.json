@@ -2418,6 +2418,27 @@
         }
       }
     },
+    "/api/Product/GetProductPrice": {
+      "get": {
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/PromotionSpecialPage": {
       "get": {
         "tags": [
