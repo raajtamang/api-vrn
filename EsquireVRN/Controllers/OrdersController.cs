@@ -436,7 +436,7 @@ namespace EsquireVRN.Controllers
                 {
                     Serilog.Log.Error("Order No. : " + OrderId + " : Confirm Total Price : " + TotalAmount);
                     string refId = EncryptionService.EncryptString(OrderId + "-" + custID) + "!" + OrderId;
-                    return Ok(new { message = "Order confirmed successfully. Please proceed to make payment.", reference = refId, TotalAmount, CustomerEmail = User.Identity.Name });
+                    return Ok(new { message = "Order confirmed successfully. Please proceed to make payment.", reference = refId, TotalAmount, CustomerEmail = User.Identity.Name, OrderId });
                 }
 
                 return Ok(new { message = "Order confirmed successfully." });
@@ -467,7 +467,7 @@ namespace EsquireVRN.Controllers
             }
             List<OrderItem> orderItems = Shared.GetOrderItems(OrderId);
             decimal TotalAmount = Convert.ToDecimal(orderItems.Sum(x => x.Price * x.ProdQty)) + Convert.ToDecimal(order.DeliveryCost) - Convert.ToDecimal(order.Discount);
-            return Ok(new { message = "Please proceed to make payment.", reference = refId, TotalAmount, CustomerEmail = User.Identity.Name,OrderId });
+            return Ok(new { message = "Please proceed to make payment.", reference = refId, TotalAmount, CustomerEmail = User.Identity.Name, OrderId });
 
         }
 
