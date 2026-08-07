@@ -17,13 +17,13 @@ namespace EsquireVRN.Controllers
     {
         [HttpGet]
         [Authorize]
-        public IActionResult Get(int? page_number, int? page_size, string? search,string?start_date,string?end_date)
+        public IActionResult Get(int? page_number, int? page_size, string? search, string? start_date, string? end_date)
         {
 
             if (User.IsInRole("Customer"))
             {
                 long CustomerID = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
-                var orders = Shared.GetPagedCustomerOrders(CustomerID, page_number, page_size, search,start_date,end_date);
+                var orders = Shared.GetPagedCustomerOrders(CustomerID, page_number, page_size, search, start_date, end_date);
                 return Ok(orders);
             }
             else
@@ -87,7 +87,7 @@ namespace EsquireVRN.Controllers
                 if (model != null)
                 {
                     Shared.BranchDetail branchDetail = Shared.getBranchName("" + oldOrder.NearestBranchId);
-                    string confrimMail =Shared.GetWebConfigKeyValue("AdminEmail");
+                    string confrimMail = Shared.GetWebConfigKeyValue("AdminEmail");
                     string branchName = branchDetail.OrgBraShort;
                     var custome = Shared.GetCustomer(oldOrder.CustomerID);
                     if (custome == null)
@@ -240,7 +240,6 @@ namespace EsquireVRN.Controllers
                                 db.Execute(sql);
                             }
 
-                            Shared.ClearQuotationCartWithCustId(custID);
 
                             string finconsubject = "Order Confirmation and Processing Update";
                             List<string> Emails = new() { tempcustomer.Email };
@@ -274,7 +273,6 @@ namespace EsquireVRN.Controllers
                             db.Execute(sql);
                         }
 
-                        Shared.ClearQuotationCartWithCustId(custID);
 
                         Shared.BillingDetail? BillingDetail = await Shared.GetBillingDetail(connectId, Convert.ToInt64(userId), FinconServerUsername, FinconServerPassword);
 
@@ -451,6 +449,27 @@ namespace EsquireVRN.Controllers
                 return StatusCode(500, new { error = ex.Message });
 
             }
+        }
+        [HttpPost]
+        [Route("MakePayment")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult MakePayment([FromBody] long OrderId)
+        {
+            long userId = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
+            string refId = EncryptionService.EncryptString(OrderId + "-" + userId) + "!" + OrderId;
+            var order = Shared.GetOrder(OrderId);
+            if (order == null)
+            {
+                return NotFound(new { error = "Order doesn't exist. Please check and try again." });
+            }
+            if (order.StatusID != 2 || order.PayID!=Shared.PAY_ID_CREDIT_CARD_INSTANT_EFT_MOBI_CREDIT)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Invalid order." });
+            }
+            List<OrderItem> orderItems = Shared.GetOrderItems(OrderId);
+            decimal TotalAmount = Convert.ToDecimal(orderItems.Sum(x => x.Price * x.ProdQty)) + Convert.ToDecimal(order.DeliveryCost) - Convert.ToDecimal(order.Discount);
+            return Ok(new { message = "Please proceed to make payment.", reference = refId, TotalAmount, CustomerEmail = User.Identity.Name });
+
         }
 
         private List<string> PrepareEmail(long orderId, string finconId, string terms, string credit, long OrgId)
