@@ -27,7 +27,7 @@ namespace EsquireVRN.Models
         public int DeliveryDescID { get; set; }
         public string? Notes { get; set; }
         public string? ShippingInstruction { get; set; }
-        public long? PayId { get; set; }
+        public long? PayID { get; set; }
         public long OrgId { get; set; }
         public string? Customer { get; set; }
         public string? Company { get; set; }

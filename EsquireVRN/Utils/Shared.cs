@@ -3968,7 +3968,7 @@ namespace EsquireVRN.Utils
                 WhereClause += " AND ((x.AccountNo like '%" + fixedSearchText + "%') OR (Convert(varchar,x.ResellerOrderID) like '%" + fixedSearchText + "%') OR (x.Company Like '%" + fixedSearchText + "%') OR (x.OrderStatus like '%" + fixedSearchText + "%') OR (x.Email like '%" + fixedSearchText + "%') OR (x.Customer like '%" + fixedSearchText + "%') OR (Convert(varchar,x.TotalAmount) like '%" + fixedSearchText + "%'))";
             }
 
-            string query = "Select x.* from (Select O.*,(Select FinconId from WebOrders Where WebOrders.OrderId=O.WebOrderId) as FinconId,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price*ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID=o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID=c.CustID where O.OrgID=" + GetOrgID() + ") as x WHERE (1=1) " + WhereClause + " Order By x.OrderdDate Desc OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) from(Select O.*, c.FirstName + ' ' + c.Surname as Customer, c.Company, c.Email, (Select AccountNo From Accounts where AccountID = c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID = O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID = O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price * ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID = o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID = c.CustID where O.OrgID = " + GetOrgID() + ") as x WHERE (1=1) " + WhereClause + ";";
+            string query = "Select x.* from (Select O.*,(Select FinconId from WebOrders Where WebOrders.OrderId=O.WebOrderId) as FinconId,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price*ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID=o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID=c.CustID where O.OrgID=" + GetOrgID() + ") as x WHERE (1=1) " + WhereClause + " Order By x.DateCreated Desc OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) from(Select O.*, c.FirstName + ' ' + c.Surname as Customer, c.Company, c.Email, (Select AccountNo From Accounts where AccountID = c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID = O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID = O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price * ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID = o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID = c.CustID where O.OrgID = " + GetOrgID() + ") as x WHERE (1=1) " + WhereClause + ";";
             List<OrderWithCustomer> orders = [];
             int pageCount = 1;
             using (var db = new SqlConnection(connString))
@@ -3986,7 +3986,7 @@ namespace EsquireVRN.Utils
             PagedOrders pagedOrders = new()
             {
                 page_count = pageCount,
-                Orders = orders.OrderByDescending(x => x.OrderdDate).ToList()
+                Orders = orders.OrderByDescending(x => x.DateCreated).ToList()
             };
             return pagedOrders;
         }
@@ -4022,7 +4022,7 @@ namespace EsquireVRN.Utils
                 WhereClause += " AND ((x.AccountNo like '%" + fixedSearchText + "%') OR (Convert(varchar,x.ResellerOrderID) like '%" + fixedSearchText + "%') OR (x.Company Like '%" + fixedSearchText + "%') OR (x.OrderStatus like '%" + fixedSearchText + "%') OR (x.Email like '%" + fixedSearchText + "%') OR (x.Customer like '%" + fixedSearchText + "%') OR (Convert(varchar,x.TotalAmount) like '%" + fixedSearchText + "%'))";
             }
 
-            string query = "Select x.* from (Select O.*,(Select FinconId from WebOrders Where WebOrders.OrderId=O.WebOrderId) as FinconId,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price*ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID=o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID=c.CustID where O.OrgID=" + GetOrgID() + ") as x WHERE (x.CustomerID=" + CustID + ") " + WhereClause + " Order By x.OrderdDate Desc OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) from(Select O.*, c.FirstName + ' ' + c.Surname as Customer, c.Company, c.Email, (Select AccountNo From Accounts where AccountID = c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID = O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID = O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price * ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID = o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID = c.CustID where O.OrgID = " + GetOrgID() + ") as x WHERE (x.CustomerID=" + CustID + ") " + WhereClause + ";";
+            string query = "Select x.* from (Select O.*,(Select FinconId from WebOrders Where WebOrders.OrderId=O.WebOrderId) as FinconId,c.FirstName+' '+ c.Surname as Customer,c.Company,c.Email,(Select AccountNo From Accounts where AccountID=c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID=O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID=O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price*ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID=o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID=c.CustID where O.OrgID=" + GetOrgID() + ") as x WHERE (x.CustomerID=" + CustID + ") " + WhereClause + " Order By x.DateCreated Desc OFFSET " + pSize * (pNum - 1) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select Count(1) from(Select O.*, c.FirstName + ' ' + c.Surname as Customer, c.Company, c.Email, (Select AccountNo From Accounts where AccountID = c.AccountID) as AccountNo,(Select PayStatus from PaymentStatus where PaymentStatus.PayStatusID = O.PayId) as PaymentStatus,(Select Status from WEBOrderStatus where WEBOrderStatus.StatusID = O.StatusID) as OrderStatus,(Select Sum(ResellerOrderItems.Price * ResellerOrderItems.ProdQty) from ResellerOrderItems Where ResellerOrderItems.ResellerOrderID = o.ResellerOrderID) as TotalAmount  from WEBCustomer c join ResellerOrders O on o.CustomerID = c.CustID where O.OrgID = " + GetOrgID() + ") as x WHERE (x.CustomerID=" + CustID + ") " + WhereClause + ";";
             List<OrderWithCustomer> orders = [];
             int pageCount = 1;
             using (var db = new SqlConnection(connString))
@@ -4040,7 +4040,7 @@ namespace EsquireVRN.Utils
             PagedOrders pagedOrders = new()
             {
                 page_count = pageCount,
-                Orders = orders.OrderByDescending(x => x.OrderdDate).ToList()
+                Orders = [.. orders.OrderByDescending(x => x.DateCreated)]
             };
             return pagedOrders;
         }
@@ -4857,7 +4857,7 @@ namespace EsquireVRN.Utils
             PagedWebOrderWithCustomer pagedOrders = new()
             {
                 page_count = pageCount,
-                Orders = orders.OrderByDescending(x => x.OrderDate).ToList()
+                Orders = [.. orders.OrderByDescending(x => x.OrderDate)]
             };
             return pagedOrders;
         }

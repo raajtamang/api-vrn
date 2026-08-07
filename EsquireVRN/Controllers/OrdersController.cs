@@ -16,7 +16,6 @@ namespace EsquireVRN.Controllers
     public class OrdersController : ControllerBase
     {
         [HttpGet]
-        [Authorize]
         public IActionResult Get(int? page_number, int? page_size, string? search, string? start_date, string? end_date)
         {
 
@@ -95,7 +94,7 @@ namespace EsquireVRN.Controllers
                         return NotFound(new { error = "Customer doesn't exist. Please check and try again." });
 
                     }
-                    string paymentType = Shared.GetpaymentType(oldOrder.PayId ?? 0);
+                    string paymentType = Shared.GetpaymentType(oldOrder.PayID ?? 0);
                     string header = model.Header.Replace("{OrderNumber}", "" + oldOrder.ResellerOrderID).Replace("{NewStatus}", statusList[req.StatusId - 1]);
                     string body = model.Detail.Replace("{CustomerTitle}", custome.Title).Replace("{CustomerFirstName}", custome.FirstName).Replace("{CustomerSurname}", custome.Surname).Replace("{NewStatus}", statusList[req.StatusId - 1]).Replace("{OrderNumber}", "" + oldOrder.ResellerOrderID).Replace("{OrderDate}", oldOrder.DateCreated.ToString("yyyy/MM/dd hh:mm:ss tt")).Replace("{OrderPayMethod}", paymentType).Replace("{OrderDelivery}", oldOrder.DeliveryMethod).Replace("{FromOrgName}", Shared.GetOrgName());
 
@@ -114,7 +113,6 @@ namespace EsquireVRN.Controllers
 
         [HttpGet]
         [Route("OrderStatus")]
-        [Authorize]
         public IActionResult GetOrderStatus()
         {
             List<Shared.OrderStatus> orderStatus = Shared.GetOrderStaus();
@@ -453,8 +451,9 @@ namespace EsquireVRN.Controllers
         [HttpPost]
         [Route("MakePayment")]
         [Authorize(Roles = "Reseller")]
-        public IActionResult MakePayment([FromBody] long OrderId)
+        public IActionResult MakePayment([FromBody] OrderRequest req)
         {
+            long OrderId = req.OrderId;
             long userId = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
             string refId = EncryptionService.EncryptString(OrderId + "-" + userId) + "!" + OrderId;
             var order = Shared.GetOrder(OrderId);
@@ -462,13 +461,13 @@ namespace EsquireVRN.Controllers
             {
                 return NotFound(new { error = "Order doesn't exist. Please check and try again." });
             }
-            if (order.StatusID != 2 || order.PayID!=Shared.PAY_ID_CREDIT_CARD_INSTANT_EFT_MOBI_CREDIT)
+            if (order.StatusID != 2 || order.PayID != Shared.PAY_ID_CREDIT_CARD_INSTANT_EFT_MOBI_CREDIT)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Invalid order." });
             }
             List<OrderItem> orderItems = Shared.GetOrderItems(OrderId);
             decimal TotalAmount = Convert.ToDecimal(orderItems.Sum(x => x.Price * x.ProdQty)) + Convert.ToDecimal(order.DeliveryCost) - Convert.ToDecimal(order.Discount);
-            return Ok(new { message = "Please proceed to make payment.", reference = refId, TotalAmount, CustomerEmail = User.Identity.Name });
+            return Ok(new { message = "Please proceed to make payment.", reference = refId, TotalAmount, CustomerEmail = User.Identity.Name,OrderId });
 
         }
 
@@ -580,6 +579,9 @@ namespace EsquireVRN.Controllers
             return returnString;
         }
 
-
+        public class OrderRequest()
+        {
+            public required long OrderId { get; set; }
+        }
     }
 }
