@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+using static Hangfire.Storage.JobStorageFeatures;
 
 namespace EsquireVRN.Utils
 {
@@ -2973,6 +2974,48 @@ namespace EsquireVRN.Utils
             }
         }
 
+        public static void SendMail(string strSubject, string strHTMLBody, MailAddress[] to, MailAddress from, MailAddress[] bcc, bool includeSignature)
+        {
+            try
+            {
+                //string[] strAdminEmails = getAdminEMail().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                string strSite = GetWebConfigKeyValue("SiteName");
+                MailMessage myMail = new MailMessage();
+                myMail.Subject = strSubject;
+                foreach (MailAddress m in to)
+                    myMail.To.Add(m);
+                if (from.Address != "productquestions@improweb.com")
+                    myMail.CC.Add(from);
+
+                //foreach (string adminEmail in strAdminEmails)
+                //    myMail.Bcc.Add(new MailAddress(adminEmail));
+
+                if (bcc != null)
+                {
+                    foreach (MailAddress m in bcc)
+                        myMail.Bcc.Add(m);
+                }
+                string strTitle = "";
+                if (includeSignature)
+                    strTitle = "Sent From " + strSite;
+
+                myMail.From = from;
+                myMail.IsBodyHtml = true;
+
+                myMail.Body = "<html><head><TITLE>" + strTitle + "</TITLE>" +
+                    "<STYLE>BODY {FONT-SIZE: 12px; FONT-FAMILY: Arial, helvetica, sans-serif; " +
+                    "SCROLLBAR-BASE-COLOR:#2D5281;}</STYLE></head><BODY>" +
+                    "<table WIDTH=100% BORDER=0 cellspacing=0 cellpadding=0><tr><td>" + strHTMLBody +
+                    "</td></tr><tr><td><HR></td></tr></table></BODY></html>";
+                SmtpClient client = MailSetup();
+                client.Send(myMail);
+            }
+            catch (Exception ex)
+            {
+
+
+            }
+        }
 
         public static PdfDocument GetPdf(string html)
         {
@@ -3365,14 +3408,35 @@ namespace EsquireVRN.Utils
             try
             {
                 string strSql = @"SELECT OrgID, UserID, AccountID='NULL', Password, 
-                    FirstName, Surname, Active,UsePrice=1,DefaultBranch=null FROM Users WHERE (EMailAddress = N'" +
-                        username.Replace("\'", "\'\'") + "') AND (Password='" + password.Replace("\'", "\'\'") + "') AND OrgID IN (94,380,932,546)";
+                    FirstName, Surname,Salt,IV, Active,UsePrice=1,DefaultBranch=null FROM Users WHERE (EMailAddress = N'" +
+                        username.Replace("\'", "\'\'") + "') AND OrgID IN (94,380,932,546)";
                 using (var connection = new SqlConnection(connString))
                 {
                     var result = connection.QueryMultiple(strSql);
                     var uDetail = result.Read().FirstOrDefault();
                     if (uDetail != null)
                     {
+                        string salt = uDetail.Salt;
+                        if (string.IsNullOrEmpty(salt))
+                        {
+                            if (uDetail.Password != password)
+                            {
+                                returnValue.CustID = INVALID_LOGIN;
+                                return returnValue;
+                            }
+                        }
+                        else
+                        {
+                            string iv = uDetail.IV;
+                            var encPassword = uDetail.Password;
+                            bool validationResult = EncryptionService.ValidatePassword(password, encPassword, salt, iv);
+                            if (!validationResult)
+                            {
+                                returnValue.CustID = INVALID_LOGIN;
+                                return returnValue;
+                            }
+                        }
+
                         returnValue.CustID = Convert.ToString(uDetail.UserID);
                         returnValue.UserName = Convert.ToString(uDetail.FirstName) + " " + Convert.ToString(uDetail.Surname);
                         returnValue.UsePrice = Convert.ToInt32(uDetail.UsePrice);
@@ -3384,7 +3448,7 @@ namespace EsquireVRN.Utils
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 returnValue.CustID = INVALID_LOGIN;
             }
@@ -3453,42 +3517,59 @@ namespace EsquireVRN.Utils
             {
                 using (var db = new SqlConnection(connString))
                 {
-                    string strSQL = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password, 
+                    string strSQL = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV, 
                     WEBCustomer.FirstName, WEBCustomer.Surname, Accounts.Active, Accounts.UsePrice,Accounts.DefaultBranch FROM WEBCustomer 
                     INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND (WEbCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID=" + GetOrgID() + "  AND WebCustomer.UserType=N'Customer' Order By WebCustomer.CustID" + @";
+                        username.Replace("\'", "\'\'") + "') Accounts.OrgID IN (94,380,932,546) Order By WebCustomer.CustID" + @";
                     SELECT WEBCustomer.Email, WEBCustomer.FraudulentUserID, Users.FirstName, Users.Surname, Organisation.WEBOrgURL
                     FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
                         Organisation ON Users.OrgID = Organisation.OrgID
-                    WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1)  AND Users.OrgID=" + GetOrgID() + ";";
+                    WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEBCustomer.Active = 1)  AND Users.OrgID IN (94,380,932,546);";
 
                     var result = db.QueryMultiple(strSQL);
                     var uDetail = result.Read<LoginUDetail>().FirstOrDefault();
                     if (uDetail != null)
                     {
-                        if (uDetail.Password == password)
+                        string query = @"SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.CustId =" + uDetail.CustID + ");";
+                        var fradulent_check = db.Query(query).FirstOrDefault();
+                        if (fradulent_check != null)
                         {
-                            returnValue.CustID = Convert.ToString(uDetail.CustID);
-                            returnValue.UserName = Convert.ToString(uDetail.FirstName) + " " + Convert.ToString(uDetail.Surname);
-                            returnValue.UsePrice = Convert.ToInt32(uDetail.UsePrice);
-                            returnValue.IsLoggedIn = true;
-                            returnValue.FirstName = Convert.ToString(uDetail.FirstName);
-                            returnValue.Surname = Convert.ToString(uDetail.Surname);
-                            returnValue.AccountID = Convert.ToString(uDetail.AccountID);
-                            returnValue.DefaultBranch = Convert.ToString(uDetail.DefaultBranch);
+                            returnValue.CustID = ACCOUNT_FRAUDULENT;
+                            returnValue.IsLoggedIn = false;
+                            return returnValue;
+                        }
+                        var salt = uDetail.Salt;
+                        if (string.IsNullOrWhiteSpace(salt))
+                        {
+                            if (uDetail.Password != password)
+                            {
+                                returnValue.CustID = INVALID_LOGIN;
+                                returnValue.IsLoggedIn = false;
+                                return returnValue;
+                            }
                         }
                         else
                         {
-                            returnValue.IsLoggedIn = false;
-                            returnValue.CustID = "Password_Mismatch";
-                        }
-                    }
+                            string iv = uDetail.IV ?? "";
+                            var encPassword = uDetail.Password;
+                            bool validationResult = EncryptionService.ValidatePassword(password, encPassword, salt, iv);
+                            if (!validationResult)
+                            {
+                                returnValue.CustID = INVALID_LOGIN;
+                                returnValue.IsLoggedIn = false;
+                                return returnValue;
+                            }
 
-                    var fradulent_check = result.Read().FirstOrDefault();
-                    if (fradulent_check != null)
-                    {
-                        returnValue.CustID = ACCOUNT_FRAUDULENT;
-                        returnValue.IsLoggedIn = false;
+                        }
+                        returnValue.CustID = Convert.ToString(uDetail.CustID);
+                        returnValue.UserName = Convert.ToString(uDetail.FirstName) + " " + Convert.ToString(uDetail.Surname);
+                        returnValue.UsePrice = Convert.ToInt32(uDetail.UsePrice);
+                        returnValue.IsLoggedIn = true;
+                        returnValue.FirstName = Convert.ToString(uDetail.FirstName);
+                        returnValue.Surname = Convert.ToString(uDetail.Surname);
+                        returnValue.AccountID = Convert.ToString(uDetail.AccountID);
+                        returnValue.DefaultBranch = Convert.ToString(uDetail.DefaultBranch);
+                        returnValue.AccountNumber = Convert.ToString(uDetail.AccountNo);
                     }
                 }
 
@@ -3501,6 +3582,7 @@ namespace EsquireVRN.Utils
             return returnValue;
         }
 
+
         public static LoginDetails ResellerLogin(string username, string password)
         {
             LoginDetails returnValue = new()
@@ -3511,18 +3593,47 @@ namespace EsquireVRN.Utils
             };
             try
             {
-                string strSql = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password, 
+                string strSql = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV, 
                     WEBCustomer.FirstName, WEBCustomer.Surname,Accounts.AccountNo, Accounts.Active, Accounts.UsePrice, Accounts.DefaultBranch " +
                 "FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND ( WEBCustomer.Password='" + password.Replace("\'", "\'\'") + "') AND Accounts.OrgID=" + GetOrgID() + " AND WEBCustomer.UserType=N'Reseller' Order By WEBCustomer.CustID" + @";
-                    SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
-                    Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.Email = N'" + username.Replace("'", "''") + "') AND (WEbCustomer.Password='" + password + "') AND (WEBCustomer.Active = 1) AND Users.OrgID=" + GetOrgID() + ";";
+                        username.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (94,380,932,546,473) Order By WEBCustomer.CustID;";
                 using (var connection = new SqlConnection(connString))
                 {
                     var result = connection.QueryMultiple(strSql);
                     var uDetail = result.Read<LoginUDetail>().FirstOrDefault();
                     if (uDetail != null)
                     {
+                        string query = @"SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.CustId =" + uDetail.CustID + ");";
+                        var fradulent_check = connection.Query(query).FirstOrDefault();
+                        if (fradulent_check != null)
+                        {
+                            returnValue.CustID = ACCOUNT_FRAUDULENT;
+                            returnValue.IsLoggedIn = false;
+                            return returnValue;
+                        }
+                        var salt = uDetail.Salt;
+                        if (string.IsNullOrWhiteSpace(salt))
+                        {
+                            if (uDetail.Password != password)
+                            {
+                                returnValue.CustID = INVALID_LOGIN;
+                                returnValue.IsLoggedIn = false;
+                                return returnValue;
+                            }
+                        }
+                        else
+                        {
+                            string iv = uDetail.IV ?? "";
+                            var encPassword = uDetail.Password;
+                            bool validationResult = EncryptionService.ValidatePassword(password, encPassword, salt, iv);
+                            if (!validationResult)
+                            {
+                                returnValue.CustID = INVALID_LOGIN;
+                                returnValue.IsLoggedIn = false;
+                                return returnValue;
+                            }
+
+                        }
                         returnValue.CustID = Convert.ToString(uDetail.CustID);
                         returnValue.UserName = Convert.ToString(uDetail.FirstName) + " " + Convert.ToString(uDetail.Surname);
                         returnValue.UsePrice = Convert.ToInt32(uDetail.UsePrice);
@@ -3533,12 +3644,7 @@ namespace EsquireVRN.Utils
                         returnValue.DefaultBranch = Convert.ToString(uDetail.DefaultBranch);
                         returnValue.AccountNumber = Convert.ToString(uDetail.AccountNo);
                     }
-                    var fradulent_check = result.Read().FirstOrDefault();
-                    if (fradulent_check != null)
-                    {
-                        returnValue.CustID = ACCOUNT_FRAUDULENT;
-                        returnValue.IsLoggedIn = false;
-                    }
+
                 }
             }
             catch (Exception ex)
@@ -3547,6 +3653,7 @@ namespace EsquireVRN.Utils
             }
             return returnValue;
         }
+
         public static string getAdminEMail()
         {
 
@@ -4945,6 +5052,109 @@ namespace EsquireVRN.Utils
                 returnList.Add(productPriceId);
             }
             return returnList;
+        }
+
+        internal static object GetMetaData(long id)
+        {
+            string query = "Select TOP 1 Description as MetaDescription,ProductName as MetaTitle,ProductName as ProductName,ImgURL as Image,Description as ShortDescription From Products Where ProdId=@Id";
+            using var db = new SqlConnection(connString);
+            var result = db.Query(query, new { Id = id });
+            return result;
+        }
+
+        internal static object GetPromotionalPageMetaData(long id)
+        {
+            string query = "Select TOP 1 MetaDescription,Description,MetaTitle,Title from PromotionSpecialPage WHERE Id=@Id";
+            using var db = new SqlConnection(connString);
+            var result = db.Query(query, new { Id = id });
+            return result;
+        }
+
+        internal static object GetNormalSpecialPageMetaData(long id)
+        {
+            string query = "Select TOP 1 Title,Description,Description as MetaDescription,MetaTitle from NormalSpecialPage WHERE Id=@Id";
+            using var db = new SqlConnection(connString);
+            var result = db.Query(query, new { Id = id });
+            return result;
+        }
+
+        internal static string GetPassword(string email)
+        {
+            string strQuer = "Select Password,Email,Salt,IV,OrgID from WEBCustomer where Email=@Email and OrgID IN (94,380,932,546)";
+            string password = "Not Found";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { Email = email };
+                List<ForgotPasswordDTO> customers = db.Query<ForgotPasswordDTO>(strQuer, values).ToList();
+                if (customers != null && customers.Count() > 0)
+                {
+                    ForgotPasswordDTO eSquireUser = customers.Where(x => x.OrgID == 94).FirstOrDefault();
+                    if (eSquireUser != null)
+                    {
+                        if (string.IsNullOrEmpty(eSquireUser.Salt))
+                        {
+
+                            password = eSquireUser.Password;
+                        }
+                        else
+                        {
+                            password = EncryptionService.Decrypt(eSquireUser.Password, eSquireUser.Salt, eSquireUser.IV);
+                        }
+                    }
+                    else
+                    {
+                        ForgotPasswordDTO otherCustomer = customers.OrderByDescending(x => x.CustID).FirstOrDefault();
+                        if (otherCustomer != null)
+                        {
+                            if (string.IsNullOrEmpty(eSquireUser.Salt))
+                            {
+
+                                password = otherCustomer.Password;
+                            }
+                            else
+                            {
+                                password = EncryptionService.Decrypt(otherCustomer.Password, otherCustomer.Salt, otherCustomer.IV);
+                            }
+                        }
+                    }
+                }
+            }
+            return password;
+        }
+
+        public static void SaveForgotPassord(string email, string ip)
+        {
+            using IDbConnection db = new SqlConnection(connString);
+
+            var sql = @"
+            INSERT INTO ForgotPasswordRequest (Email, IP, Date)
+            VALUES (@Email, @IP, @Date);";
+
+            db.Execute(sql, new
+            {
+                Email = email,
+                IP = ip,
+                Date = DateTime.UtcNow
+            });
+        }
+
+        public static bool ExistsToday(string email, string ip)
+        {
+            using IDbConnection db = new SqlConnection(connString);
+
+            var sql = @"
+            SELECT COUNT(1)
+            FROM ForgotPasswordRequest
+            WHERE (Email = @Email OR IP = @IP) AND CAST(Date as DATE) = CAST(@Today AS DATE);";
+
+            var count = db.ExecuteScalar<int>(sql, new
+            {
+                Email = email,
+                IP = ip,
+                Today = DateTime.UtcNow
+            });
+
+            return count > 0;
         }
     }
 }

@@ -88,7 +88,7 @@ namespace EsquireVRN.Controllers
                 return StatusCode(404, new { error = "Normal Special Page product doesn't exist anymore." });
             }
             SpecialPageProductDetail pageProducts = Shared.GetSpecialPageProductDetail(id);
-            if(pageProducts == null)
+            if (pageProducts == null)
             {
                 return StatusCode(404, new { error = "Normal Special Page product doesn't exist anymore." });
             }
@@ -99,7 +99,7 @@ namespace EsquireVRN.Controllers
             if (pageProducts == null)
             {
                 return NotFound(new { error = "Special Page Product doesn't exist." });
-            }            
+            }
 
             var Brand = Shared.GetBrand(Convert.ToInt64(pageProducts.ManufID));
             long categoryId = Shared.GetCategoryId(oldProduct.ProdID.Value);
@@ -110,6 +110,37 @@ namespace EsquireVRN.Controllers
             var images = Shared.GetProductImages(pageProducts.ProdID);
             List<CategoryFAQ> faqs = Shared.GetFAQByCategory(categoryId);
             return Ok(new { Product = pageProducts, Specs = ProductSpecs, Features = features, Reviews = reviews, Images = images, CategoryId = categoryId, Category, Brand, FAQs = faqs });
+        }
+
+        [HttpGet]
+        [Route("Metadata/{id:long}")]
+        public IActionResult GetProductMetaData(long id)
+        {
+            SpecialPageProduct oldProduct = Shared.GetSpecialPageProduct(id);
+            if (oldProduct == null)
+            {
+                return StatusCode(404, new { error = "Normal Special Page product doesn't exist anymore." });
+            }
+            if (oldProduct.ProdID == null)
+            {
+                return StatusCode(404, new { error = "Normal Special Page product doesn't exist anymore." });
+            }
+            var meta_data = Shared.GetMetaData(oldProduct.ProdID.Value);
+            return Ok(meta_data);
+        }
+
+        [HttpGet]
+        [Route("PageMetaData/{id}")]
+        public IActionResult GetPageMetaData(int id)
+        {
+            NormalSpecialPage page = Shared.GetNormalSpecialPageDetail(id);
+            if (page == null)
+            {
+                return StatusCode(404, new { error = "Normal Special Page doesn't exist anymore." });
+            }
+
+            var meta_data = Shared.GetNormalSpecialPageMetaData(page.Id);
+            return Ok(meta_data);
         }
 
         [HttpGet]

@@ -94,3 +94,4 @@ D:\dashboard\VRN\EsquireVRN\EsquireVRN\obj\Debug\net8.0\refint\EsquireVRN.dll
 D:\dashboard\VRN\EsquireVRN\EsquireVRN\obj\Debug\net8.0\EsquireVRN.pdb
 D:\dashboard\VRN\EsquireVRN\EsquireVRN\obj\Debug\net8.0\EsquireVRN.genruntimeconfig.cache
 D:\dashboard\VRN\EsquireVRN\EsquireVRN\obj\Debug\net8.0\ref\EsquireVRN.dll
+D:\dashboard\VRN\EsquireVRN\EsquireVRN\bin\Debug\net8.0\CsvHelper.dll

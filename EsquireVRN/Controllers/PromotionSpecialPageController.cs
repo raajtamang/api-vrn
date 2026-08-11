@@ -45,7 +45,7 @@ namespace EsquireVRN.Controllers
         public IActionResult ResellerPage()
         {
             return Ok(Shared.GetResellerPromotionalSpecialPage());
-        }      
+        }
 
         [HttpGet]
         [Route("ByMetaTitle")]
@@ -104,7 +104,7 @@ namespace EsquireVRN.Controllers
             {
                 return NotFound(new { error = "Special Page Product doesn't exist." });
             }
-            
+
             var Brand = Shared.GetBrand(Convert.ToInt64(pageProducts.ManufID));
             long categoryId = Shared.GetCategoryId(oldProduct.ProdID.Value);
             var Category = Shared.GetCategory(categoryId);
@@ -116,7 +116,7 @@ namespace EsquireVRN.Controllers
             return Ok(new { Product = pageProducts, Specs = ProductSpecs, Features = features, Reviews = reviews, Images = images, CategoryId = categoryId, Category, Brand, FAQs = faqs });
         }
 
-       
+
 
         [HttpGet]
         [Route("PriceByProductCode/{id}")]
@@ -136,6 +136,35 @@ namespace EsquireVRN.Controllers
                 return StatusCode(400, "Invalid product code.");
             }
 
+        }
+        [HttpGet]
+        [Route("PageMetadata")]
+        public IActionResult GetPageMetaData(string meta_title)
+        {
+            PromotionSpecialPage page = Shared.GetPromotionalSpecialPageDetailByMetaTitle(meta_title);
+            if (page == null)
+            {
+                return StatusCode(404, new { error = "Promotional Special Page doesn't exist anymore." });
+            }
+
+            var meta_data = Shared.GetPromotionalPageMetaData(page.Id);
+            return Ok(meta_data);
+        }
+        [HttpGet]
+        [Route("ProductMetadata/{id:long}")]
+        public IActionResult GetProductMetaData(long id)
+        {
+            SpecialPageProduct oldProduct = Shared.GetSpecialPageProduct(id);
+            if (oldProduct == null)
+            {
+                return StatusCode(404, new { error = "Normal Special Page product doesn't exist anymore." });
+            }
+            if (oldProduct.ProdID == null)
+            {
+                return StatusCode(404, new { error = "Normal Special Page product doesn't exist anymore." });
+            }
+            var meta_data = Shared.GetMetaData(oldProduct.ProdID.Value);
+            return Ok(meta_data);
         }
     }
 }

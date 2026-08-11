@@ -355,5 +355,12 @@ namespace EsquireVRN.Controllers
             return Ok(prices);
         }
 
+        [HttpGet("MetaData/{id:long}")]
+        public IActionResult GetProductMetaData(long id)
+        {
+            var meta_data=Shared.GetMetaData(id);
+            return Ok(meta_data);
+        }
+
     }
 }

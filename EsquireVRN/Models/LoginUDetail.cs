@@ -12,6 +12,8 @@
         public int UsePrice { get; set; }
         public string? DefaultBranch { get; set; }
         public string? AccountNo { get; set; }
+        public string? Salt { get; set; }
+        public string? IV { get; set; }
 
     }
 }

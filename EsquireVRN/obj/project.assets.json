@@ -20,6 +20,19 @@
           "Microsoft.AspNetCore.App"
         ]
       },
+      "CsvHelper/27.2.1": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/CsvHelper.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/CsvHelper.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Dapper/2.1.66": {
         "type": "package",
         "compile": {
@@ -1404,6 +1417,30 @@
         "aspnetcoreratelimit.5.0.0.nupkg.sha512",
         "aspnetcoreratelimit.nuspec",
         "lib/net6.0/AspNetCoreRateLimit.dll"
+      ]
+    },
+    "CsvHelper/27.2.1": {
+      "sha512": "uS5ix5hL9gL5taiAG//CScyJa8Fn1ZOh3FDhDvf4laboESFs84mCNropfp7PIt8xCkyQofljFpqu1B5UnSXjyA==",
+      "type": "package",
+      "path": "csvhelper/27.2.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "csvhelper.27.2.1.nupkg.sha512",
+        "csvhelper.nuspec",
+        "lib/net45/CsvHelper.dll",
+        "lib/net45/CsvHelper.xml",
+        "lib/net47/CsvHelper.dll",
+        "lib/net47/CsvHelper.xml",
+        "lib/net5.0/CsvHelper.dll",
+        "lib/net5.0/CsvHelper.xml",
+        "lib/net6.0/CsvHelper.dll",
+        "lib/net6.0/CsvHelper.xml",
+        "lib/netstandard2.0/CsvHelper.dll",
+        "lib/netstandard2.0/CsvHelper.xml",
+        "lib/netstandard2.1/CsvHelper.dll",
+        "lib/netstandard2.1/CsvHelper.xml"
       ]
     },
     "Dapper/2.1.66": {
@@ -3803,6 +3840,7 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "AspNetCoreRateLimit >= 5.0.0",
+      "CsvHelper >= 27.2.1",
       "Dapper >= 2.1.66",
       "DotNetCore.NPOI >= 1.2.3",
       "Hangfire.AspNetCore >= 1.8.22",
@@ -3871,6 +3909,10 @@
           "AspNetCoreRateLimit": {
             "target": "Package",
             "version": "[5.0.0, )"
+          },
+          "CsvHelper": {
+            "target": "Package",
+            "version": "[27.2.1, )"
           },
           "Dapper": {
             "target": "Package",

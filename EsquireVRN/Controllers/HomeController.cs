@@ -473,6 +473,47 @@ namespace EsquireVRN.Controllers
         {
             return Ok(Shared.GetDashboardCards());
         }
-       
+
+        [HttpPost]
+        [Route("api/ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model, [FromServices] TurnstileValidator validator)
+        {
+            string email = model.email;
+
+
+            string ipAddress = Convert.ToString(Request.HttpContext.Connection.RemoteIpAddress);
+
+            var isCaptchaValid = await validator.ValidateAsync(model.CfTurnstileResponse, HttpContext.Connection.RemoteIpAddress?.ToString());
+
+            if (!isCaptchaValid)
+            {
+                return StatusCode(400, new { error = "Captcha validation failed" });
+            }
+
+            string password = Shared.GetPassword(email);
+            if (password == "Not Found")
+            {
+                return NotFound(new { error = "There is no account with this email. Please check your email and try again." });
+            }
+
+            if (Shared.ExistsToday(email, ipAddress))
+            {
+                return Unauthorized(new { error = "You are allowed to request password only once per day." });
+            }
+
+            string strTo = email;
+            string strSubject = "Login for www.esquire.co.za";
+            List<MailAddress> bcc = new() { new MailAddress("test@esquire.co.za"), new MailAddress("info@esquire.co.za") };
+
+            string strBody = "<span class=style6>Dear valued customer,</span><br/><br/><br/>" +
+                "Your password for <a href='https://esquire.co.za'>www.esquire.co.za</a> is: <b>" + password +
+                "</b><br/><br/>You can <b>change your password</b> by <a class=style3 href='https://esquire.co.za/login' target=\"_new\">signing in</a> and then going to <b>my profile</b> on the website.";
+            Shared.SendMail(strSubject, strBody,
+                new MailAddress[] { new MailAddress(strTo) },
+                new MailAddress(Shared.GetWebConfigKeyValue("NoReplyEmail")), bcc.ToArray(), false);
+            Shared.SaveForgotPassord(email, ipAddress);
+            return Ok(new { message = "Thank you. An e-mail with your password has been sent to your inbox." });
+        }
+
     }
 }
