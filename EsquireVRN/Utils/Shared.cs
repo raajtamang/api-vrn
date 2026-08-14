@@ -3610,7 +3610,7 @@ namespace EsquireVRN.Utils
                     string strSQL = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV, 
                     WEBCustomer.FirstName, WEBCustomer.Surname, Accounts.Active, Accounts.UsePrice,Accounts.DefaultBranch FROM WEBCustomer 
                     INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (94,380,932,546) Order By WebCustomer.CustID" + @";
+                        username.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (94,380,932,546) AND WEbCustomer.UserType=N'Customer' Order By WebCustomer.CustID" + @";
                     SELECT WEBCustomer.Email, WEBCustomer.FraudulentUserID, Users.FirstName, Users.Surname, Organisation.WEBOrgURL
                     FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
                         Organisation ON Users.OrgID = Organisation.OrgID
@@ -3687,7 +3687,7 @@ namespace EsquireVRN.Utils
                 string strSql = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV, 
                     WEBCustomer.FirstName, WEBCustomer.Surname,Accounts.AccountNo, Accounts.Active, Accounts.UsePrice, Accounts.DefaultBranch " +
                 "FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (94,380,932,546,473) Order By WEBCustomer.CustID;";
+                        username.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (94,380,932,546,473) AND WEbCustomer.UserType=N'Reseller' Order By WEBCustomer.CustID;";
                 using (var connection = new SqlConnection(connString))
                 {
                     var result = connection.QueryMultiple(strSql);
