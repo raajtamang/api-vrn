@@ -121,5 +121,37 @@ namespace EsquireVRN.Controllers
                 return StatusCode(500, new { error = "Something went wrong. Please try again." });
             }
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult Delete(long id)
+        {
+            SubCategory oSubCategory = Shared.GetSubCategory(id);
+            if (oSubCategory == null)
+            {
+                return StatusCode(404, new { error = "SubCategory doesn't exist anymore." });
+            }
+            
+            if (Shared.DeleteSubCategory(id))
+            {
+                Shared.DeleteSubCategoryProduct(oSubCategory.Title);
+                var folderName = Path.Combine("Resources", "Images", "SubCategories");
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                if (!Directory.Exists(pathToSave))
+                {
+                    Directory.CreateDirectory(pathToSave);
+                }
+                string oldImage = oSubCategory.ImageUrl.Split('/').LastOrDefault();
+                if (!string.IsNullOrWhiteSpace(oldImage))
+                {
+                    string oldImagePt = Path.Combine(pathToSave, oldImage);
+                    if (System.IO.File.Exists(oldImagePt))
+                    {
+                        System.IO.File.Delete(oldImagePt);
+                    }
+                }
+            }
+            return Ok(new { message = "SubCategory removed successfully" });
+        }
     }
 }

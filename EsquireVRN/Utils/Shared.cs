@@ -257,12 +257,24 @@ namespace EsquireVRN.Utils
             return brands;
         }
 
+
         internal static List<Product_View> GetBrandProducts(long id)
         {
             string searchWhere = " AND (Products.ManufID=" + id + ")";
             List<Product_View> Products = GetProducts(searchWhere);
 
             return Products;
+        }
+
+        public static bool DeleteBrand(long? id)
+        {
+            string queryStr = "DELETE FROM [dbo].[Manufacturers] WHERE [ManufID]=@Id";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { Id = id };
+                db.Execute(queryStr, values);
+            }
+            return true;
         }
 
         public static List<Product_View> GetProducts(string strWhere)
@@ -584,6 +596,62 @@ namespace EsquireVRN.Utils
             return string.Join(',', subcategories.Distinct().Select(x => new { x = "'" + x.Replace("'", "''") + "'" }).Select(x => x.x));
         }
 
+        public static bool DeleteCategory(long id)
+        {
+            string queryStr = "DELETE FROM [dbo].[ProductGroupHead] WHERE GroupHeadID=@Id";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { Id = id };
+                db.Execute(queryStr, values);
+            }
+            return true;
+        }
+
+        public static void DeleteSubCategories(long id)
+        {
+            string subCategories = GetSubCategoryIdForCategory("" + id);
+            if (!string.IsNullOrEmpty(subCategories))
+            {
+                string queryStr = "DELETE FROM [dbo].[ProductGroups] WHERE OrgID=" + GetOrgID() + " AND ProdGroupID IN (" + subCategories + "); DELETE FROM ProdGroupLink WHERE GroupHeadId=" + id;
+                using (var db = new SqlConnection(connString))
+                {
+                    db.Execute(queryStr);
+                }
+            }
+        }
+
+        internal static string GetSubCategoryIdForCategory(string id)
+        {
+            string ids = "";
+            var query = "Select ProdGroupID from ProdGroupLink JOIN ProductGroupHead ON ProdGroupLink.GroupHeadId=ProductGroupHead.GroupHeadId JOIN ProductGroups on ProdGroupLink.ProdGroupName=ProductGroups.GroupName WHERE ProdGroupLink.GroupHeadId=@Id AND ProductGroupHead.OrgId=" + GetOrgID();
+            using var db = new SqlConnection(connString);
+            List<long> idLIst = [.. db.Query<long>(query, new { Id = id })];
+            if (idLIst.Count > 0)
+            {
+                ids = String.Join(",", idLIst);
+            }
+            return ids;
+        }
+
+        public static void DeleteProductsByCategory(long id)
+        {
+            string subCategories = GetSubCategoryIdForCategory("" + id);
+            if (!string.IsNullOrEmpty(subCategories))
+            {
+                string query = "Select ProdID from Products Join ProductGroups on Products.GroupName=ProductGroups.GroupName WHERE Products.OrgId=" + GetOrgID + " AND ProductGroups.ProdGroupID IN (" + subCategories + ")";
+
+                List<long> productList = [];
+                using var db = new SqlConnection(connString);
+                productList = [.. db.Query<long>(query)];
+                if (productList.Count > 0)
+                {
+                    string productids = string.Join(",", productList);
+                    string productDeleteQuery = "DELETE FROM Products WHERE OrgID=" + GetOrgID() + " AND ProdID IN (" + productids + ")";
+                    db.Execute(productDeleteQuery);
+                }
+            }
+        }
+
         //Sub Categories Section
         public static PagedSubCategories GetSubCategories(long? pageNumber, long? pageSize)
         {
@@ -639,6 +707,28 @@ namespace EsquireVRN.Utils
             string searchWhere = " AND (GroupName='" + id.Replace("'", "''") + "')";
             List<Product_View> Products = GetProducts(searchWhere);
             return Products;
+        }
+
+        public static bool DeleteSubCategory(long id)
+        {
+            string queryStr = "DELETE FROM [dbo].[ProductGroups] WHERE ProdGroupID=@Id";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { Id = id };
+                db.Execute(queryStr, values);
+            }
+            return true;
+        }
+
+        public static bool DeleteSubCategoryProduct(string id)
+        {
+            string queryStr = "DELETE FROM [dbo].[Products] WHERE GroupName=@Id AND OrgID=" + GetOrgID();
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { Id = id };
+                db.Execute(queryStr, values);
+            }
+            return true;
         }
 
         //Menu Section
@@ -3520,7 +3610,7 @@ namespace EsquireVRN.Utils
                     string strSQL = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV, 
                     WEBCustomer.FirstName, WEBCustomer.Surname, Accounts.Active, Accounts.UsePrice,Accounts.DefaultBranch FROM WEBCustomer 
                     INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') Accounts.OrgID IN (94,380,932,546) Order By WebCustomer.CustID" + @";
+                        username.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (94,380,932,546) Order By WebCustomer.CustID" + @";
                     SELECT WEBCustomer.Email, WEBCustomer.FraudulentUserID, Users.FirstName, Users.Surname, Organisation.WEBOrgURL
                     FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN
                         Organisation ON Users.OrgID = Organisation.OrgID
@@ -3531,7 +3621,8 @@ namespace EsquireVRN.Utils
                     if (uDetail != null)
                     {
                         string query = @"SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.CustId =" + uDetail.CustID + ");";
-                        var fradulent_check = db.Query(query).FirstOrDefault();
+                        using var fCheck = new SqlConnection(connString);
+                        var fradulent_check = fCheck.Query(query).FirstOrDefault();
                         if (fradulent_check != null)
                         {
                             returnValue.CustID = ACCOUNT_FRAUDULENT;
@@ -3574,7 +3665,7 @@ namespace EsquireVRN.Utils
                 }
 
             }
-            catch
+            catch(Exception ex)
             {
                 returnValue.CustID = INVALID_LOGIN;
             }
@@ -3604,7 +3695,8 @@ namespace EsquireVRN.Utils
                     if (uDetail != null)
                     {
                         string query = @"SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.CustId =" + uDetail.CustID + ");";
-                        var fradulent_check = connection.Query(query).FirstOrDefault();
+                        using var fCheck = new SqlConnection(connString);
+                        var fradulent_check = fCheck.Query(query).FirstOrDefault();
                         if (fradulent_check != null)
                         {
                             returnValue.CustID = ACCOUNT_FRAUDULENT;
@@ -5155,6 +5247,266 @@ namespace EsquireVRN.Utils
             });
 
             return count > 0;
+        }
+
+        //EFT Payment Setup
+        public static async Task<IEnumerable<EFTPaymentSetup>>
+        GetAllEFTPaymentSetupsAsync()
+        {
+            const string sql = @"
+            SELECT
+                Id,
+                Name,
+                AccountNo,
+                BranchCode,
+                AccountName,
+                LogoUrl,
+                OrgID,
+                Position
+            FROM EFTPaymentSetup
+            ORDER BY Position, Id;
+        ";
+
+            using var connection = new SqlConnection(connString);
+
+            return await connection.QueryAsync<EFTPaymentSetup>(sql);
+        }
+
+
+        // ---------------------------------------------------------
+        // Get EFT Payment Setup by Id
+        // ---------------------------------------------------------
+        public static async Task<EFTPaymentSetup?>
+            GetEFTPaymentSetupByIdAsync(long id)
+        {
+            const string sql = @"
+            SELECT
+                Id,
+                Name,
+                AccountNo,
+                BranchCode,
+                AccountName,
+                LogoUrl,
+                OrgID,
+                Position
+            FROM EFTPaymentSetup
+            WHERE Id = @Id;
+        ";
+
+            using var connection = new SqlConnection(connString);
+
+            return await connection.QueryFirstOrDefaultAsync<EFTPaymentSetup>(
+                sql,
+                new
+                {
+                    Id = id
+                });
+        }
+
+
+        // ---------------------------------------------------------
+        // Get EFT Payment Setups by Organization
+        // ---------------------------------------------------------
+        public static async Task<IEnumerable<EFTPaymentSetup>>
+            GetEFTPaymentSetupsByOrgIdAsync(long orgId)
+        {
+            const string sql = @"
+            SELECT
+                Id,
+                Name,
+                AccountNo,
+                BranchCode,
+                AccountName,
+                LogoUrl,
+                OrgID,
+                Position
+            FROM EFTPaymentSetup
+            WHERE OrgID = @OrgID
+            ORDER BY Position, Id;
+        ";
+
+            using var connection = new SqlConnection(connString);
+
+            return await connection.QueryAsync<EFTPaymentSetup>(
+                sql,
+                new
+                {
+                    OrgID = orgId
+                });
+        }
+
+
+        // ---------------------------------------------------------
+        // Insert EFT Payment Setup
+        // ---------------------------------------------------------
+        public static async Task<long>
+            InsertEFTPaymentSetupAsync(EFTPaymentSetup model)
+        {
+            const string sql = @"
+            INSERT INTO EFTPaymentSetup
+            (
+                Name,
+                AccountNo,
+                BranchCode,
+                AccountName,
+                LogoUrl,
+                OrgID,
+                Position
+            )
+            VALUES
+            (
+                @Name,
+                @AccountNo,
+                @BranchCode,
+                @AccountName,
+                @LogoUrl,
+                @OrgID,
+                @Position
+            );
+
+            SELECT CAST(SCOPE_IDENTITY() AS BIGINT);
+        ";
+
+            using var connection = new SqlConnection(connString);
+
+            return await connection.ExecuteScalarAsync<long>(
+                sql,
+                new
+                {
+                    model.Name,
+                    model.AccountNo,
+                    model.BranchCode,
+                    model.AccountName,
+                    model.LogoUrl,
+                    model.OrgID,
+                    model.Position
+                });
+        }
+
+
+        // ---------------------------------------------------------
+        // Update EFT Payment Setup
+        // ---------------------------------------------------------
+        public static async Task<int>
+            UpdateEFTPaymentSetupAsync(EFTPaymentSetup model)
+        {
+            const string sql = @"
+            UPDATE EFTPaymentSetup
+            SET
+                Name = @Name,
+                AccountNo = @AccountNo,
+                BranchCode = @BranchCode,
+                AccountName = @AccountName,
+                LogoUrl = @LogoUrl,
+                OrgID = @OrgID,
+                Position = @Position
+            WHERE Id = @Id;
+        ";
+
+            using var connection = new SqlConnection(connString);
+
+            return await connection.ExecuteAsync(
+                sql,
+                new
+                {
+                    model.Id,
+                    model.Name,
+                    model.AccountNo,
+                    model.BranchCode,
+                    model.AccountName,
+                    model.LogoUrl,
+                    model.OrgID,
+                    model.Position
+                });
+        }
+
+
+        // ---------------------------------------------------------
+        // Delete EFT Payment Setup
+        // ---------------------------------------------------------
+        public static async Task<int>
+            DeleteEFTPaymentSetupAsync(long id)
+        {
+            const string sql = @"
+            DELETE FROM EFTPaymentSetup
+            WHERE Id = @Id;
+        ";
+
+            using var connection = new SqlConnection(connString);
+
+            return await connection.ExecuteAsync(
+                sql,
+                new
+                {
+                    Id = id
+                });
+        }
+
+        public static async Task<bool> ReorderEFTPaymentSetupsAsync(
+    long orgId,
+    List<long> ids)
+        {
+            const string validateSql = @"
+        SELECT COUNT(*)
+        FROM EFTPaymentSetup
+        WHERE OrgID = @OrgID
+          AND Id IN @Ids;
+    ";
+
+            const string updateSql = @"
+        UPDATE EFTPaymentSetup
+        SET Position = @Position
+        WHERE Id = @Id
+          AND OrgID = @OrgID;
+    ";
+
+            using var connection = new SqlConnection(connString);
+
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
+
+            using IDbTransaction transaction = connection.BeginTransaction();
+
+            try
+            {
+                var count = await connection.ExecuteScalarAsync<int>(
+                    validateSql,
+                    new
+                    {
+                        OrgID = orgId,
+                        Ids = ids
+                    },
+                    transaction);
+
+                // Make sure every supplied ID belongs to this organization.
+                if (count != ids.Count)
+                {
+                    transaction.Rollback();
+                    return false;
+                }
+
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    await connection.ExecuteAsync(
+                        updateSql,
+                        new
+                        {
+                            Id = ids[i],
+                            OrgID = orgId,
+                            Position = i + 1
+                        },
+                        transaction);
+                }
+
+                transaction.Commit();
+
+                return true;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }
