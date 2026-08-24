@@ -32,7 +32,7 @@ namespace EsquireVRN.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(long? id)
         {
-            Brand brand = Shared.GetBrand(id);
+            var brand = Shared.GetBrand(id);
             if (brand == null)
             {
                 return NotFound(new { error = "Brand doesn't exist." });
@@ -40,56 +40,56 @@ namespace EsquireVRN.Controllers
             return Ok(brand);
         }
 
-        [HttpGet("GetAllBrands")]
-        [Authorize(Roles = "Reseller")]
-        public IActionResult GetAllBrands(long? page_number, long? page_size, string? search)
-        {
-            return Ok(Shared.GetAllBrands(page_number, page_size, search));
+        //[HttpGet("GetAllBrands")]
+        ////[Authorize(Roles = "Reseller")]
+        //public IActionResult GetAllBrands(long? page_number, long? page_size, string? search)
+        //{
+        //    return Ok(Shared.GetAllBrands(page_number, page_size, search));
 
-        }
+        //}
 
-        [HttpPost("UpdateBrandList")]
-        //[Authorize(Roles = "Reseller")]
-        public IActionResult UpdateBrands([FromBody] UpdateBrandModel reqModel)
-        {
-            try
-            {
-                var orgId = Shared.GetOrgID();
-                if (reqModel?.AddIdList?.Count > 0)
-                {
-                    long position = Shared.GetVRNBrandLastPosition(orgId);
-                    List<VRNBrands> subCategories = [];
-                    foreach (var item in reqModel.AddIdList)
-                    {
-                        if (!Shared.VRNBrandsExists(item))
-                        {
-                            VRNBrands sCategory = new()
-                            {
-                                BrandId = item,
-                                OrgId = orgId,
-                                Position = position,
-                                CreatedDate = DateTime.Now
-                            };
-                            subCategories.Add(sCategory);
-                            position++;
-                        }
-                    }
-                    if (subCategories.Count > 0)
-                    {
-                        Shared.AddVRNBrands(subCategories);
-                    }
-                }
-                if (reqModel?.RemoveIdList?.Count > 0)
-                {
-                    Shared.RemoveVRNBrands(reqModel.RemoveIdList, Shared.GetOrgID());
-                }
-                return Ok(new { message = "Brand list updated successfully." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Something went wrong. Please try again." });
-            }
-        }
+        //[HttpPost("UpdateBrandList")]
+        ////[Authorize(Roles = "Reseller")]
+        //public IActionResult UpdateBrands([FromBody] UpdateBrandModel reqModel)
+        //{
+        //    try
+        //    {
+        //        var orgId = Shared.GetOrgID();
+        //        if (reqModel?.AddIdList?.Count > 0)
+        //        {
+        //            long position = Shared.GetVRNBrandLastPosition(orgId);
+        //            List<VRNBrands> subCategories = [];
+        //            foreach (var item in reqModel.AddIdList)
+        //            {
+        //                if (!Shared.VRNBrandsExists(item))
+        //                {
+        //                    VRNBrands sCategory = new()
+        //                    {
+        //                        BrandId = item,
+        //                        OrgId = orgId,
+        //                        Position = position,
+        //                        CreatedDate = DateTime.Now
+        //                    };
+        //                    subCategories.Add(sCategory);
+        //                    position++;
+        //                }
+        //            }
+        //            if (subCategories.Count > 0)
+        //            {
+        //                Shared.AddVRNBrands(subCategories);
+        //            }
+        //        }
+        //        if (reqModel?.RemoveIdList?.Count > 0)
+        //        {
+        //            Shared.RemoveVRNBrands(reqModel.RemoveIdList, Shared.GetOrgID());
+        //        }
+        //        return Ok(new { message = "Brand list updated successfully." });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { error = "Something went wrong. Please try again." });
+        //    }
+        //}
 
         [HttpGet]
         [Route("Products")]
@@ -120,53 +120,53 @@ namespace EsquireVRN.Controllers
         }
 
         // DELETE api/<BrandController>/5
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Reseller")]
-        public IActionResult Delete(long? id)
-        {
-            try
-            {
-                Brand oBrand = Shared.GetBrand(id);
-                if (oBrand == null)
-                {
-                    return StatusCode(404, new { error = "Brand doesn't exist anymore." });
-                }
-                //if (!Shared.CanDeleteBrand(id))
-                //{
-                //    return StatusCode(400, new { error = "Brand has items assigned to it. Please remove all the products assigned to it and try again." });
-                //}
-                if (Shared.DeleteBrand(id))
-                {
-                    var folderName = Path.Combine("Resources", "Images", "Brands");
-                    var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                    if (!Directory.Exists(pathToSave))
-                    {
-                        Directory.CreateDirectory(pathToSave);
-                    }
-                    if (!string.IsNullOrWhiteSpace(oBrand.Link))
-                    {
-                        string oldImage = oBrand.Link.Split('/').LastOrDefault();
-                        if (!string.IsNullOrWhiteSpace(oldImage))
-                        {
-                            string oldImagePt = Path.Combine(pathToSave, oldImage);
-                            if (System.IO.File.Exists(oldImagePt))
-                            {
-                                System.IO.File.Delete(oldImagePt);
-                            }
-                        }
-                    }
-                    return Ok(new { message = "Brand removed successfully" });
-                }
-                else
-                {
-                    return StatusCode(500, new { error = "Something went wrong with the server. Please try again." });
-                }
-            }
-            catch
-            {
-                return StatusCode(500, new { error = "Something went wrong with the server. Please try again." });
-            }
+        //[HttpDelete("{id}")]
+        //[Authorize(Roles = "Reseller")]
+        //public IActionResult Delete(long? id)
+        //{
+        //    try
+        //    {
+        //        Brand oBrand = Shared.GetBrand(id);
+        //        if (oBrand == null)
+        //        {
+        //            return StatusCode(404, new { error = "Brand doesn't exist anymore." });
+        //        }
+        //        //if (!Shared.CanDeleteBrand(id))
+        //        //{
+        //        //    return StatusCode(400, new { error = "Brand has items assigned to it. Please remove all the products assigned to it and try again." });
+        //        //}
+        //        if (Shared.DeleteBrand(id))
+        //        {
+        //            var folderName = Path.Combine("Resources", "Images", "Brands");
+        //            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+        //            if (!Directory.Exists(pathToSave))
+        //            {
+        //                Directory.CreateDirectory(pathToSave);
+        //            }
+        //            if (!string.IsNullOrWhiteSpace(oBrand.Link))
+        //            {
+        //                string oldImage = oBrand.Link.Split('/').LastOrDefault();
+        //                if (!string.IsNullOrWhiteSpace(oldImage))
+        //                {
+        //                    string oldImagePt = Path.Combine(pathToSave, oldImage);
+        //                    if (System.IO.File.Exists(oldImagePt))
+        //                    {
+        //                        System.IO.File.Delete(oldImagePt);
+        //                    }
+        //                }
+        //            }
+        //            return Ok(new { message = "Brand removed successfully" });
+        //        }
+        //        else
+        //        {
+        //            return StatusCode(500, new { error = "Something went wrong with the server. Please try again." });
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        return StatusCode(500, new { error = "Something went wrong with the server. Please try again." });
+        //    }
 
-        }
+        //}
     }
 }

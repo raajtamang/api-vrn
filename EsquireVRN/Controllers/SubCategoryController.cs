@@ -1,8 +1,6 @@
 ﻿using Dapper;
 using EsquireVRN.Models;
-using EsquireVRN.Models.DTO;
 using EsquireVRN.Utils;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
@@ -32,7 +30,7 @@ namespace EsquireVRN.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(long? id)
         {
-            SubCategory subCategory = Shared.GetSubCategory(id);
+            var subCategory = Shared.GetSubCategory(id);
             if (subCategory == null)
             {
                 return NotFound(new { error = "Sub Category doesn't exist." });
@@ -44,7 +42,7 @@ namespace EsquireVRN.Controllers
         [Route("Products")]
         public IActionResult GetProducts(long id)
         {
-            SubCategory oSubCategory = Shared.GetSubCategory(id);
+            var oSubCategory = Shared.GetSubCategory(id);
             if (oSubCategory == null)
             {
                 return StatusCode(404, new { error = "SubCategory doesn't exist anymore." });
@@ -70,88 +68,88 @@ namespace EsquireVRN.Controllers
 
 
 
-        [HttpGet("All/{CategoryId}")]
-        [Authorize(Roles = "Reseller")]
-        public IActionResult GetAllSubCategories(string? search, long CategoryId, long? page_number, long? page_size)
-        {
-            return Ok(Shared.GetAllWebSubCategories(search, CategoryId, page_size, page_number));
-        }
+        //[HttpGet("All/{CategoryId}")]
+        //[Authorize(Roles = "Reseller")]
+        //public IActionResult GetAllSubCategories(string? search, long CategoryId, long? page_number, long? page_size)
+        //{
+        //    return Ok(Shared.GetAllWebSubCategories(search, CategoryId, page_size, page_number));
+        //}
 
-        [HttpPost("UpdateSubCategoryList")]
+       // [HttpPost("UpdateSubCategoryList")]
+       //// [Authorize(Roles = "Reseller")]
+       // public IActionResult UpdateCategories([FromBody] UpdateCategoryModel reqModel)
+       // {
+       //     try
+       //     {
+       //         var orgId = Shared.GetOrgID();
+       //         if (reqModel?.AddIdList?.Count > 0)
+       //         {
+       //             long position = Shared.GetVRNLastPosition(orgId);
+       //             List<VRNSubCategories> subCategories = [];
+       //             foreach (var item in reqModel.AddIdList)
+       //             {
+       //                 if (!Shared.VRNCategoriesExists(item.SubCategoryId))
+       //                 {
+       //                     var title = Shared.GetSubCategoryTitle(item.SubCategoryId);
+       //                     VRNSubCategories sCategory = new()
+       //                     {
+       //                         SubCategoryId = item.SubCategoryId,
+       //                         CategoryID = item.CategoryID,
+       //                         OrgId = orgId,
+       //                         Position = position,
+       //                         Title = title
+       //                     };
+       //                     subCategories.Add(sCategory);
+       //                     position++;
+       //                 }
+       //             }
+       //             if (subCategories.Count > 0)
+       //             {
+       //                 Shared.AddVRNCategories(subCategories);
+       //             }
+       //         }
+       //         if (reqModel?.RemoveIdList?.Count > 0)
+       //         {
+       //             Shared.RemoveVRNCategories(reqModel.RemoveIdList, Shared.GetOrgID());
+       //         }
+       //         return Ok(new { message = "Category list updated successfully." });
+       //     }
+       //     catch
+       //     {
+       //         return StatusCode(500, new { error = "Something went wrong. Please try again." });
+       //     }
+       // }
+
+       // [HttpDelete("{id}")]
        // [Authorize(Roles = "Reseller")]
-        public IActionResult UpdateCategories([FromBody] UpdateCategoryModel reqModel)
-        {
-            try
-            {
-                var orgId = Shared.GetOrgID();
-                if (reqModel?.AddIdList?.Count > 0)
-                {
-                    long position = Shared.GetVRNLastPosition(orgId);
-                    List<VRNSubCategories> subCategories = [];
-                    foreach (var item in reqModel.AddIdList)
-                    {
-                        if (!Shared.VRNCategoriesExists(item.SubCategoryId))
-                        {
-                            var title = Shared.GetSubCategoryTitle(item.SubCategoryId);
-                            VRNSubCategories sCategory = new()
-                            {
-                                SubCategoryId = item.SubCategoryId,
-                                CategoryID = item.CategoryID,
-                                OrgId = orgId,
-                                Position = position,
-                                Title = title
-                            };
-                            subCategories.Add(sCategory);
-                            position++;
-                        }
-                    }
-                    if (subCategories.Count > 0)
-                    {
-                        Shared.AddVRNCategories(subCategories);
-                    }
-                }
-                if (reqModel?.RemoveIdList?.Count > 0)
-                {
-                    Shared.RemoveVRNCategories(reqModel.RemoveIdList, Shared.GetOrgID());
-                }
-                return Ok(new { message = "Category list updated successfully." });
-            }
-            catch
-            {
-                return StatusCode(500, new { error = "Something went wrong. Please try again." });
-            }
-        }
-
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Reseller")]
-        public IActionResult Delete(long id)
-        {
-            SubCategory oSubCategory = Shared.GetSubCategory(id);
-            if (oSubCategory == null)
-            {
-                return StatusCode(404, new { error = "SubCategory doesn't exist anymore." });
-            }
+       // public IActionResult Delete(long id)
+       // {
+       //     SubCategory oSubCategory = Shared.GetSubCategory(id);
+       //     if (oSubCategory == null)
+       //     {
+       //         return StatusCode(404, new { error = "SubCategory doesn't exist anymore." });
+       //     }
             
-            if (Shared.DeleteSubCategory(id))
-            {
-                Shared.DeleteSubCategoryProduct(oSubCategory.Title);
-                var folderName = Path.Combine("Resources", "Images", "SubCategories");
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                if (!Directory.Exists(pathToSave))
-                {
-                    Directory.CreateDirectory(pathToSave);
-                }
-                string oldImage = oSubCategory.ImageUrl.Split('/').LastOrDefault();
-                if (!string.IsNullOrWhiteSpace(oldImage))
-                {
-                    string oldImagePt = Path.Combine(pathToSave, oldImage);
-                    if (System.IO.File.Exists(oldImagePt))
-                    {
-                        System.IO.File.Delete(oldImagePt);
-                    }
-                }
-            }
-            return Ok(new { message = "SubCategory removed successfully" });
-        }
+       //     if (Shared.DeleteSubCategory(id))
+       //     {
+       //         Shared.DeleteSubCategoryProduct(oSubCategory.Title);
+       //         var folderName = Path.Combine("Resources", "Images", "SubCategories");
+       //         var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+       //         if (!Directory.Exists(pathToSave))
+       //         {
+       //             Directory.CreateDirectory(pathToSave);
+       //         }
+       //         string oldImage = oSubCategory.ImageUrl.Split('/').LastOrDefault();
+       //         if (!string.IsNullOrWhiteSpace(oldImage))
+       //         {
+       //             string oldImagePt = Path.Combine(pathToSave, oldImage);
+       //             if (System.IO.File.Exists(oldImagePt))
+       //             {
+       //                 System.IO.File.Delete(oldImagePt);
+       //             }
+       //         }
+       //     }
+       //     return Ok(new { message = "SubCategory removed successfully" });
+       // }
     }
 }

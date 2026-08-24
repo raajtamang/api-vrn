@@ -19,12 +19,12 @@ namespace EsquireVRN.Controllers
             return Ok(Shared.GetCategories(page_number, page_size));
         }
 
-        [HttpGet("All")]
-        [Authorize(Roles = "Reseller")]
-        public IActionResult GetAllCategories(string? search, long? page_number, long? page_size)
-        {
-            return Ok(Shared.GetAllCategories(search, page_number, page_size));
-        }
+        //[HttpGet("All")]
+        //[Authorize(Roles = "Reseller")]
+        //public IActionResult GetAllCategories(string? search, long? page_number, long? page_size)
+        //{
+        //    return Ok(Shared.GetAllCategories(search, page_number, page_size));
+        //}
         [HttpGet]
         [Route("Popular")]
         public IActionResult GetPopularCategory(int page_number, int page_size)
@@ -36,7 +36,7 @@ namespace EsquireVRN.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(long? id)
         {
-            Category category = Shared.GetCategory(id);
+            var category = Shared.GetCategory(id);
             if (category == null)
             {
                 return NotFound(new { error = "Category doesn't exist." });
@@ -48,7 +48,7 @@ namespace EsquireVRN.Controllers
         [Route("Products")]
         public IActionResult GetProducts(long id)
         {
-            Category Category = Shared.GetCategory(id);
+            var Category = Shared.GetCategory(id);
             if (Category == null)
             {
                 return StatusCode(404, new { error = "Category doesn't exist anymore." });
@@ -84,41 +84,41 @@ namespace EsquireVRN.Controllers
 
         }
 
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Reseller")]
-        public IActionResult Delete(long id)
-        {
-            Category oCategory = Shared.GetCategory(id);
-            if (oCategory == null)
-            {
-                return StatusCode(404, new
-                {
-                    error = "Category doesn't exist anymore."
-                });
-            }
+        //[HttpDelete("{id}")]
+        //[Authorize(Roles = "Reseller")]
+        //public IActionResult Delete(long id)
+        //{
+        //    Category oCategory = Shared.GetCategory(id);
+        //    if (oCategory == null)
+        //    {
+        //        return StatusCode(404, new
+        //        {
+        //            error = "Category doesn't exist anymore."
+        //        });
+        //    }
 
-            if (Shared.DeleteCategory(id))
-            {
-                Shared.DeleteSubCategories(id);
-                Shared.DeleteProductsByCategory(id);
+        //    if (Shared.DeleteCategory(id))
+        //    {
+        //        Shared.DeleteSubCategories(id);
+        //        Shared.DeleteProductsByCategory(id);
 
-                var folderName = Path.Combine("Resources", "Images", "Categories");
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                if (!Directory.Exists(pathToSave))
-                {
-                    Directory.CreateDirectory(pathToSave);
-                }
-                var oldImage = oCategory.ImageUrl?.Split('/').LastOrDefault();
-                if (!string.IsNullOrWhiteSpace(oldImage))
-                {
-                    string oldImagePt = Path.Combine(pathToSave, oldImage);
-                    if (System.IO.File.Exists(oldImagePt))
-                    {
-                        System.IO.File.Delete(oldImagePt);
-                    }
-                }
-            }
-            return Ok(new { message = "Category removed successfully" });
-        }
+        //        var folderName = Path.Combine("Resources", "Images", "Categories");
+        //        var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+        //        if (!Directory.Exists(pathToSave))
+        //        {
+        //            Directory.CreateDirectory(pathToSave);
+        //        }
+        //        var oldImage = oCategory.ImageUrl?.Split('/').LastOrDefault();
+        //        if (!string.IsNullOrWhiteSpace(oldImage))
+        //        {
+        //            string oldImagePt = Path.Combine(pathToSave, oldImage);
+        //            if (System.IO.File.Exists(oldImagePt))
+        //            {
+        //                System.IO.File.Delete(oldImagePt);
+        //            }
+        //        }
+        //    }
+        //    return Ok(new { message = "Category removed successfully" });
+        //}
     }
 }

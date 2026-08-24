@@ -331,7 +331,7 @@ namespace EsquireVRN.Controllers
         public IActionResult GetTopSalesProducts()
         {
             List<TopSale> topSales = [];
-            string query = "WITH CTE as (Select Products.ProdId,Products.ImgURL,Products.ProductName,Sum(ResellerOrderItems.ProdQty) as Sales from ResellerOrderItems JOIN Products on ResellerOrderItems.ProdID=Products.ProdID JOIN VRNSubCategories ON Products.GroupName=VRNSubCategories.Title JOIN VRNBrands on Products.ManufID=VRNBrands.BrandId WHERE VRNBrands.OrgId="+Shared.GetOrgID()+" AND VRNSubCategories.OrgId="+Shared.GetOrgID()+" AND Products.OrgID IN (" + Shared.GetOrgID()+") AND Products.Active=1 AND Products.OutputMe=1 AND dbo.[GetProductStockCount](Products.ProdId,Products.Status,N'A')>0 Group By Products.ProdID,Products.ImgURL,Products.ProductName) Select Top 10 * from CTE Order By Sales desc;";
+            string query = "WITH CTE as (Select Products.ProdId,Products.ImgURL,Products.ProductName,Sum(ResellerOrderItems.ProdQty) as Sales from ResellerOrderItems JOIN Products on ResellerOrderItems.ProdID=Products.ProdID WHERE Products.OrgCategory IN (" + Shared.GetOrgCategory()+") AND Products.Active=1 AND Products.OutputMe=1 AND dbo.[GetProductStockCount](Products.ProdId,Products.Status,N'A')>0 Group By Products.ProdID,Products.ImgURL,Products.ProductName) Select Top 10 * from CTE Order By Sales desc;";
             using (var db = new SqlConnection(Shared.connString))
             {
                 topSales = [.. db.Query<TopSale>(query)];
