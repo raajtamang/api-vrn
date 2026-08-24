@@ -266,19 +266,20 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Shared.cs",
-              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
-              "RelativeDocumentMoniker": "EsquireVRN\\Utils\\Shared.cs",
-              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
-              "RelativeToolTip": "EsquireVRN\\Utils\\Shared.cs",
-              "ViewState": "AgIAABIWAAAAAAAAAAAvwAAWAAAZAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "OrgCategoryController.cs",
+              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\OrgCategoryController.cs",
+              "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\OrgCategoryController.cs",
+              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\OrgCategoryController.cs",
+              "RelativeToolTip": "EsquireVRN\\Controllers\\OrgCategoryController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-24T08:58:15.102Z"
+              "WhenOpened": "2026-08-21T05:04:45.527Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -290,8 +291,7 @@
               "RelativeToolTip": "EsquireVRN\\appsettings.Development.json",
               "ViewState": "AgIAACMAAAAAAAAAAAAAAC0AAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-04-18T05:38:04.007Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-18T05:38:04.007Z"
             },
             {
               "$type": "Document",
@@ -331,16 +331,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "OrgCategoryController.cs",
-              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\OrgCategoryController.cs",
-              "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\OrgCategoryController.cs",
-              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\OrgCategoryController.cs",
-              "RelativeToolTip": "EsquireVRN\\Controllers\\OrgCategoryController.cs",
-              "ViewState": "AgIAAK8AAAAAAAAAAADwv8UAAAAkAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "Shared.cs",
+              "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
+              "RelativeDocumentMoniker": "EsquireVRN\\Utils\\Shared.cs",
+              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
+              "RelativeToolTip": "EsquireVRN\\Utils\\Shared.cs",
+              "ViewState": "AgIAABIWAAAAAAAAAAAvwAAWAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-21T05:04:45.527Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-24T08:58:15.102Z"
             },
             {
               "$type": "Document",

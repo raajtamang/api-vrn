@@ -7,7 +7,7 @@ namespace EsquireVRN.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Reseller")]
+    [Authorize(Roles = "Reseller")]
     public class OrgCategoryController : ControllerBase
     {
         // =========================

@@ -276,7 +276,7 @@
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\OrgCategoryController.cs",
               "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\OrgCategoryController.cs",
               "RelativeToolTip": "EsquireVRN\\Controllers\\OrgCategoryController.cs",
-              "ViewState": "AgIAALMAAAAAAAAAAAAqwMUAAAAkAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-21T05:04:45.527Z",
               "EditorCaption": ""
@@ -291,8 +291,7 @@
               "RelativeToolTip": "EsquireVRN\\appsettings.Development.json",
               "ViewState": "AgIAACMAAAAAAAAAAAAAAC0AAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-04-18T05:38:04.007Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-18T05:38:04.007Z"
             },
             {
               "$type": "Document",
