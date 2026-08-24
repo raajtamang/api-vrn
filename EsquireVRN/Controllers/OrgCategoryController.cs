@@ -1,4 +1,4 @@
-﻿using EsquireVRN.Models;
+﻿using EsquireVRN.Models.DTO;
 using EsquireVRN.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +7,7 @@ namespace EsquireVRN.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Reseller")]
+    //[Authorize(Roles = "Reseller")]
     public class OrgCategoryController : ControllerBase
     {
         // =========================
@@ -15,30 +15,39 @@ namespace EsquireVRN.Controllers
         // POST: api/OrgCategory
         // =========================
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] OrgCategory model)
+        public async Task<IActionResult> Create([FromBody] OrgCategoryCreateDTO model)
         {
             if (model == null)
             {
-                return BadRequest("Invalid request.");
-            }
-
-            if (model.OrgId <= 0)
-            {
-                return BadRequest("OrgId is required.");
+                return BadRequest(new { error = "Invalid request." });
             }
 
             if (string.IsNullOrWhiteSpace(model.Category))
             {
-                return BadRequest("Category is required.");
+                return BadRequest(new { error = "Category is required." });
             }
 
             try
             {
-                var id = await Shared.CreateOrgCategory(model);
+                var oOrgCategory = await Shared.GetOrgCategoriesByOrgId(Shared.GetOrgID());
+                if (oOrgCategory != null && oOrgCategory.Any())
+                {
+                    var orgCategory = oOrgCategory.FirstOrDefault();
 
-                var nOrgCategory = GetById(id);
+                    var updated = await Shared.UpdateOrgCategory(orgCategory.Id, model);
+                    var nOrgCategory = await Shared.GetOrgCategoryById(orgCategory.Id);
+                    return Ok(new { OrganisationCategory = nOrgCategory, message = "Organisation category updated successfully." });
+                }
+                else
+                {
 
-                return Ok(new { nOrgCategory, message = "Organisation category added successfully." });
+                    var id = await Shared.CreateOrgCategory(model);
+
+                    var nOrgCategory = await Shared.GetOrgCategoryById(id);
+
+                    return Ok(new { OrganisationCategory = nOrgCategory, message = "Organisation category added successfully." });
+
+                }
             }
             catch (Exception ex)
             {
@@ -58,7 +67,7 @@ namespace EsquireVRN.Controllers
         {
             if (id <= 0)
             {
-                return BadRequest("Invalid Id.");
+                return BadRequest(new { error = "Invalid Id." });
             }
 
             try
@@ -68,7 +77,7 @@ namespace EsquireVRN.Controllers
                 if (result == null)
                 {
                     return NotFound(
-                        $"Organisation Category with Id {id} does not exist.");
+                        new { error = $"Organisation Category with Id {id} does not exist." });
                 }
 
                 return Ok(result);
@@ -113,7 +122,7 @@ namespace EsquireVRN.Controllers
         {
             if (orgId <= 0)
             {
-                return BadRequest("Invalid OrgId.");
+                return BadRequest(new { error = "Invalid OrgId." });
             }
 
             try
@@ -138,32 +147,25 @@ namespace EsquireVRN.Controllers
         [HttpPut("{id:long}")]
         public async Task<IActionResult> Update(
             long id,
-            [FromBody] OrgCategory model)
+            [FromBody] OrgCategoryCreateDTO model)
         {
             if (id <= 0)
             {
-                return BadRequest("Invalid Id.");
+                return BadRequest(new { error = "Invalid Id." });
             }
 
             if (model == null)
             {
-                return BadRequest("Invalid request.");
-            }
-
-            if (model.OrgId <= 0)
-            {
-                return BadRequest("OrgId is required.");
+                return BadRequest(new { error = "Invalid request." });
             }
 
             if (string.IsNullOrWhiteSpace(model.Category))
             {
-                return BadRequest("Category is required.");
+                return BadRequest(new { error = "Category is required." });
             }
 
             try
             {
-                // Make sure the URL Id is used
-                model.Id = id;
 
                 // Check whether record exists
                 var existing = await Shared.GetOrgCategoryById(id);
@@ -171,15 +173,15 @@ namespace EsquireVRN.Controllers
                 if (existing == null)
                 {
                     return NotFound(
-                        $"OrgCategory with Id {id} was not found.");
+                        new { error = $"OrgCategory with Id {id} was not found." });
                 }
 
-                var updated = await Shared.UpdateOrgCategory(model);
+                var updated = await Shared.UpdateOrgCategory(id, model);
 
                 if (!updated)
                 {
                     return NotFound(
-                        $"OrgCategory with Id {id} was not found.");
+                        new { error = $"OrgCategory with Id {id} was not found." });
                 }
 
                 return Ok(model);
@@ -202,7 +204,7 @@ namespace EsquireVRN.Controllers
         {
             if (id <= 0)
             {
-                return BadRequest("Invalid Id.");
+                return BadRequest(new { error = "Invalid Id." });
             }
 
             try
@@ -213,7 +215,7 @@ namespace EsquireVRN.Controllers
                 if (existing == null)
                 {
                     return NotFound(
-                        $"OrgCategory with Id {id} was not found.");
+                        new { error = $"OrgCategory with Id {id} was not found." });
                 }
 
                 var deleted = await Shared.DeleteOrgCategory(id);
@@ -221,13 +223,15 @@ namespace EsquireVRN.Controllers
                 if (!deleted)
                 {
                     return NotFound(
-                        $"OrgCategory with Id {id} was not found.");
+                        new { error = $"OrgCategory with Id {id} was not found." });
                 }
 
                 return Ok(new
                 {
-                    message = "OrgCategory deleted successfully.",
-                    id = id
+                    message = new
+                    {
+                        error = "OrgCategory deleted successfully."
+                    }
                 });
             }
             catch (Exception ex)

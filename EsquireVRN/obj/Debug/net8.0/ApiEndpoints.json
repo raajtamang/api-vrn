@@ -1219,7 +1219,7 @@
     "Parameters": [
       {
         "Name": "model",
-        "Type": "EsquireVRN.Models.OrgCategory",
+        "Type": "EsquireVRN.Models.DTO.OrgCategoryCreateDTO",
         "IsRequired": true
       }
     ],
@@ -1266,7 +1266,7 @@
       },
       {
         "Name": "model",
-        "Type": "EsquireVRN.Models.OrgCategory",
+        "Type": "EsquireVRN.Models.DTO.OrgCategoryCreateDTO",
         "IsRequired": true
       }
     ],

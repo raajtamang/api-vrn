@@ -2015,17 +2015,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OrgCategory"
+                "$ref": "#/components/schemas/OrgCategoryCreateDTO"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/OrgCategory"
+                "$ref": "#/components/schemas/OrgCategoryCreateDTO"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/OrgCategory"
+                "$ref": "#/components/schemas/OrgCategoryCreateDTO"
               }
             }
           }
@@ -2088,17 +2088,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OrgCategory"
+                "$ref": "#/components/schemas/OrgCategoryCreateDTO"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/OrgCategory"
+                "$ref": "#/components/schemas/OrgCategoryCreateDTO"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/OrgCategory"
+                "$ref": "#/components/schemas/OrgCategoryCreateDTO"
               }
             }
           }
@@ -4974,28 +4974,15 @@
         },
         "additionalProperties": false
       },
-      "OrgCategory": {
+      "OrgCategoryCreateDTO": {
         "required": [
-          "category",
-          "orgId"
+          "category"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "orgId": {
-            "type": "integer",
-            "format": "int64"
-          },
           "category": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "date": {
             "type": "string",
-            "format": "date-time"
+            "nullable": true
           }
         },
         "additionalProperties": false
