@@ -158,7 +158,7 @@ namespace EsquireVRN.Utils
             }
             using (var db = new SqlConnection(connString))
             {
-                string strQuery = "SELECT [ManufID] AS Id, [ManufacturerName] AS [Name], [Logo], [ManufURL] AS Link, [MetaTitle], [MetaDescription], [Description], [Featured], [Position] FROM Manufacturers m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID WHERE p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (N'" + GetOrgCategory() + "') AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 " + searchText + " ORDER BY m.[ManufacturerName] OFFSET (" + pNum + " - 1) * " + pSize + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;SELECT Count(1) FROM dbo.Manufacturers m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID AND p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (N'esquire') AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 " + searchText + ";";
+                string strQuery = "SELECT [ManufID] AS Id, [ManufacturerName] AS [Name], [Logo], [ManufURL] AS Link, [MetaTitle], [MetaDescription], [Description], [Featured], [Position] FROM Manufacturers m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID AND p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (N'" + GetOrgCategory() + "') AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 " + searchText + " ORDER BY m.[ManufacturerName] OFFSET (" + pNum + " - 1) * " + pSize + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;SELECT Count(1) FROM dbo.Manufacturers m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID AND p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (N'esquire') AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 " + searchText + ";";
                 //string strQuery = "Select m.ManufID AS Id, m.ManufacturerName AS Name, m.Logo, m.ManufURL AS Link,m.MetaTitle, m.MetaDescription, m.Description FROM dbo.Manufacturers m JOIN VRNBrands VRNB ON m.ManufID = VRNB.BrandId WHERE VRNB.OrgId=" + GetOrgID() + whereConditon + " ORDER BY VRNB.Position OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;Select COUNT(1) FROM Manufacturers m JOIN VRNBrands VRNB on m.ManufID=VRNB.BrandId WHERE VRNB.OrgId=" + GetOrgID() + whereConditon + ";";
                 var result = db.QueryMultiple(strQuery, new { SearchText = searchText });
                 brands = [.. result.Read<Brand>().DistinctBy(x => x.Name)];
@@ -446,16 +446,21 @@ namespace EsquireVRN.Utils
         }
 
         //Categories Section
-        public static PagedCategories GetCategories(long? pageNum, long? pageSize)
+        public static PagedCategories GetCategories(long? pageNum, long? pageSize, string? searchText)
         {
             long pNum = (pageNum ?? 1);
             long pSize = (pageSize ?? 12);
             List<Category> categories = [];
             long pCount = 1;
+            string where = "";
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                where = " AND pgH.HeadName LIKE '%' + @Search + '%'";
+            }
             using (var db = new SqlConnection(connString))
             {
-                string strQuery = "Select x.* from (Select  pgH.GroupHeadID  as Id,pgH.HeadName as Title,pgH.MetaTitle,pgH.MetaDescription,pgH.ImageUrl,pgH.[Description],pgH.[Featured],pgH.[Position] FROM ProductGroupHead pgH WHERE pgH.OrgId=" + GetOrgCategoryId() + ") as x ORDER BY x.Title OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY; Select  Count(1) FROM ProductGroupHead pgH WHERE pgH.OrgId=" + GetOrgCategoryId() + ";";
-                var result = db.QueryMultiple(strQuery);
+                string strQuery = "Select pgH.GroupHeadID  as Id,pgH.HeadName as Title,pgH.MetaTitle,pgH.MetaDescription,pgH.ImageUrl,pgH.[Description],pgH.[Featured],pgH.[Position] FROM ProductGroupHead pgH WHERE pgH.OrgId=" + GetOrgCategoryId() + " " + where + " AND (Select Count(Distinct ProdId) From Products Where Products.CategoryId=pGH.GroupHeadId AND Products.OrgCategory=N'" + GetOrgCategory() + "' AND Products.Active=1 AND Products.OutputMe=1 AND (Select SUM(StockCount)+ISNULL(Products.StockQty, 0) from BranchStock Where BranchStock.ProdId=Products.ProdId)>0)>0 ORDER BY  pGH.HeadName OFFSET 0 ROWS FETCH NEXT 12 ROWS ONLY;Select  Count(Distinct pgH.GroupHeadID) FROM ProductGroupHead pgH JOIN Products P on pGH.GroupHeadId=P.CategoryID WHERE pgH.OrgId=" + GetOrgCategoryId() + " " + where + " AND P.Active=1  AND P.OutputMe=1  AND (Select SUM(StockCount)+ISNULL(P.StockQty, 0) from BranchStock Where BranchStock.ProdId=P.ProdId)>0;";
+                var result = db.QueryMultiple(strQuery, new {Search=searchText});
                 categories = [.. result.Read<Category>().DistinctBy(x => x.Title)];
                 long counts = result.Read<long>().FirstOrDefault();
                 if (counts > 0)
@@ -532,7 +537,7 @@ namespace EsquireVRN.Utils
             List<Category> categories = [];
             using (var db = new SqlConnection(connString))
             {
-                string strQuery = "SELECT PGH.GroupHeadID AS Id,PGH.HeadName AS Title,PGH.MetaTitle,PGH.ImageURL,(SELECT Count(Distinct p.ProdID) from Products p Join ProductGroups pg on p.GroupName=pg.GroupName Join ProdGroupLink pgl on pgl.ProdGroupName=pg.GroupName where pgl.GroupHeadID=PGH.GroupHeadID and p.OutputMe=1 and p.Active = 1 and p.OrgCategory IN ('N" + GetOrgCategory() + "') AND (dbo.GetProductStockCount(p.ProdID, p.Status, N'A')) >=1) AS ItemCount FROM ProductGroupHead PGH WHERE PGH.OrgID = " + GetOrgCategoryId() + " ORDER BY NEWID() OFFSET " + (page_number - 1) * page_size + " ROWS FETCH NEXT " + page_size + " ROWS ONLY;";
+                string strQuery = "Select pgH.GroupHeadID  as Id,pgH.HeadName as Title,pgH.MetaTitle,pgH.MetaDescription,pgH.ImageUrl,pgH.[Description],pgH.[Featured],pgH.[Position] FROM ProductGroupHead pgH WHERE pgH.OrgId=" + GetOrgCategoryId() + " AND (Select Count(Distinct ProdId) From Products Where Products.CategoryId=pGH.GroupHeadId AND Products.OrgCategory=N'" + GetOrgCategory() + "' AND Products.Active=1 AND Products.OutputMe=1 AND (Select SUM(StockCount)+ISNULL(Products.StockQty, 0) from BranchStock Where BranchStock.ProdId=Products.ProdId)>0)>0 ORDER BY  pGH.HeadName OFFSET " + (page_number - 1) * page_size + " ROWS FETCH NEXT " + page_size + " ROWS ONLY;";
                 categories = [.. db.Query<Category>(strQuery)];
             }
             return categories;

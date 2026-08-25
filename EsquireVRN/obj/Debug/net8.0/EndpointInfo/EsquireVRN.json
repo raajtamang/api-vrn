@@ -179,6 +179,13 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          {
+            "name": "searchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
