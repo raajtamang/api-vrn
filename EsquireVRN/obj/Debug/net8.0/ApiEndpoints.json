@@ -1295,6 +1295,26 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.OrgCategoryController",
+    "Method": "GetOrgcategory",
+    "RelativePath": "api/OrgCategory/GetOrgCategory",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.OrgCategoryController",
+    "Method": "GetOrgcategoryId",
+    "RelativePath": "api/OrgCategory/GetOrgCategoryId",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.OrgCategoryController",
     "Method": "GetByOrgId",
     "RelativePath": "api/OrgCategory/org/{orgId}",
     "HttpMethod": "GET",

@@ -241,5 +241,17 @@ namespace EsquireVRN.Controllers
                     ex.Message);
             }
         }
+
+        [HttpGet("GetOrgCategory")]
+        public IActionResult GetOrgcategory()
+        {
+            return Ok(Shared.GetOrgCategory());
+        }
+
+        [HttpGet("GetOrgCategoryId")]
+        public IActionResult GetOrgcategoryId()
+        {
+            return Ok(Shared.GetOrgCategoryId());
+        }
     }
 }

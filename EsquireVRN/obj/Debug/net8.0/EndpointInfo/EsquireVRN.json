@@ -2161,6 +2161,30 @@
         }
       }
     },
+    "/api/OrgCategory/GetOrgCategory": {
+      "get": {
+        "tags": [
+          "OrgCategory"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/OrgCategory/GetOrgCategoryId": {
+      "get": {
+        "tags": [
+          "OrgCategory"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/PageImage": {
       "get": {
         "tags": [
