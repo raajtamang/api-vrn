@@ -193,7 +193,7 @@ namespace EsquireVRN.Utils
             }
             using (var db = new SqlConnection(connString))
             {
-                string strQuery = "SELECT [ManufID] AS Id, [ManufacturerName] AS [Name], [Logo], [ManufURL] AS Link, [MetaTitle], [MetaDescription], [Description], [Featured], [Position] FROM Manufacturers m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID WHERE p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (" + GetOrgCategory() + ") AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 " + searchText;
+                string strQuery = "SELECT [ManufID] AS Id, [ManufacturerName] AS [Name], [Logo], [ManufURL] AS Link, [MetaTitle], [MetaDescription], [Description], [Featured], [Position] FROM Manufacturers m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID AND p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (" + GetOrgCategory() + ") AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 " + searchText;
                 var result = db.QueryMultiple(strQuery, new { SearchText = searchText });
                 brands = [.. result.Read<BrandDTO>().DistinctBy(x => x.Name)];
                 long counts = result.Read<long>().FirstOrDefault();
@@ -242,7 +242,7 @@ namespace EsquireVRN.Utils
             List<Brand> brands = [];
             using (var db = new SqlConnection(connString))
             {
-                string queryStr = @"Select m.ManufID AS Id, m.ManufacturerName AS Name, m.Logo, m.ManufURL AS Link,m.MetaTitle, m.MetaDescription, m.Description FROM dbo.Manufacturers m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID WHERE p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (" + GetOrgCategory() + ") AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 ORDER BY NEWID() OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY";
+                string queryStr = @"Select m.ManufID AS Id, m.ManufacturerName AS Name, m.Logo, m.ManufURL AS Link,m.MetaTitle, m.MetaDescription, m.Description FROM dbo.Manufacturers m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID AND p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (" + GetOrgCategory() + ") AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 ORDER BY NEWID() OFFSET " + (pSize * (pNum - 1)) + " ROWS FETCH NEXT " + pSize + " ROWS ONLY";
                 brands = db.Query<Brand>(queryStr).ToList();
             }
             return brands;
@@ -252,7 +252,7 @@ namespace EsquireVRN.Utils
             Brand brands = new();
             using (var db = new SqlConnection(connString))
             {
-                string queryStr = "Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo],[ManufURL] as Link,[MetaTitle],[MetaDescription],[Description],[Featured],m.[Position] from [dbo].[Manufacturers] m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID WHERE p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (" + GetOrgCategory() + ") AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 AND [ManufID]=@MfdId";
+                string queryStr = "Select [ManufID] as Id,[ManufacturerName] as [Name],[Logo],[ManufURL] as Link,[MetaTitle],[MetaDescription],[Description],[Featured],m.[Position] from [dbo].[Manufacturers] m WHERE (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.ManufID = m.ManufID AND p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (" + GetOrgCategory() + ") AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 AND [ManufID]=@MfdId";
                 var values = new { MfdId = id };
                 return db.Query<Brand>(queryStr, values).FirstOrDefault();
             }
@@ -1604,7 +1604,7 @@ namespace EsquireVRN.Utils
             string strWEBStockOnly = detail.WEBStockOnly.ToString();
             Product productDetail = new();
             double margin = GetMargin();
-            using (IDbConnection db = new SqlConnection(connString))
+            using (var db = new SqlConnection(connString))
             {
                 string strQuery = @"SELECT [ProdID],Products.[OrgID],[ProductCode],[ManufID],[ManufCode],[Description],[LongDescription],[PurchasePrice]*1.15*" + margin + " AS PurchasePrice,Products.PriceExclVat" + strWEBPriceUsed + " *1.15 *" + margin + " AS Price," + "Products.PriceExclVat" + strWEBDiscountPriceUsed + " *1.15*" + margin + " AS DiscountPrice, Products.PriceExclVat" + strWEBPublicPriceUsed + " *1.15 *" + margin + " AS PublicPrice,[GroupName],[UsualAvailability],[Notes],[URL],[ImgURL],[Status],[Warranty],[OrgSourceID],[OutputMe],[Active],dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') AS StockQty,[DiscQty],[Unit],[CreateDate],[Length],[Width],[Height],[Mass],[DebitOrderFormId],[DeliveryID],[MasterProdID],[AdwordExclude],[DataSource],[ProductName],Products.[CategoryID],[Trending],[Featured],[BestSeller],[MostViewed],(Select ROUND(AVG(CAST(rp.ProdRevRating AS FLOAT)), 2) From ReviewProduct rp where rp.ProdID=Products.ProdID) as Rating FROM [dbo].[Products] WHERE (Products.ProdID = @ProdID);";
                 var values = new { ProdID = prodId };
