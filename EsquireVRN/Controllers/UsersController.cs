@@ -8,17 +8,17 @@ namespace EsquireVRN.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="Reseller")]
+    [Authorize(Roles = "Reseller")]
     public class UsersController : ControllerBase
     {
         // GET: api/<UsersController>
         [HttpGet]
-        public IActionResult Get(int? page_number,int? page_size)
+        public IActionResult Get(int? page_number, int? page_size)
         {
-            long AccountId = Convert.ToInt64(User.Claims.First(claim => claim.Type == "AcountId").Value);
+            long AccountId = Shared.GetAccountId();
             int pSize = (page_size ?? 12);
-            int pNum=(page_number ?? 1);
-            return Ok(Shared.GetCutomers(pNum,pSize,AccountId));
+            int pNum = (page_number ?? 1);
+            return Ok(Shared.GetCutomers(pNum, pSize, AccountId));
         }
 
         // GET api/<UsersController>/5
@@ -34,11 +34,7 @@ namespace EsquireVRN.Controllers
         {
             try
             {
-                if (customer.AccountID == null)
-                {
-                    customer.AccountID = Convert.ToInt64(User.Claims.First(claim => claim.Type == "AcountId").Value);
-                }
-                
+                customer.AccountID = Shared.GetAccountId();
                 customer.OrgID = Shared.GetOrgID();
                 customer.SendEmails = 255;
                 customer.DateCreated = DateTime.UtcNow.AddHours(2);

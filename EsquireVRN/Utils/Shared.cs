@@ -3687,7 +3687,7 @@ namespace EsquireVRN.Utils
                 string strSql = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV, 
                     WEBCustomer.FirstName, WEBCustomer.Surname,Accounts.AccountNo, Accounts.Active, Accounts.UsePrice, Accounts.DefaultBranch " +
                 "FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND Accounts.OrgID IN (" + GetOrgID() + ") AND WEbCustomer.UserType=N'Reseller' Order By WEBCustomer.CustID;";
+                        username.Replace("\'", "\'\'") + "') AND WebCustomer.Active=1 AND WebCustomer.UserType=N'Reseller' AND WebCustomer.OrgId IN (94,380,932,546,473) Order By WEBCustomer.CustID;Select WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV,WEBCustomer.AccountID,Accounts.AccountNo FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID Where WEBCustomer.Email=N'" + username.Replace("'", "''") + "' AND WEBCustomer.Active=1 AND WEBCustomer.OrgID in (94,380,932,546,473) AND WebCustomer.UserType=N'Reseller' Order By WEBCustomer.CustID";
                 using (var connection = new SqlConnection(connString))
                 {
                     var result = connection.QueryMultiple(strSql);
@@ -3695,8 +3695,8 @@ namespace EsquireVRN.Utils
                     if (uDetail != null)
                     {
                         string query = @"SELECT WEBCustomer.FraudulentUserID FROM WEBCustomer INNER JOIN Users ON WEBCustomer.FraudulentUserID = Users.UserID INNER JOIN Organisation ON Users.OrgID = Organisation.OrgID WHERE (WEBCustomer.CustId =" + uDetail.CustID + ");";
-                        using var fCheck = new SqlConnection(connString);
-                        var fradulent_check = fCheck.Query(query).FirstOrDefault();
+                        using var fCheckConnection = new SqlConnection(connString);
+                        var fradulent_check = fCheckConnection.Query(query).FirstOrDefault();
                         if (fradulent_check != null)
                         {
                             returnValue.CustID = ACCOUNT_FRAUDULENT;
@@ -3706,19 +3706,35 @@ namespace EsquireVRN.Utils
                         var salt = uDetail.Salt;
                         if (string.IsNullOrWhiteSpace(salt))
                         {
-                            if (uDetail.Password != password)
+                            var passwords = result.Read<LoginUDetail>().ToList();
+                            foreach (var item in passwords)
                             {
-                                returnValue.CustID = INVALID_LOGIN;
-                                returnValue.IsLoggedIn = false;
-                                return returnValue;
+                                if (item.Password == password)
+                                {
+                                    uDetail.AccountID = item.AccountID;
+                                    uDetail.AccountNo = item.AccountNo;
+                                    break;
+                                }
                             }
                         }
                         else
                         {
                             string iv = uDetail.IV ?? "";
                             var encPassword = uDetail.Password;
-                            bool validationResult = EncryptionService.ValidatePassword(password, encPassword, salt, iv);
-                            if (!validationResult)
+                            var passwords = result.Read<LoginUDetail>().ToList();
+                            bool login_success = false;
+                            foreach (var item in passwords)
+                            {
+                                bool validationResult = EncryptionService.ValidatePassword(password, encPassword, salt, iv);
+                                if (validationResult)
+                                {
+                                    login_success = true;
+                                    uDetail.AccountID = item.AccountID;
+                                    uDetail.AccountNo = item.AccountNo;
+                                    break;
+                                }
+                            }
+                            if (!login_success)
                             {
                                 returnValue.CustID = INVALID_LOGIN;
                                 returnValue.IsLoggedIn = false;
@@ -3739,7 +3755,7 @@ namespace EsquireVRN.Utils
 
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 returnValue.CustID = INVALID_LOGIN;
             }
@@ -5682,6 +5698,14 @@ namespace EsquireVRN.Utils
             }
 
             return string.Join(',', OrgCategoryIds);
+        }
+
+        internal static long GetAccountId()
+        {
+            string query = "SELECT TOP 1 AccountID FROM Accounts  WHERE (OrgID = " + GetOrgID() + ") AND (Defalut = 1);";
+            using var db = new SqlConnection(query);
+            long account_id = db.Query<long>(query).FirstOrDefault();
+            return account_id;
         }
     }
 }
