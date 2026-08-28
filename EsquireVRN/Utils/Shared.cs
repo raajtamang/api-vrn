@@ -5703,7 +5703,7 @@ namespace EsquireVRN.Utils
         internal static long GetAccountId()
         {
             string query = "SELECT TOP 1 AccountID FROM Accounts  WHERE (OrgID = " + GetOrgID() + ") AND (Defalut = 1);";
-            using var db = new SqlConnection(query);
+            using var db = new SqlConnection(connString);
             long account_id = db.Query<long>(query).FirstOrDefault();
             return account_id;
         }
