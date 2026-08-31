@@ -5707,5 +5707,57 @@ namespace EsquireVRN.Utils
             long account_id = db.Query<long>(query).FirstOrDefault();
             return account_id;
         }
+
+        //Banners
+        internal static List<Banner>? GetBanners()
+        {
+            string query = "SELECT * From Banners WHERE OrgId=" + GetOrgID() + " Order By CreateDate Desc";
+            using (var db = new SqlConnection(connString))
+            {
+                var banners = db.Query<Banner>(query).ToList();
+                return banners;
+            }
+        }
+
+        internal static Banner? GetBanner(long id)
+        {
+            string query = "SELECT * From Banners WHERE OrgId=" + GetOrgID() + " AND Id=" + id;
+            using (var db = new SqlConnection(connString))
+            {
+                var banners = db.Query<Banner>(query).FirstOrDefault();
+                return banners;
+            }
+        }
+
+        internal static Banner? CreateBanner(Banner banner)
+        {
+            string query = "INSERT INTO [dbo].[Banners] ([Title],[Content],[OrgID],[CreateDate]) OUTPUT inserted.Id VALUES (@Title,@Content,@OrgID,@CreateDate)";
+            using (var db = new SqlConnection(connString))
+            {
+                long id = db.Query<long>(query, banner).FirstOrDefault();
+                var n_banner = GetBanner(id);
+                return n_banner;
+            }
+        }
+
+        internal static Banner? UpdateBanner(long id, Banner banner)
+        {
+            string query = "UPDATE [dbo].[Banners] SET [Title] = @Title,[Content] = @Content,[OrgID] = @OrgID,[CreateDate] = @CreateDate WHERE Id=" + id;
+            using (var db = new SqlConnection(connString))
+            {
+                db.Execute(query, banner);
+            }
+            var u_banner = GetBanner(id);
+            return u_banner;
+        }
+
+        internal static void DeleteBanner(long id)
+        {
+            string query = "DELETE FROM [dbo].[Banners] WHERE Id=" + id;
+            using (var db = new SqlConnection(connString))
+            {
+                db.Execute(query);
+            }
+        }
     }
 }
