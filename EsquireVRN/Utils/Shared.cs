@@ -16,8 +16,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
-using static Esquire.Controllers.HomepageSetupController;
-using static Hangfire.Storage.JobStorageFeatures;
 
 namespace EsquireVRN.Utils
 {
@@ -139,6 +137,12 @@ namespace EsquireVRN.Utils
         {
             public int StatusID { get; set; }
             public string? Status { get; set; }
+        }
+
+        public class SelectOption
+        {
+            public long Id { get; set; }
+            public int Position { get; set; }
         }
 
         //Brands Section

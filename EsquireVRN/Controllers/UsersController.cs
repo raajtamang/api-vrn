@@ -109,7 +109,7 @@ namespace EsquireVRN.Controllers
             {
                 string EmailFormat = Shared.GetWebConfigKeyValue("AccountDeactivated");
                 emailBody = EmailFormat.Replace("name", newCustomer.Title + " " + newCustomer.FirstName + " " + newCustomer.Surname);
-                subject = "Your online account at Esquire Online Store is now deactivated!";
+                subject = "Your online account at Happy Monkey is now deactivated!";
                 sendEmail = true;
 
             }
@@ -117,7 +117,7 @@ namespace EsquireVRN.Controllers
             {
                 string EmailFormat = Shared.GetWebConfigKeyValue("AccountActivated");
                 emailBody = EmailFormat.Replace("{title}", oldCustomer.Title).Replace("{fname}", oldCustomer.FirstName).Replace("{sname}", oldCustomer.Surname).Replace("{url}", "https://esquire.co.za");
-                subject = "Your online account at Esquire Online Store is now activated!";
+                subject = "Your online account at Happy Monkey is now activated!";
                 sendEmail = true;
             }
             if (sendEmail && !string.IsNullOrEmpty(newCustomer?.Email))

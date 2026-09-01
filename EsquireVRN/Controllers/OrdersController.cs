@@ -286,7 +286,7 @@ namespace EsquireVRN.Controllers
                         string emailbody = emails[0];
                         string doc = emails[1];
 
-                        string subject = "Order Number: " + RESULT.FinconId + " From Esquire Technologies has been processed.";
+                        string subject = "Order Number: " + RESULT.FinconId + " From Happy Monkey  has been processed.";
                         string[] toEmail = new string[]
                          {
                         new(customer.Email)
@@ -406,7 +406,7 @@ namespace EsquireVRN.Controllers
                         string emailbody = emails[0];
                         string doc = emails[1];
                         string finconId = Convert.ToInt64(RESULT.FinconId).ToString().PadLeft(8, '0');
-                        string subject = "Order Number: " + finconId + " From Esquire Technologies has been processed.";
+                        string subject = "Order Number: " + finconId + " From Happy Monkey  has been processed.";
                         string[] toEmail =
                          [
                         new(customer.Email)
@@ -515,15 +515,15 @@ namespace EsquireVRN.Controllers
                 {
                     deliveryAddress = dAddress.ShippingAddress + ", " + dAddress.Town + ", " + dAddress.ShippingCountry;
                 }
-                string orderInstruction = "Use this order number when talking to Esquire Technologies.";
+                string orderInstruction = "Use this order number when talking to Happy Monkey .";
                 if (OrgId == 473)
                 {
-                    orderInstruction = "Use this order number when talking to Esquire Technologies*.";
+                    orderInstruction = "Use this order number when talking to Happy Monkey *.";
                 }
                 string MailFormat = Shared.GetWebConfigKeyValue("OrderConfirmMailCourierDirect");
                 string PdfFormat = Shared.GetWebConfigKeyValue("OrderConfirmPdfCourierDirect");
                 string tAmount = Math.Round((orderAmount + deliveryCharge), 2).ToString(currencyFormat);
-                string use_this = "Use this order number when talking to Esquire Technologies. | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
+                string use_this = "Use this order number when talking to Happy Monkey . | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
 
                 string talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref :  Debit or Credit Card (" + paymentRefId + ")";
                 if (order.PayID == 2)
@@ -548,11 +548,11 @@ namespace EsquireVRN.Controllers
                 string MailFormat = Shared.GetWebConfigKeyValue("OrderConfirmMailCollectFromShop");
                 string PdfFormat = Shared.GetWebConfigKeyValue("OrderConfirmPdfCollectFromShop");
 
-                string orderInstruction = "Use this order number when talking to Esquire Technologies.";
-                string use_this = "Use this order number when talking to Esquire Technologies. | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
+                string orderInstruction = "Use this order number when talking to Happy Monkey .";
+                string use_this = "Use this order number when talking to Happy Monkey . | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
                 if (OrgId == 473)
                 {
-                    orderInstruction = "Use this order number when talking to Esquire Technologies*.";
+                    orderInstruction = "Use this order number when talking to Happy Monkey *.";
                 }
                 string oAmount = orderAmount.ToString(currencyFormat);
                 string talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref :  Debit or Credit Card (" + paymentRefId + ")";

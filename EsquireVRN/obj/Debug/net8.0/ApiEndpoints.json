@@ -825,7 +825,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "ContainingType": "EsquireVRN.Controllers.HomepageSetupController",
     "Method": "Get",
     "RelativePath": "api/HomepageSetup",
     "HttpMethod": "GET",
@@ -835,7 +835,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "ContainingType": "EsquireVRN.Controllers.HomepageSetupController",
     "Method": "Post",
     "RelativePath": "api/HomepageSetup",
     "HttpMethod": "POST",
@@ -851,7 +851,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "ContainingType": "EsquireVRN.Controllers.HomepageSetupController",
     "Method": "Get",
     "RelativePath": "api/HomepageSetup/{id}",
     "HttpMethod": "GET",
@@ -867,7 +867,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "ContainingType": "EsquireVRN.Controllers.HomepageSetupController",
     "Method": "Put",
     "RelativePath": "api/HomepageSetup/{id}",
     "HttpMethod": "PUT",
@@ -888,7 +888,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "ContainingType": "EsquireVRN.Controllers.HomepageSetupController",
     "Method": "Delete",
     "RelativePath": "api/HomepageSetup/{id}",
     "HttpMethod": "DELETE",
@@ -904,7 +904,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "ContainingType": "EsquireVRN.Controllers.HomepageSetupController",
     "Method": "OrderSections",
     "RelativePath": "api/HomepageSetup/OrderSections",
     "HttpMethod": "POST",
@@ -913,7 +913,7 @@
     "Parameters": [
       {
         "Name": "menuIdList",
-        "Type": "Esquire.Controllers.HomepageSetupController\u002BHomepageSectionIdList",
+        "Type": "EsquireVRN.Controllers.HomepageSetupController\u002BHomepageSectionIdList",
         "IsRequired": true
       }
     ],

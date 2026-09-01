@@ -111,11 +111,11 @@ namespace EsquireVRN.Controllers
         {
             try
             {
-                List<SelectOption> IdPositionList = new();
+                List<Shared.SelectOption> IdPositionList = new();
                 int postion = 1;
                 foreach (var item in menuIdList.Ids)
                 {
-                    SelectOption selectOption = new()
+                    Shared.SelectOption selectOption = new()
                     {
                         Id = item,
                         Position = postion
@@ -138,10 +138,6 @@ namespace EsquireVRN.Controllers
             public required List<long> Ids { get; set; }
         }
 
-        public class SelectOption
-        {
-            public long Id { get; set; }
-            public int Position { get; set; }
-        }
+       
     }
 }
