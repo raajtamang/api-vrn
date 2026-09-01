@@ -16,6 +16,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+using static Esquire.Controllers.HomepageSetupController;
 using static Hangfire.Storage.JobStorageFeatures;
 
 namespace EsquireVRN.Utils
@@ -5758,6 +5759,56 @@ namespace EsquireVRN.Utils
             {
                 db.Execute(query);
             }
+        }
+
+        //Homepage Setup
+
+        internal static HomepageSetup? GetHomepageSetup(long id)
+        {
+            string query = "Select * from HomePageSetup Where Id=" + id + " AND OrgId=" + GetOrgID() + " Order By Position";
+            using var db = new SqlConnection(connString);
+            return db.Query<HomepageSetup>(query).FirstOrDefault();
+        }
+
+        internal static HomepageSetup? GetHomepageSetupByPosition(int? position)
+        {
+            string query = "Select * from HomePageSetup Where position=" + position + " AND OrgId=" + GetOrgID() + " Order By Position";
+            using var db = new SqlConnection(connString);
+            return db.Query<HomepageSetup>(query).FirstOrDefault();
+        }
+
+        internal static HomepageSetup? SaveHomepageSetup(HomepageSetup setup)
+        {
+            string query = "INSERT INTO [dbo].[HomePageSetup] ([ContentType],[ContentId],[Title],[Position],[Status],[CreateDate],[OrgID]) OUTPUT inserted.Id VALUES (@ContentType,@ContentId,@Title,@Position,@Status,@CreateDate,@OrgID)";
+            using var db = new SqlConnection(connString);
+            long id = db.Query<long>(query, setup).FirstOrDefault();
+            return GetHomepageSetup(id);
+        }
+
+        internal static HomepageSetup? UpdateHomepageSetup(long id, HomepageSetup setup)
+        {
+            string query = "UPDATE [dbo].[HomePageSetup] SET [ContentType] = @ContentType,[ContentId] = @ContentId,[Title] = @Title,[Position] = @Position,[Status] = @Status,[CreateDate] = @CreateDate,[OrgID] = @OrgID WHERE Id=" + id;
+            using (SqlConnection db = new SqlConnection(connString))
+            {
+                db.Execute(query, setup);
+            }
+            return GetHomepageSetup(id);
+        }
+
+        internal static void DeleteHomepageSetup(long id)
+        {
+            string query = "DELETE FROM [dbo].[HomePageSetup] WHERE Id=" + id;
+            using var db = new SqlConnection(connString);
+            db.Execute(query);
+        }
+
+        internal static List<HomepageSetup> UpdateHomePageSectionOrder(List<SelectOption> idPositionList)
+        {
+            string sqlQuery = "UPDATE [dbo].[HomePageSetup] SET [Position]=@Position WHERE Id=@Id AND OrgID=" + GetOrgID();
+            using var db = new SqlConnection(connString);
+            db.Execute(sqlQuery, idPositionList);
+            List<HomepageSetup> New_Menu = GetHomepageSetups();
+            return New_Menu;
         }
     }
 }

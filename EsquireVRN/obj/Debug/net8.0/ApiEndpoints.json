@@ -825,6 +825,101 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "Method": "Get",
+    "RelativePath": "api/HomepageSetup",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "Method": "Post",
+    "RelativePath": "api/HomepageSetup",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "setup",
+        "Type": "EsquireVRN.Models.HomepageSetup",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "Method": "Get",
+    "RelativePath": "api/HomepageSetup/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "Method": "Put",
+    "RelativePath": "api/HomepageSetup/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "setup",
+        "Type": "EsquireVRN.Models.HomepageSetup",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "Method": "Delete",
+    "RelativePath": "api/HomepageSetup/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Esquire.Controllers.HomepageSetupController",
+    "Method": "OrderSections",
+    "RelativePath": "api/HomepageSetup/OrderSections",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "menuIdList",
+        "Type": "Esquire.Controllers.HomepageSetupController\u002BHomepageSectionIdList",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EsquireVRN.Controllers.HomeController",
     "Method": "Login",
     "RelativePath": "api/login",
