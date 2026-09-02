@@ -10,5 +10,6 @@ namespace EsquireVRN.Models
         public string? LastName { get; set; }
         public string Email { get; set; }
         public DateTime? Date { get; set; }
+        public long? OrgId { get; set; }
     }
 }

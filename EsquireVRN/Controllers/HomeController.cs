@@ -7,6 +7,7 @@ using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Net.Mail;
 using System.Text;
+using System.Web;
 
 namespace EsquireVRN.Controllers
 {
@@ -513,6 +514,69 @@ namespace EsquireVRN.Controllers
                 new MailAddress(Shared.GetWebConfigKeyValue("NoReplyEmail")), bcc.ToArray(), false);
             Shared.SaveForgotPassord(email, ipAddress);
             return Ok(new { message = "Thank you. An e-mail with your password has been sent to your inbox." });
+        }
+
+        [HttpPost]
+        [Route("api/ContactUs")]
+        public async Task<IActionResult> ContactUS([FromBody] Contact contact)
+        {
+
+
+            string ipAddress = Convert.ToString(Request.HttpContext.Connection.RemoteIpAddress);
+
+            if (Shared.isEmailValid(contact.Email) && !string.IsNullOrEmpty(contact.Message))
+            {
+                string emailBody = Shared.GetWebConfigKeyValue("ContactMessageEmail");
+
+                emailBody = emailBody.Replace("{0}", contact.AccountNumber).Replace("{1}", contact.FirstName + " " + contact.SurName).Replace("{2}", contact.CompanyName).Replace("{3}", contact.Email).Replace("{4}", contact.Phone).Replace("{5}", contact.Message).Replace("{6}", ipAddress);
+                List<MailAddress> bcc = new() { new MailAddress("test@esquire.co.za"), new MailAddress("info@esquire.co.za") };
+
+                Shared.sendMail(contact.Subject??"Contact Message", HttpUtility.HtmlDecode(emailBody), Shared.splitEMailTo(Shared.GetOrgEmail(), Shared.GetOrgName()),
+                    Shared.splitEMailFrom(Shared.GetOrgEmail(), "Contact Us"), bcc.ToArray());
+                return Ok(new { message = "Your email has been sent." });
+            }
+            else
+            {
+                return BadRequest(new { error = contact.Email + " is not a valid e-mail address!" });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("api/SaveNewsLetter")]
+        public IActionResult SaveNewsletter([FromBody] NewsLetter newsLetter)
+        {
+            newsLetter.Date = DateTime.UtcNow.AddHours(2);
+            newsLetter.OrgId = Shared.GetOrgID();
+            return Ok(Shared.SaveNewsLetter(newsLetter));
+
+        }
+
+        [HttpGet]
+        [Route("api/GetNewsLetter")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult GetNewsletter(int? page_number, int? page_size)
+        {
+            int pNum = (page_number ?? 1);
+            int pSize = (page_size ?? 12);
+            return Ok(Shared.GetNewsLetters(pNum, pSize));
+
+        }
+
+        [HttpDelete]
+        [Route("api/RemoveNewsLetter")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult GetNewsletter(long id)
+        {
+            if (Shared.RemoveGetNewsLetters(id))
+            {
+                return Ok(new { message = "Newsletter removed successfully." });
+            }
+            else
+            {
+                return NotFound(new { error = "Newsletter doesn't exist. Plese check and try again." });
+            }
+
         }
 
     }

@@ -2873,6 +2873,11 @@ namespace EsquireVRN.Utils
             }
         }
 
+        public static void sendMail(string strSubject, string strHTMLBody, MailAddress[] to, MailAddress from, MailAddress[] bcc)
+        {
+            sendMail(strSubject, strHTMLBody, to, from, bcc, null, true);
+        }
+
         public static void sendMail(string strSubject, string strHTMLBody, MailAddress[] to, MailAddress from, MailAddress[] bcc, bool includeSignature)
         {
             sendMail(strSubject, strHTMLBody, to, from, bcc, null, includeSignature);
@@ -3692,7 +3697,7 @@ namespace EsquireVRN.Utils
                 string strSql = @"SELECT Top 1 WEBCustomer.OrgID, WEBCustomer.CustID, WEBCustomer.AccountID, WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV, 
                     WEBCustomer.FirstName, WEBCustomer.Surname,Accounts.AccountNo, Accounts.Active, Accounts.UsePrice, Accounts.DefaultBranch " +
                 "FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID WHERE (WEBCustomer.Email = N'" +
-                        username.Replace("\'", "\'\'") + "') AND WebCustomer.Active=1 AND WebCustomer.UserType=N'Reseller' AND WebCustomer.OrgId IN ("+GetOrgID()+") Order By WEBCustomer.CustID;Select WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV,WEBCustomer.AccountID,Accounts.AccountNo FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID Where WEBCustomer.Email=N'" + username.Replace("'", "''") + "' AND WEBCustomer.Active=1 AND WEBCustomer.OrgID in ("+GetOrgID()+") AND WebCustomer.UserType=N'Reseller' Order By WEBCustomer.CustID";
+                        username.Replace("\'", "\'\'") + "') AND WebCustomer.Active=1 AND WebCustomer.UserType=N'Reseller' AND WebCustomer.OrgId IN (" + GetOrgID() + ") Order By WEBCustomer.CustID;Select WEBCustomer.Password,WEBCustomer.Salt,WEBCustomer.IV,WEBCustomer.AccountID,Accounts.AccountNo FROM WEBCustomer INNER JOIN Accounts ON WEBCustomer.AccountID = Accounts.AccountID Where WEBCustomer.Email=N'" + username.Replace("'", "''") + "' AND WEBCustomer.Active=1 AND WEBCustomer.OrgID in (" + GetOrgID() + ") AND WebCustomer.UserType=N'Reseller' Order By WEBCustomer.CustID";
                 using (var connection = new SqlConnection(connString))
                 {
                     var result = connection.QueryMultiple(strSql);
@@ -5813,6 +5818,62 @@ namespace EsquireVRN.Utils
             db.Execute(sqlQuery, idPositionList);
             List<HomepageSetup> New_Menu = GetHomepageSetups();
             return New_Menu;
+        }
+
+        //NewsLetter
+        internal static NewsLetter SaveNewsLetter(NewsLetter newsLetter)
+        {
+
+            string strQuery = "INSERT INTO [dbo].[NewsLetter] ([FirstName],[LastName],[Email],[Date],[OrgID]) OUTPUT INSERTED.Id VALUES (@FirstName,@LastName,@Email,@Date,@OrgId)";
+            using (var db = new SqlConnection(connString))
+            {
+                long id = db.Query<long>(strQuery, newsLetter).FirstOrDefault();
+                newsLetter.Id = id;
+            }
+            return newsLetter;
+        }
+
+        internal static PagedNewsLetter GetNewsLetters(int pNum, int pSize)
+        {
+            List<NewsLetter> newsLetters = [];
+            long count = 0;
+            string strQuery = "Select * FROM NEWSLETTER WHERE OrgId=" + GetOrgID() + " ORDER BY DATE DESC OFFSET " + (pSize * (pNum - 1)) + @" ROWS FETCH NEXT " + pSize + @" ROWS ONLY;Select Count(*) from NEWSLETTER WHERE OrgId=" + GetOrgID() + " ;";
+            using (var db = new SqlConnection(connString))
+            {
+                var result = db.QueryMultiple(strQuery);
+                if (result != null)
+                {
+                    newsLetters = result.Read<NewsLetter>().ToList();
+                    count = result.Read<long>().FirstOrDefault();
+                }
+            }
+            long pageCount = Convert.ToInt32(count / pSize);
+            decimal pageDivision = Convert.ToDecimal(count) / Convert.ToDecimal(pSize);
+            if ((pageDivision - pageCount) > 0)
+            {
+                pageCount += 1;
+            }
+            PagedNewsLetter pNewsLetter = new()
+            {
+                NewsLetters = newsLetters,
+                PageCount = pageCount
+            };
+            return pNewsLetter;
+        }
+
+        internal static bool RemoveGetNewsLetters(long id)
+        {
+            string strQuery = "DELETE FROM NEWSLETTER WHERE Id=" + id + " AND OrgID=" + GetOrgID();
+            using var db = new SqlConnection(connString);
+            int result = db.Execute(strQuery);
+            if (result > -1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
