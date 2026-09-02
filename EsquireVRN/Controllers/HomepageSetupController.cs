@@ -9,7 +9,7 @@ namespace EsquireVRN.Controllers
 {
    [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Reseller")]
     public class HomepageSetupController : ControllerBase
     {
         // GET: api/<HomepageSetupController>
