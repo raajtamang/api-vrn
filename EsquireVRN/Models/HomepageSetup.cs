@@ -7,7 +7,7 @@ namespace EsquireVRN.Models
         [Key]
         public long Id { get; set; }
         public string? ContentType { get; set; }
-        public long ContentId { get; set; }
+        public long? ContentId { get; set; }
         public string? Title { get; set; }
         public int? Position { get; set; }
         public bool? Status { get; set; }

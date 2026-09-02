@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EsquireVRN.Controllers
 {
-   [Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Reseller")]
     public class HomepageSetupController : ControllerBase
@@ -52,7 +52,7 @@ namespace EsquireVRN.Controllers
                 var newPage = Shared.SaveHomepageSetup(setup);
                 return Ok(newPage);
             }
-            catch
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Something went wrong with the server. Please try again." });
             }
@@ -70,7 +70,7 @@ namespace EsquireVRN.Controllers
                 {
                     return StatusCode(StatusCodes.Status404NotFound, new { error = "There is no section with this id. Please check and try again." });
                 }
-                setup.Position ??= Shared.GetHomepageSetups().Count;               
+                setup.Position ??= Shared.GetHomepageSetups().Count;
                 setup.OrgID = old_homepageSetup.OrgID;
                 setup.CreateDate = old_homepageSetup.CreateDate;
                 var updated_setup = Shared.UpdateHomepageSetup(id, setup);
@@ -138,6 +138,6 @@ namespace EsquireVRN.Controllers
             public required List<long> Ids { get; set; }
         }
 
-       
+
     }
 }

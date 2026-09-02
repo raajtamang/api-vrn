@@ -4163,6 +4163,7 @@ namespace EsquireVRN.Utils
         {
             string query = "Select * from Banners Where Id In (" + string.Join(',', list) + ")";
             List<Banner> banners = [];
+            if (!list.Any()) { return banners; }
             using (var db = new SqlConnection(connString))
             {
                 banners = [.. db.Query<Banner>(query)];

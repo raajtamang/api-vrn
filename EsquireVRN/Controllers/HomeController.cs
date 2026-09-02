@@ -224,7 +224,7 @@ namespace EsquireVRN.Controllers
         public IActionResult GetHomepageSetup()
         {
             List<HomepageSetup> setups = Shared.GetHomepageSetups();
-            List<Banner> banners = Shared.GetBanners([.. setups.Select(x => x.ContentId)]);
+            List<Banner> banners = Shared.GetBanners([.. setups.Select(x => x.ContentId??0)]);
             return Ok(new { setups, banners });
         }
 
