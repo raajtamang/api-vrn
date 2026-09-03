@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\dashboard\\VRN\\EsquireVRN\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\utils\\shared.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\utils\\shared.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\controllers\\homepagesetupcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\controllers\\homepagesetupcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -13,10 +17,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\models\\homepagesetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\models\\homepagesetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\utils\\shared.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|solutionrelative:esquirevrn\\utils\\shared.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2971A2BF-990E-41A1-88FB-B239BC7EDEC6}|EsquireVRN\\EsquireVRN.csproj|d:\\dashboard\\vrn\\esquirevrn\\esquirevrn\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
@@ -298,17 +298,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "Shared.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Utils\\Shared.cs",
               "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
               "RelativeToolTip": "EsquireVRN\\Utils\\Shared.cs",
-              "ViewState": "AgIAADYQAAAAAAAAAAAowDYQAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAAEEHAAAAAAAAAAAkwEgHAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-24T08:58:15.102Z",
               "IsPinned": true,
@@ -316,7 +316,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "HomepageSetup.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Models\\HomepageSetup.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Models\\HomepageSetup.cs",
@@ -324,12 +324,11 @@
               "RelativeToolTip": "EsquireVRN\\Models\\HomepageSetup.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAuwAkAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-02T10:10:18.93Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-02T10:10:18.93Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "HomeController.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\HomeController.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\HomeController.cs",
@@ -337,8 +336,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\HomeController.cs",
               "ViewState": "AgIAANcAAAAAAAAAAAAIwOIAAABaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-01T15:26:12.334Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-01T15:26:12.334Z"
             },
             {
               "$type": "Document",
@@ -362,12 +360,11 @@
               "RelativeToolTip": "EsquireVRN\\appsettings.Development.json",
               "ViewState": "AgIAACMAAAAAAAAAAAAAACoAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-09-01T06:57:52.679Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-01T06:57:52.679Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "HomepageSetupController.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\HomepageSetupController.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\HomepageSetupController.cs",
@@ -375,8 +372,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\HomepageSetupController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-01T05:45:46.564Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-01T05:45:46.564Z"
             },
             {
               "$type": "Document",
@@ -388,8 +384,7 @@
               "RelativeToolTip": "EsquireVRN\\appsettings.json",
               "ViewState": "AgIAACQAAAAAAAAAAAArwEsAAADpBwAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-08-14T12:42:32.142Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-14T12:42:32.142Z"
             },
             {
               "$type": "Document",
@@ -401,8 +396,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\OrdersController.cs",
               "ViewState": "AgIAADcBAAAAAAAAAAAnwCUBAABUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-12T12:20:09.996Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-12T12:20:09.996Z"
             },
             {
               "$type": "Document",
@@ -450,8 +444,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\ProductController.cs",
               "ViewState": "AgIAAAMAAAAAAAAAAAAAAAoAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-05T08:38:23.077Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T08:38:23.077Z"
             },
             {
               "$type": "Document",
@@ -463,8 +456,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\UsersController.cs",
               "ViewState": "AgIAAG8AAAAAAAAAAAAAAG8AAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-08T06:14:16.034Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-08T06:14:16.034Z"
             },
             {
               "$type": "Document",
@@ -500,8 +492,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\BrandController.cs",
               "ViewState": "AgIAAA4AAAAAAAAAAAAjwB4AAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-27T15:02:38.976Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-27T15:02:38.976Z"
             },
             {
               "$type": "Document",
@@ -633,8 +624,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\ShopController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAMYBAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-12T12:38:53.803Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-12T12:38:53.803Z"
             },
             {
               "$type": "Document",
@@ -718,8 +708,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\MenuController.cs",
               "ViewState": "AgIAABkAAAAAAAAAAAAkwCIAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-30T12:19:13.083Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-30T12:19:13.083Z"
             },
             {
               "$type": "Document",

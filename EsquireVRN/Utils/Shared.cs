@@ -1849,12 +1849,12 @@ namespace EsquireVRN.Utils
                                  " FROM Manufacturers RIGHT OUTER JOIN SourceList INNER JOIN OrganisationSource" +
                                  " ON SourceList.SourceID = OrganisationSource.SourceID INNER JOIN Organisation ON SourceList.SourceOrgID = Organisation.OrgID RIGHT OUTER JOIN Products" +
                                  " ON OrganisationSource.OrgSourceID = Products.OrgSourceID ON Manufacturers.ManufID = Products.ManufID WHERE (Products.Active = 1) AND (Products.OutputMe = 1)  AND Products.OrgCategory IN (" + GetOrgCategory() + ")" +
-                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') ORDER BY NEWID()";
-                products = db.Query<Product_View>(strQuery).ToList();
+                                 " AND ((dbo.GetProductStockCount(Products.ProdID, Products.Status, N'A') >= " + strWEBMinStock + ")) AND (Products.ImgURL IS NOT NULL AND Products.ImgURL!='') ORDER BY CreateDate DESC";
+                products = [.. db.Query<Product_View>(strQuery)];
             }
 
-            List<Product_View> returnProducts = new();
-            if (products != null && products.Any())
+            List<Product_View> returnProducts = [];
+            if (products != null && products.Count != 0)
             {
                 foreach (var item in products)
                 {
@@ -1862,7 +1862,8 @@ namespace EsquireVRN.Utils
                     returnProducts.Add(item);
                 }
             }
-            return returnProducts;
+
+            return [.. returnProducts.OrderBy(x => Guid.NewGuid())];
         }
 
         internal static List<Product_View> GetMostViewedProducts()
