@@ -191,12 +191,14 @@ namespace EsquireVRN.Controllers
 
 
                     #region Next we need to send the e-mail:
+                    string siteUrl = Shared.GetWebConfigKeyValue("Website");
                     StringBuilder sbBody = new(Shared.GetWebConfigKeyValue("WelcomeEMailText"));
                     sbBody.Replace("{First Name}", registration.FirstName);
                     sbBody.Replace("{Surname}", registration.Surname);
                     sbBody.Replace("{Password}", registration.Password);
                     sbBody.Replace("{EMail}", registration.Email);
                     sbBody.Replace("{Title}", strTitle);
+                    sbBody.Replace("{Site URL}", siteUrl);
                     string strFromEMail = Shared.GetWebConfigKeyValue("AdminEmail");
                     List<MailAddress> bcc = new() { new MailAddress("test@esquire.co.za"), new MailAddress("info@esquire.co.za"), new MailAddress("asgar@esquire.co.za") };
 
