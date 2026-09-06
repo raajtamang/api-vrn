@@ -150,5 +150,34 @@ namespace EsquireVRN.Controllers
             }
             return StatusCode(500, new { error = "Something went wrong. Please try again." });
         }
+
+        [HttpPost("ToggleUserStatus/{id}")]
+        public IActionResult ToggleUserStatus(long id)
+        {
+            try
+            {
+                var customer = Shared.GetCustomer(id);
+                if (customer == null)
+                {
+                    return NotFound(new { error = "User doesn't exist." });
+                }
+
+                if (customer.Active == false)
+                {
+                    var uCustomer = Shared.UpdateCustomerStatus(id, 1);
+                    return Ok(new { message = "Customer active status set to active.", uCustomer });
+                }
+                else
+                {
+                    var uCustomer = Shared.UpdateCustomerStatus(id, 0);
+                    return Ok(new { message = "Customer active status set to inactive.", uCustomer });
+
+                }
+            }
+            catch
+            {
+                return StatusCode(500, new { error = "Something went wrong. Please try again." });
+            }
+        }
     }
 }

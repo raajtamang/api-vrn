@@ -5877,5 +5877,14 @@ namespace EsquireVRN.Utils
                 return false;
             }
         }
+
+        internal static Customer? UpdateCustomerStatus(long id, int status)
+        {
+            string query = "Update WebCustomer SET Active=" + status + " Where CustId=" + id +" AND OrgId="+GetOrgID()+" AND UserType='Customer'";
+            using var db = new SqlConnection(connString);
+            db.Execute(query);
+            var Customer = GetCustomer(id);
+            return Customer;
+        }
     }
 }
