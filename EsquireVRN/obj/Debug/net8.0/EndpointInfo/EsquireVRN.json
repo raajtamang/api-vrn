@@ -4277,6 +4277,29 @@
         }
       }
     },
+    "/api/Users/ToggleUserStatus/{id}": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/WarrentyCenters": {
       "get": {
         "tags": [
