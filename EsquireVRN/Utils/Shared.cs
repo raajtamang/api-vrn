@@ -108,6 +108,12 @@ namespace EsquireVRN.Utils
             public string Area;
         }
 
+        public struct DeliveryDescription
+        {
+            public int DeliveryDescID;
+            public double DeliveryDesc;
+        }
+
         public struct BranchDetail
         {
             public string BranchName;
@@ -2526,6 +2532,76 @@ namespace EsquireVRN.Utils
                 dMethods = db.Query<WebDeliveryMethods>(query).ToList();
             }
             return dMethods;
+        }
+
+        internal static WebDeliveryMethods? GetDeliveryMethod(long id)
+        {
+            using (var db = new SqlConnection(connString))
+            {
+                string query = "Select WEBDelivery.DeliveryID as DeliveryID,WEBDeliveryDesc.DeliveryDesc as Area From WEBDelivery JOin WEBDeliveryDesc on WebDelivery.DeliveryDescId=WEBDeliveryDesc.DeliveryDescId where WEBDelivery.DeliveryID=" + id;
+                var dMethod = db.Query<WebDeliveryMethods>(query).FirstOrDefault();
+                return dMethod;
+            }
+        }
+
+
+
+        internal static List<DeliveryDescription> GetDeliveryDescription()
+        {
+            using var db = new SqlConnection(connString);
+            var descriptions = db.Query<DeliveryDescription>("Select * from WebDeliveryDesc").ToList();
+            return descriptions;
+        }
+
+        internal static string? GetDeliveryAddressArea(long id)
+        {
+            using var db = new SqlConnection(connString);
+            var descriptions = db.Query<string>("SELECT DeliveryDesc FROM WebDeliveryDesc WHERE DeliveryDescId=" + id).FirstOrDefault();
+            return descriptions;
+        }
+
+        internal static bool CanSaveDeliveryAddress(long id)
+        {
+            using var db = new SqlConnection(connString);
+            var descriptions = db.Query<long>("SELECT Count(1) FROM WebDelivery WHERE DeliveryDescId=" + id + " AND OrgId=" + GetOrgID()).FirstOrDefault();
+            if (descriptions > 0)
+            {
+                return false;
+            }
+            return true;
+        }
+        internal static WebDeliveryMethods? SaveWebDelivery(CreateDeliveryDTO delivery)
+        {
+            string query = "INSERT INTO [dbo].[WEBDelivery] ([OrgID],[DeliveryDescID],[Cost],[Area],[WEBDeliveryRuleID],[RuleAmount],[MatrixSplit],[AfterSplitDivider],[MatrixStart],[useVolumetric],[Username],[Password],[Token],[AddressID],[CourierDirectAccount]) OUTPUT INSERTED.DeliveryID VALUES (@OrgID,@DeliveryDescID,0,@Area,1,0,0,1,0,0,N'',N'',N'',0,N'')";
+            using var db = new SqlConnection(connString);
+            long deliveryId = db.Query<long>(query, delivery).FirstOrDefault();
+            return GetDeliveryMethod(deliveryId);
+        }
+
+        internal static WebDeliveryMethods? UpdateWebDelivery(long id, CreateDeliveryDTO delivery)
+        {
+            string query = "UPDATE [dbo].[WEBDelivery] SET DeliveryDescID=@DeliveryDescID,Area=@Area WHERE DeliveryID=" + id;
+            using var db = new SqlConnection(connString);
+            db.Execute(query, delivery);
+            return GetDeliveryMethod(id);
+        }
+
+        internal static bool CanDeleteDeliveryAddress(long id)
+        {
+            string query = "Select Count(1) From [dbo].[WEBOrders] WHERE ShippingId=" + id;
+            using var db = new SqlConnection(connString);
+            long orderCount = db.Query<long>(query).FirstOrDefault();
+            if (orderCount > 0)
+            {
+                return false;
+            }
+            return true;
+        }
+        internal static void DeleteWebDelivery(long id)
+        {
+            string query = "Delete From [dbo].[WEBDelivery] WHERE DeliveryID=" + id;
+            using var db = new SqlConnection(connString);
+            db.Execute(query);
         }
 
         internal static string GetShippingId(long customerID)
@@ -5879,7 +5955,7 @@ namespace EsquireVRN.Utils
 
         internal static Customer? UpdateCustomerStatus(long id, int status)
         {
-            string query = "Update WebCustomer SET Active=" + status + " Where CustId=" + id +" AND OrgId="+GetOrgID()+" AND UserType='Customer'";
+            string query = "Update WebCustomer SET Active=" + status + " Where CustId=" + id + " AND OrgId=" + GetOrgID() + " AND UserType='Customer'";
             using var db = new SqlConnection(connString);
             db.Execute(query);
             var Customer = GetCustomer(id);
