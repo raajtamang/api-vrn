@@ -4341,6 +4341,18 @@
         }
       }
     },
+    "/api/WebDelivery/api/GetDeliveryDescriptions": {
+      "get": {
+        "tags": [
+          "WebDelivery"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/WebDelivery": {
       "get": {
         "tags": [

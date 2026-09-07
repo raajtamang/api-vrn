@@ -2880,6 +2880,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "EsquireVRN.Controllers.WebDeliveryController",
+    "Method": "GetDeliveryDescriptions",
+    "RelativePath": "api/WebDelivery/api/GetDeliveryDescriptions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EsquireVRN.Controllers.WebOrdersController",
     "Method": "Get",
     "RelativePath": "api/WebOrders",

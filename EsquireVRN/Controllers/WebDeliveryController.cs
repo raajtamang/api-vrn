@@ -10,6 +10,12 @@ namespace EsquireVRN.Controllers
     [Authorize(Roles ="Reseller")]
     public class WebDeliveryController : ControllerBase
     {
+        [HttpGet("GetDeliveryDescriptions")]
+        public IActionResult GetDeliveryDescriptions()
+        {
+            return Ok(Shared.GetDeliveryDescription());
+        }
+
         [HttpGet]
         public IActionResult Get()
         {

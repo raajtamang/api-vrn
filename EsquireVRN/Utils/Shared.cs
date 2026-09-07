@@ -108,12 +108,6 @@ namespace EsquireVRN.Utils
             public string Area;
         }
 
-        public struct DeliveryDescription
-        {
-            public int DeliveryDescID;
-            public double DeliveryDesc;
-        }
-
         public struct BranchDetail
         {
             public string BranchName;
