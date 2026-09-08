@@ -6,6 +6,7 @@ namespace EsquireVRN.Models
     {
         [Required]
         public required long ResellerOrderId { get; set; }
+        public required long NearestBranchId { get; set; }
         public int? PaymentId { get; set; }
     }
 }
