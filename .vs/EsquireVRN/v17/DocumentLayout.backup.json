@@ -318,9 +318,9 @@
               "Title": "Shared.cs",
               "DocumentMoniker": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
               "RelativeDocumentMoniker": "EsquireVRN\\Utils\\Shared.cs",
-              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs*",
-              "RelativeToolTip": "EsquireVRN\\Utils\\Shared.cs*",
-              "ViewState": "AgIAAGMXAAAAAAAAAAArwHEXAAAhAAAAAAAAAA==",
+              "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
+              "RelativeToolTip": "EsquireVRN\\Utils\\Shared.cs",
+              "ViewState": "AgIAAGMXAAAAAAAAAAArwGgXAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-24T08:58:15.102Z",
               "IsPinned": true,
@@ -360,8 +360,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\OrdersController.cs",
               "ViewState": "AgIAAIIAAAAAAAAAAAAUwI4AAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-12T12:20:09.996Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-12T12:20:09.996Z"
             },
             {
               "$type": "Document",
