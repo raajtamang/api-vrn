@@ -126,13 +126,13 @@ namespace EsquireVRN.Controllers
             var quotations = Shared.GetResellerOrder(model.ResellerOrderId);
             if (quotations == null)
             {
-                return StatusCode(404, new { error = "Quotation doesn't exist" });
+                return StatusCode(404, new { error = "Order doesn't exist" });
             }
             long userId = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
             List<ResellerOrderItems> quotationDetails = Shared.GetResellerOrderItems(model.ResellerOrderId);
             if (!quotationDetails.Any())
             {
-                return StatusCode(400, new { error = "Quotation has no items added. Please add some items first." });
+                return StatusCode(400, new { error = "Order has no items added. Please add some items first." });
             }
             string error = Shared.CheckStock(userId);
             if (!string.IsNullOrEmpty(error))
@@ -143,6 +143,12 @@ namespace EsquireVRN.Controllers
             if (quotations.DeliveryCost > 0)
             {
                 DeliveryType = "Courier Direct";
+            }
+            string ConnectId = await Shared.GetConnectID();
+            string VAccountNo = Shared.GetCustomerAccountNo(userId);
+            if (!await Shared.ValidateUserAccount(VAccountNo, ConnectId))
+            {
+                return StatusCode(400, new { error = "User has no invalid account number. Please contact the adminstrator for the issue." });
             }
             try
             {
@@ -202,7 +208,7 @@ namespace EsquireVRN.Controllers
                     string FinconUrl = Shared.GetWebConfigKeyValue("FinconUrl");
                     string FinconServerUsername = Shared.GetWebConfigKeyValue("FinconServerUsername");
                     string FinconServerPassword = Shared.GetWebConfigKeyValue("FinconServerPassword");
-                    string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
+                    string connectId = await Shared.GetConnectID();
                     if (string.IsNullOrEmpty(connectId))
                     {
                         Customer tempcustomer = Shared.GetCustomer(Convert.ToInt64(userId));
@@ -317,7 +323,7 @@ namespace EsquireVRN.Controllers
                     string FinconUrl = Shared.GetWebConfigKeyValue("FinconUrl");
                     string FinconServerUsername = Shared.GetWebConfigKeyValue("FinconServerUsername");
                     string FinconServerPassword = Shared.GetWebConfigKeyValue("FinconServerPassword");
-                    string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
+                    string connectId = await Shared.GetConnectID();
 
                     if (string.IsNullOrEmpty(connectId))
                     {
@@ -578,7 +584,6 @@ namespace EsquireVRN.Controllers
             Serilog.Log.Error("Order No. : " + order.OrderID + " : Email Total Price : " + eTotal);
             return returnString;
         }
-
         public class OrderRequest()
         {
             public required long OrderId { get; set; }

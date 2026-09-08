@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPOI.POIFS.Storage;
 using SelectPdf;
 using System.Collections.Generic;
 using System.Data;
@@ -16,6 +17,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+using static Hangfire.Storage.JobStorageFeatures;
 
 namespace EsquireVRN.Utils
 {
@@ -2212,13 +2214,16 @@ namespace EsquireVRN.Utils
             return false;
         }
 
-        public static async Task<string> GetConnectID(string FinconUrl, string FinconServerUsername, string FinconServerPassword)
+        public static async Task<string> GetConnectID()
         {
             string FinconUsername = Shared.GetWebConfigKeyValue("FinconUsername");
             string FinconPassword = Shared.GetWebConfigKeyValue("FinconPassword");
             string UseAltExt = Shared.GetWebConfigKeyValue("UseAltExt");
             string DataID = Shared.GetWebConfigKeyValue("DataID");
+            string FinconUrl = GetWebConfigKeyValue("FinconUrl");
             string ConnectID = "";
+            string FinconServerUsername = GetWebConfigKeyValue("FinconServerUsername");
+            string FinconServerPassword = GetWebConfigKeyValue("FinconServerPassword");
             try
             {
                 using (var client = new HttpClient())
@@ -5954,6 +5959,49 @@ namespace EsquireVRN.Utils
             db.Execute(query);
             var Customer = GetCustomer(id);
             return Customer;
+        }
+
+        internal static async Task<bool> ValidateUserAccount(string accountNo, string connectId)
+        {
+            try
+            {
+                string FinconUrl = GetWebConfigKeyValue("FinconUrl");
+                string FinconServerUsername = GetWebConfigKeyValue("FinconServerUsername");
+                string FinconServerPassword = GetWebConfigKeyValue("FinconServerPassword");
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes(FinconServerUsername + ":" + FinconServerPassword)));
+
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri(FinconUrl + "\"GetDebAccounts\"/" + connectId + "/" + accountNo + "/" + accountNo + "/1/1"),
+                    };
+
+                    var response = await client.SendAsync(request).ConfigureAwait(false);
+                    response.EnsureSuccessStatusCode();
+
+                    var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    dynamic obj = JObject.Parse(responseBody);
+                    int count = (int)obj.result[0].Count;
+                    if (count == 0)
+                    {
+                        return false;
+                    }
+                    dynamic account = obj.result[0].Stock[0];
+                    if (account == null)
+                    {
+                        return false;
+                    }
+                    return account.Active;
+                }
+            }
+            catch
+            {
+            }
+            return false;
         }
     }
 }

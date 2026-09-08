@@ -52,7 +52,7 @@ namespace EsquireVRN.Controllers
                 string FinconServerUsername = Shared.GetWebConfigKeyValue("FinconServerUsername");
                 string FinconServerPassword = Shared.GetWebConfigKeyValue("FinconServerPassword");
 
-                string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
+                string connectId = await Shared.GetConnectID();
                 if (string.IsNullOrEmpty(connectId))
                 {
                     return StatusCode(500, new { error = "Something went wrong with the servers. Please try again. If error persists please contact the administrators." });
@@ -231,7 +231,7 @@ namespace EsquireVRN.Controllers
                 string FinconUrl = Shared.GetWebConfigKeyValue("FinconUrl");
                 string FinconServerUsername = Shared.GetWebConfigKeyValue("FinconServerUsername");
                 string FinconServerPassword = Shared.GetWebConfigKeyValue("FinconServerPassword");
-                string connectId = await Shared.GetConnectID(FinconUrl, FinconServerUsername, FinconServerPassword);
+                string connectId = await Shared.GetConnectID();
 
                 if (string.IsNullOrEmpty(connectId))
                 {
