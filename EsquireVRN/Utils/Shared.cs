@@ -5995,7 +5995,11 @@ namespace EsquireVRN.Utils
                     {
                         return false;
                     }
-                    return account.Active;
+                    if (account.Active == "Y")
+                    {
+                        return true;
+                    }
+                    return false;
                 }
             }
             catch
