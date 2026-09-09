@@ -3279,7 +3279,7 @@ namespace EsquireVRN.Utils
 
         public static string GetAccountNumber(long? custId)
         {
-            string sqlQuery = "Select a.AccountNo From Accounts a Join WEBCustomer c on a.AccountID=c.AccountID Where c.CustID=@CustId and a.OrgId IN (" + GetOrgCategoryId() + ")";
+            string sqlQuery = "Select a.AccountNo From Accounts a Join WEBCustomer c on a.AccountID=c.AccountID Where c.CustID=@CustId and a.OrgId IN (" + GetOrgID() + ")";
             string accountNo = "";
             long orgId = GetOrgID();
             using (var db = new SqlConnection(connString))
