@@ -1,5 +1,6 @@
 ﻿using EsquireVRN.Models;
 using EsquireVRN.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -84,6 +85,8 @@ namespace EsquireVRN.Controllers
         /// Create a new EFT payment setup.
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Reseller")]
+
         public async Task<IActionResult> Create([FromBody] EFTPaymentSetup model)
         {
             try
@@ -136,6 +139,8 @@ namespace EsquireVRN.Controllers
         /// Update an existing EFT payment setup.
         /// </summary>
         [HttpPut("{id:long}")]
+        [Authorize(Roles = "Reseller")]
+
         public async Task<IActionResult> Update(
             long id,
             [FromBody] EFTPaymentSetup model)
@@ -207,6 +212,8 @@ namespace EsquireVRN.Controllers
         /// Delete an EFT payment setup.
         /// </summary>
         [HttpDelete("{id:long}")]
+        [Authorize(Roles = "Reseller")]
+
         public async Task<IActionResult> Delete(long id)
         {
             try
@@ -246,8 +253,8 @@ namespace EsquireVRN.Controllers
         }
 
         [HttpPut("reorder")]
-        public async Task<IActionResult> Reorder(
-    [FromBody] EFTPaymentSetupReorderRequest request)
+        [Authorize(Roles = "Reseller")]
+        public async Task<IActionResult> Reorder([FromBody] EFTPaymentSetupReorderRequest request)
         {
             try
             {
