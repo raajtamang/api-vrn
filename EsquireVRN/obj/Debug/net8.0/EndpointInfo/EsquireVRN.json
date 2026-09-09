@@ -4341,7 +4341,7 @@
         }
       }
     },
-    "/api/WebDelivery/api/GetDeliveryDescriptions": {
+    "/api/WebDelivery/GetDeliveryDescriptions": {
       "get": {
         "tags": [
           "WebDelivery"
@@ -4977,11 +4977,16 @@
       },
       "ConvertResellerOrderToOrderModel": {
         "required": [
+          "nearestBranchId",
           "resellerOrderId"
         ],
         "type": "object",
         "properties": {
           "resellerOrderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nearestBranchId": {
             "type": "integer",
             "format": "int64"
           },

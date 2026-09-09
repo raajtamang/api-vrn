@@ -166,7 +166,7 @@ namespace EsquireVRN.Controllers
                      "ShippingID, StatusID, OrgID, OrgBranchID, DeliveryQuoteID, DistOrdStatus, CustRef, Notes, Discount,DeliveryId,ShippingInstruction) OUTPUT inserted.OrderID VALUES " +
                      "(" + userId + ", N'" +
                      details.DeliveryDesc.Replace("'", "''") + "'," +
-                     details.DeliveryDescID.ToString() + "," + deliveryCost + "," + model.PaymentId + "," + quotations.ShippingID + ",2," + Shared.GetOrgID() +
+                     details.DeliveryDescID.ToString() + "," + deliveryCost + "," + model.PaymentId + "," + quotations.ShippingID + ",2,94"+
                      "," + model.NearestBranchId + ",N'" + quotations.DeliveryQuoteID + "',1 ,N'', N'" + quotations.Notes + "'," +
                      bundleDiscount.ToString("0.00").Replace(",", ".") + "," + details.DeliveryID + ",N'" + quotations.ShippingInstruction + "'); SELECT SCOPE_IDENTITY();";
                 double TotalAmount = 0;
@@ -223,7 +223,7 @@ namespace EsquireVRN.Controllers
 
                         string finconsubject = "Order Confirmation and Processing Update";
                         List<string> Emails = new() { tempcustomer.Email };
-                        List<string> cc = new() { "syanthan1st@gmail.com", confrimMail };
+                        List<string> cc = new() { "syanthan1st@gmail.com","4me.suren@gmail.com", confrimMail };
                         string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
                         BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za ", false));
 

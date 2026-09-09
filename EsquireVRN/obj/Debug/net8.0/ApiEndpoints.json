@@ -2882,7 +2882,7 @@
   {
     "ContainingType": "EsquireVRN.Controllers.WebDeliveryController",
     "Method": "GetDeliveryDescriptions",
-    "RelativePath": "api/WebDelivery/api/GetDeliveryDescriptions",
+    "RelativePath": "api/WebDelivery/GetDeliveryDescriptions",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
