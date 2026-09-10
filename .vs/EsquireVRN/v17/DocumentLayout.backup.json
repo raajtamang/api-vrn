@@ -319,8 +319,7 @@
               "ViewState": "AgIAAKgJAAAAAAAAAAAjwLIJAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-24T08:58:15.102Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -330,7 +329,7 @@
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\OrdersController.cs",
               "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\OrdersController.cs",
               "RelativeToolTip": "EsquireVRN\\Controllers\\OrdersController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAABMAAAAAAAAAA==",
+              "ViewState": "AgIAAHkAAAAAAAAAAAArwIsAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-12T12:20:09.996Z",
               "EditorCaption": ""
@@ -345,8 +344,7 @@
               "RelativeToolTip": "EsquireVRN\\Controllers\\HomeController.cs",
               "ViewState": "AgIAAEoAAAAAAAAAAAAnwOAAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-01T15:26:12.334Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-01T15:26:12.334Z"
             },
             {
               "$type": "Document",

@@ -128,6 +128,10 @@ namespace EsquireVRN.Controllers
             {
                 return StatusCode(404, new { error = "Order doesn't exist" });
             }
+            if (quotations.Ordered)
+            {
+                return StatusCode(400, new { error = "Order has been placed already." });
+            }
             long userId = Convert.ToInt64(User.Claims.First(claim => claim.Type == "CustomerID").Value);
             List<ResellerOrderItems> quotationDetails = Shared.GetResellerOrderItems(model.ResellerOrderId);
             if (!quotationDetails.Any())
@@ -408,7 +412,7 @@ namespace EsquireVRN.Controllers
                          [
                         new(customer.Email)
                          ];
-                        List<string> bcc = ["test@esquire.co.za","4me.suren@gmail.com", confrimMail];
+                        List<string> bcc = ["test@esquire.co.za", "4me.suren@gmail.com", confrimMail];
 
                         BackgroundJob.Enqueue(() => Shared.SendEsquireMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(RESULT.FinconId), "Quotation"));
 
