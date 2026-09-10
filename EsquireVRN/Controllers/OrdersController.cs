@@ -248,9 +248,9 @@ namespace EsquireVRN.Controllers
 
                             string finconsubject = "Order Confirmation and Processing Update";
                             List<string> Emails = new() { tempcustomer.Email };
-                            List<string> cc = new() { "syanthan1st@gmail.com"};
+                            List<string> cc = new() { "syanthan1st@gmail.com" };
                             string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
-                            BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails, cc, confrimMail , false));
+                            BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails, cc, confrimMail, false));
 
 
 
@@ -294,7 +294,7 @@ namespace EsquireVRN.Controllers
                         string doc = emails[1];
 
                         string subject = "Order Number: " + RESULT.FinconId + " From Esquire Technologies has been processed.";
-                        string[] toEmail =[new(customer.Email)];
+                        string[] toEmail = [new(customer.Email)];
                         List<string> bcc = new() { "test@esquire.co.za", "4me.suren@gmail.com" };
 
                         BackgroundJob.Enqueue(() => Shared.SendEsquireMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(RESULT.FinconId), "Order"));
@@ -375,7 +375,7 @@ namespace EsquireVRN.Controllers
                             string storeName = Shared.GetWebConfigKeyValue("SiteName");
                             List<string> Emails = new() { "nicholas@esquire.co.za", "mahomed@esquire.co.za", "kabir@esquire.co.za", "irfhan@esquire.co.za", "syanthan1st@gmail.com", "senzo@esquire.co.za", "khanyisa@esquire.co.za", "mccalvin@esuire.co.za", "tumelo@esquire.co.za", "prince@esquire.co.za", "mariamw@esquire.co.za" };
                             string finconemailbody = "<br /><br />Error occurred while sending order to fincon. Please check the fincon server. <br />Account Number : " + AccountNo + ".<br /><br />Customer Id : " + userId + "<br />Error : " + RESULT.ErrorMessage;
-                            BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails,  confrimMail, true));
+                            BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails, confrimMail, true));
 
                             return StatusCode(500, new { error = RESULT.ErrorMessage });
                         }
@@ -446,6 +446,7 @@ namespace EsquireVRN.Controllers
 
             }
         }
+
         [HttpPost]
         [Route("MakePayment")]
         [Authorize(Roles = "Reseller")]

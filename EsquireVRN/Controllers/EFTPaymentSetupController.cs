@@ -86,16 +86,16 @@ namespace EsquireVRN.Controllers
         /// </summary>
         [HttpPost]
         [Authorize(Roles = "Reseller")]
-
-        public async Task<IActionResult> Create([FromBody] EFTPaymentSetup model)
+        public async Task<IActionResult> Create([FromForm] EFTPaymentSetup model)
         {
             try
             {
+
                 if (model == null)
                 {
                     return BadRequest(new
                     {
-                        Message = "Request body is required."
+                        Message = "Request data is required."
                     });
                 }
 
@@ -114,16 +114,62 @@ namespace EsquireVRN.Controllers
                         Message = "Valid OrgID is required."
                     });
                 }
+                var requestUrl = $"{Request.Scheme}://{Request.Host.Value}/";
+                // Handle uploaded logo
+                if (model.LogoFile != null && model.LogoFile.Length > 0)
+                {
+                    var fileSize = model.LogoFile.Length;
+                    if ((fileSize / 1048576.0) > 5)
+                    {
+                        return StatusCode(400, new { error = "Image exceeds 5mb size limit." });
+                    }
+
+                    // Generate a unique file name
+                    var folderName = Path.Combine("Resources", "Images", "EFT");
+                    var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                    if (!Directory.Exists(pathToSave))
+                    {
+                        Directory.CreateDirectory(pathToSave);
+                    }
+                    string imgname = model.LogoFile.FileName;
+                    var can_continue = false;
+                    var extension = Path.GetExtension(imgname);
+                    int i = 1;
+                    while (!can_continue)
+                    {
+                        bool imgExists = System.IO.File.Exists(Path.Combine(pathToSave, imgname));
+                        if (!imgExists)
+                        {
+                            can_continue = true;
+                        }
+                        if (imgExists)
+                        {
+                            if (imgname.Contains("-" + (i - 1) + extension))
+                            {
+                                imgname = imgname.Replace("-" + (i - 1) + extension, "") + "-" + i + extension;
+                            }
+                            else
+                            {
+                                imgname = imgname.Replace(extension, "") + "-" + i + extension;
+                            }
+                            i++;
+
+                        }
+                    }
+                    string filePath = Path.Combine(pathToSave, imgname.Replace(" ", "-"));
+                    using (FileStream fs = new FileStream(filePath, FileMode.Create))
+                    {
+                        model.LogoFile.CopyTo(fs);
+                    }
+                    model.LogoUrl = requestUrl + "Resources/Images/EFT/" + imgname.Replace(" ", "-");
+
+                }
 
                 var id = await Shared.InsertEFTPaymentSetupAsync(model);
 
                 model.Id = id;
-
-                return CreatedAtAction(
-                    nameof(GetById),
-                    new { id = id },
-                    model
-                );
+                var EFTPaymentSetup = await Shared.GetEFTPaymentSetupByIdAsync(id);
+                return Ok(new { message = "EFT Payment Setup added successfully.", EFTPaymentSetup });
             }
             catch (Exception ex)
             {
@@ -138,12 +184,9 @@ namespace EsquireVRN.Controllers
         /// <summary>
         /// Update an existing EFT payment setup.
         /// </summary>
-        [HttpPut("{id:long}")]
+        [HttpPut("{id}")]
         [Authorize(Roles = "Reseller")]
-
-        public async Task<IActionResult> Update(
-            long id,
-            [FromBody] EFTPaymentSetup model)
+        public async Task<IActionResult> Update(long id, [FromForm] EFTPaymentSetup model)
         {
             try
             {
@@ -151,7 +194,7 @@ namespace EsquireVRN.Controllers
                 {
                     return BadRequest(new
                     {
-                        Message = "Request body is required."
+                        Message = "Request data is required."
                     });
                 }
 
@@ -159,7 +202,7 @@ namespace EsquireVRN.Controllers
                 {
                     return BadRequest(new
                     {
-                        Message = "Invalid Id."
+                        Message = "Valid Id is required."
                     });
                 }
 
@@ -179,23 +222,165 @@ namespace EsquireVRN.Controllers
                     });
                 }
 
-                model.Id = id;
+                // Get existing EFT Payment Setup
+                var existingEFTPaymentSetup =
+                    await Shared.GetEFTPaymentSetupByIdAsync(id);
 
-                var affectedRows =
-                    await Shared.UpdateEFTPaymentSetupAsync(model);
-
-                if (affectedRows == 0)
+                if (existingEFTPaymentSetup == null)
                 {
                     return NotFound(new
                     {
-                        Message = "EFT payment setup not found."
+                        Message = "EFT Payment Setup not found."
                     });
                 }
 
+                var requestUrl = $"{Request.Scheme}://{Request.Host.Value}/";
+
+                // Handle uploaded logo
+                if (model.LogoFile != null && model.LogoFile.Length > 0)
+                {
+                    // Validate file size
+                    var fileSize = model.LogoFile.Length;
+
+                    if ((fileSize / 1048576.0) > 5)
+                    {
+                        return BadRequest(new
+                        {
+                            error = "Image exceeds 5mb size limit."
+                        });
+                    }
+
+                    // Folder
+                    var folderName = Path.Combine(
+                        "Resources",
+                        "Images",
+                        "EFT"
+                    );
+
+                    var pathToSave = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        folderName
+                    );
+
+                    if (!Directory.Exists(pathToSave))
+                    {
+                        Directory.CreateDirectory(pathToSave);
+                    }
+
+                    // Generate file name
+                    string imgname = model.LogoFile.FileName;
+
+                    // Remove unsafe path information
+                    imgname = Path.GetFileName(imgname);
+
+                    var extension = Path.GetExtension(imgname);
+
+                    bool can_continue = false;
+                    int i = 1;
+
+                    while (!can_continue)
+                    {
+                        bool imgExists = System.IO.File.Exists(
+                            Path.Combine(
+                                pathToSave,
+                                imgname.Replace(" ", "-")
+                            )
+                        );
+
+                        if (!imgExists)
+                        {
+                            can_continue = true;
+                        }
+                        else
+                        {
+                            if (imgname.Contains("-" + (i - 1) + extension))
+                            {
+                                imgname = imgname.Replace(
+                                    "-" + (i - 1) + extension,
+                                    ""
+                                ) + "-" + i + extension;
+                            }
+                            else
+                            {
+                                imgname = imgname.Replace(
+                                    extension,
+                                    ""
+                                ) + "-" + i + extension;
+                            }
+
+                            i++;
+                        }
+                    }
+
+                    imgname = imgname.Replace(" ", "-");
+
+                    string filePath = Path.Combine(
+                        pathToSave,
+                        imgname
+                    );
+
+                    // Save new file
+                    await using (FileStream fs = new FileStream(
+                        filePath,
+                        FileMode.Create
+                    ))
+                    {
+                        await model.LogoFile.CopyToAsync(fs);
+                    }
+
+                    // Delete old logo file if it exists
+                    if (!string.IsNullOrWhiteSpace(existingEFTPaymentSetup.LogoUrl))
+                    {
+                        try
+                        {
+                            var oldFileName = Path.GetFileName(
+                                new Uri(existingEFTPaymentSetup.LogoUrl).AbsolutePath
+                            );
+
+                            var oldFilePath = Path.Combine(
+                                pathToSave,
+                                oldFileName
+                            );
+
+                            if (System.IO.File.Exists(oldFilePath))
+                            {
+                                System.IO.File.Delete(oldFilePath);
+                            }
+                        }
+                        catch
+                        {
+                            // Ignore old file deletion errors
+                            // so the database update can continue.
+                        }
+                    }
+
+                    // Set new logo URL
+                    model.LogoUrl =
+                        requestUrl +
+                        "Resources/Images/EFT/" +
+                        imgname;
+                }
+                else
+                {
+                    // No new file uploaded,
+                    // keep the existing logo
+                    model.LogoUrl = existingEFTPaymentSetup.LogoUrl;
+                }
+
+                // Make sure the correct ID is used
+                model.Id = id;
+
+                // Update database
+                await Shared.UpdateEFTPaymentSetupAsync(model);
+
+                // Get updated record
+                var EFTPaymentSetup =
+                    await Shared.GetEFTPaymentSetupByIdAsync(id);
+
                 return Ok(new
                 {
-                    Message = "EFT payment setup updated successfully.",
-                    Data = model
+                    message = "EFT Payment Setup updated successfully.",
+                    EFTPaymentSetup
                 });
             }
             catch (Exception ex)
@@ -220,12 +405,14 @@ namespace EsquireVRN.Controllers
             {
                 if (id <= 0)
                 {
-                    return BadRequest(new
-                    {
-                        Message = "Invalid Id."
-                    });
+                    return BadRequest(new { Message = "Invalid Id." });
                 }
 
+                var existingEFTPaymentSetup = await Shared.GetEFTPaymentSetupByIdAsync(id);
+                if (existingEFTPaymentSetup == null)
+                {
+                    return NotFound(new { Message = "EFT Payment Setup not found." });
+                }
                 var affectedRows =
                     await Shared.DeleteEFTPaymentSetupAsync(id);
 
@@ -235,6 +422,30 @@ namespace EsquireVRN.Controllers
                     {
                         Message = "EFT payment setup not found."
                     });
+                }
+
+                if (!string.IsNullOrWhiteSpace(existingEFTPaymentSetup.LogoUrl))
+                {
+                    var folderName = Path.Combine("Resources", "Images", "EFT");
+
+                    var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+                    try
+                    {
+                        var oldFileName = Path.GetFileName(new Uri(existingEFTPaymentSetup.LogoUrl).AbsolutePath);
+
+                        var oldFilePath = Path.Combine(pathToSave, oldFileName);
+
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore old file deletion errors
+                        // so the database update can continue.
+                    }
                 }
 
                 return Ok(new

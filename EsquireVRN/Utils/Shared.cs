@@ -2857,7 +2857,7 @@ namespace EsquireVRN.Utils
             }
             catch (Exception ex)
             {
-                Serilog.Log.Error(ex.Message);
+                Serilog.Log.Error("Error : " + ex.Message + " || Inner Exception :" + ex.InnerException);
 
             }
         }
@@ -2901,7 +2901,7 @@ namespace EsquireVRN.Utils
             }
             catch (Exception ex)
             {
-                Serilog.Log.Error(ex.Message);
+                Serilog.Log.Error("Error : " + ex.Message + " || Inner Exception :" + ex.InnerException);
 
             }
         }
@@ -3017,7 +3017,7 @@ namespace EsquireVRN.Utils
             }
             catch (Exception ex)
             {
-                Serilog.Log.Error(ex.Message);
+                Serilog.Log.Error("Error : " + ex.Message + " || Inner Exception :" + ex.InnerException);
 
             }
         }
@@ -3080,7 +3080,7 @@ namespace EsquireVRN.Utils
             }
             catch (Exception ex)
             {
-                Serilog.Log.Error(ex.Message);
+                Serilog.Log.Error("Error : " + ex.Message + " || Inner Exception :" + ex.InnerException);
 
             }
         }

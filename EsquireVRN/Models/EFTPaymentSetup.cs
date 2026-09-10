@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EsquireVRN.Models
 {
@@ -13,5 +14,7 @@ namespace EsquireVRN.Models
         public string? LogoUrl { get; set; }
         public long OrgID { get; set; }
         public int Position { get; set; } = 0;
+        [NotMapped]
+        public IFormFile? LogoFile { get; set; }
     }
 }
