@@ -166,7 +166,7 @@ namespace EsquireVRN.Controllers
                      "ShippingID, StatusID, OrgID, OrgBranchID, DeliveryQuoteID, DistOrdStatus, CustRef, Notes, Discount,DeliveryId,ShippingInstruction) OUTPUT inserted.OrderID VALUES " +
                      "(" + userId + ", N'" +
                      details.DeliveryDesc.Replace("'", "''") + "'," +
-                     details.DeliveryDescID.ToString() + "," + deliveryCost + "," + model.PaymentId + "," + quotations.ShippingID + ",2,94"+
+                     details.DeliveryDescID.ToString() + "," + deliveryCost + "," + model.PaymentId + "," + quotations.ShippingID + ",2,94" +
                      "," + model.NearestBranchId + ",N'" + quotations.DeliveryQuoteID + "',1 ,N'', N'" + quotations.Notes + "'," +
                      bundleDiscount.ToString("0.00").Replace(",", ".") + "," + details.DeliveryID + ",N'" + quotations.ShippingInstruction + "'); SELECT SCOPE_IDENTITY();";
                 double TotalAmount = 0;
@@ -199,7 +199,7 @@ namespace EsquireVRN.Controllers
                 Shared.UpdateResellerOrderStatus(strOrdID, model.ResellerOrderId);
                 long OrderId = Convert.ToInt64(strOrdID);
                 Shared.BranchDetail branchDetail = Shared.getBranchName("" + model.NearestBranchId);
-                string confrimMail = branchDetail.BranchEMail;
+                string confrimMail = "info@esquire.co.za";
                 string branchName = branchDetail.OrgBraShort;
                 string custID = "" + userId;
 
@@ -218,12 +218,9 @@ namespace EsquireVRN.Controllers
                         {
                             db.Execute(sql);
                         }
-
-                        Shared.ClearQuotationCartWithCustId(custID);
-
                         string finconsubject = "Order Confirmation and Processing Update";
                         List<string> Emails = new() { tempcustomer.Email };
-                        List<string> cc = new() { "syanthan1st@gmail.com","4me.suren@gmail.com", confrimMail };
+                        List<string> cc = new() { "syanthan1st@gmail.com", "4me.suren@gmail.com", confrimMail };
                         string finconemailbody = Shared.GetWebConfigKeyValue("OrderReceived").Replace("{title}", tempcustomer.Title).Replace("{firstname}", tempcustomer.FirstName).Replace("{surname}", tempcustomer.Surname);
                         BackgroundJob.Enqueue(() => Shared.SendEsquireMailHangFire(finconsubject, finconemailbody, Emails, cc, "info@esquire.co.za ", false));
 
@@ -292,7 +289,7 @@ namespace EsquireVRN.Controllers
                         string emailbody = emails[0];
                         string doc = emails[1];
 
-                        string subject = "Order Number: " + RESULT.FinconId + " From Happy Monkey  has been processed.";
+                        string subject = "Order Number: " + RESULT.FinconId + " From Esquire Technologies has been processed.";
                         string[] toEmail = new string[]
                          {
                         new(customer.Email)
@@ -335,7 +332,6 @@ namespace EsquireVRN.Controllers
                             db.Execute(sql);
                         }
 
-                        Shared.ClearQuotationCartWithCustId(custID);
 
                         string finconsubject = "Order Confirmation and Processing Update";
                         List<string> Emails = new() { tempcustomer.Email };
@@ -360,9 +356,6 @@ namespace EsquireVRN.Controllers
                             {
                                 db.Execute(sql);
                             }
-
-                            Shared.ClearQuotationCartWithCustId(custID);
-
                             string finconsubject = "Order Confirmation and Processing Update";
                             List<string> Emails = new() { tempcustomer.Email };
                             List<string> cc = new() { "syanthan1st@gmail.com", confrimMail };
@@ -396,8 +389,6 @@ namespace EsquireVRN.Controllers
                             db.Execute(sql);
                         }
 
-                        Shared.ClearQuotationCartWithCustId(custID);
-
                         Shared.BillingDetail? BillingDetail = await Shared.GetBillingDetail(connectId, Convert.ToInt64(userId), FinconServerUsername, FinconServerPassword);
 
                         string terms = "";
@@ -412,12 +403,12 @@ namespace EsquireVRN.Controllers
                         string emailbody = emails[0];
                         string doc = emails[1];
                         string finconId = Convert.ToInt64(RESULT.FinconId).ToString().PadLeft(8, '0');
-                        string subject = "Order Number: " + finconId + " From Happy Monkey  has been processed.";
+                        string subject = "Order Number: " + finconId + " From Esquire Technologies has been processed.";
                         string[] toEmail =
                          [
                         new(customer.Email)
                          ];
-                        List<string> bcc = ["test@esquire.co.za", confrimMail];
+                        List<string> bcc = ["test@esquire.co.za","4me.suren@gmail.com", confrimMail];
 
                         BackgroundJob.Enqueue(() => Shared.SendEsquireMail(subject, emailbody, toEmail, confrimMail, bcc, false, doc, Convert.ToString(RESULT.FinconId), "Quotation"));
 
@@ -521,15 +512,15 @@ namespace EsquireVRN.Controllers
                 {
                     deliveryAddress = dAddress.ShippingAddress + ", " + dAddress.Town + ", " + dAddress.ShippingCountry;
                 }
-                string orderInstruction = "Use this order number when talking to Happy Monkey .";
+                string orderInstruction = "Use this order number when talking to Esquire Technologies.";
                 if (OrgId == 473)
                 {
-                    orderInstruction = "Use this order number when talking to Happy Monkey *.";
+                    orderInstruction = "Use this order number when talking to Esquire Technologies*.";
                 }
                 string MailFormat = Shared.GetWebConfigKeyValue("OrderConfirmMailCourierDirect");
                 string PdfFormat = Shared.GetWebConfigKeyValue("OrderConfirmPdfCourierDirect");
                 string tAmount = Math.Round((orderAmount + deliveryCharge), 2).ToString(currencyFormat);
-                string use_this = "Use this order number when talking to Happy Monkey . | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
+                string use_this = "Use this order number when talking to Esquire Technologies. | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
 
                 string talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref :  Debit or Credit Card (" + paymentRefId + ")";
                 if (order.PayID == 2)
@@ -554,11 +545,11 @@ namespace EsquireVRN.Controllers
                 string MailFormat = Shared.GetWebConfigKeyValue("OrderConfirmMailCollectFromShop");
                 string PdfFormat = Shared.GetWebConfigKeyValue("OrderConfirmPdfCollectFromShop");
 
-                string orderInstruction = "Use this order number when talking to Happy Monkey .";
-                string use_this = "Use this order number when talking to Happy Monkey . | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
+                string orderInstruction = "Use this order number when talking to Esquire Technologies.";
+                string use_this = "Use this order number when talking to Happy. | <span style='color:red';>&nbsp; &nbsp;" + strShippingInstruction + "</span>";
                 if (OrgId == 473)
                 {
-                    orderInstruction = "Use this order number when talking to Happy Monkey *.";
+                    orderInstruction = "Use this order number when talking to Esquire Technologies*.";
                 }
                 string oAmount = orderAmount.ToString(currencyFormat);
                 string talkTo = finconId + " | " + "Web Ref : " + order.OrderID + " (Office use only) | Payment Ref :  Debit or Credit Card (" + paymentRefId + ")";

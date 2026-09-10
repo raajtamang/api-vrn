@@ -221,12 +221,152 @@ namespace EsquireVRN.Controllers
 
         }
 
+        [HttpPost]
+        [Route("api/AddAdmin")]
+        public IActionResult RegisterAdmin([FromBody] CustomerRegistrationModel registration)
+        {
+            try
+            {
+                string strOrgID = "" + Shared.GetOrgID();
+                string strAccountID = "", strCompany = "", strIDNo = "null", strVAT = "null", strSendEMails = "254", strBranch = "null", strNotes = "", strTitle = "";
+                if (!string.IsNullOrEmpty(registration.Title))
+                    strTitle = registration.Title;
+                if (strTitle.ToLower() == "undefined" || string.IsNullOrWhiteSpace(strTitle))
+                    strTitle = "Mr";
+
+                if (!string.IsNullOrEmpty(registration.Notes) && registration.Notes.ToLower() != "undefined")
+                    strNotes = registration.Notes;
+
+                if (string.IsNullOrWhiteSpace(registration.FirstName))
+                {
+                    return BadRequest(new
+                    {
+                        message = "Your first name is required!"
+                    });
+                }
+
+                if (!Shared.isEmailValid(registration.Email))
+                {
+                    return BadRequest(new
+                    {
+                        message = "Please provide a valid e-mail address!"
+                    });
+                }
+
+                if (string.IsNullOrWhiteSpace(registration.Password))
+                {
+                    return BadRequest(new
+                    {
+                        message = "Please provide a valid password!"
+                    });
+                }
+
+                string aSQL = "SELECT CustID FROM WEBCustomer WHERE Email='" + registration.Email +
+                    "' AND OrgID=" + strOrgID + ";SELECT AccountID FROM Accounts " +
+                    "WHERE (OrgID = " + strOrgID + ") AND (Defalut = 1);";
+                using (var db = new SqlConnection(Shared.connString))
+                {
+                    var result = db.QueryMultiple(aSQL);
+                    var custId = result.Read<long?>().FirstOrDefault();
+                    if (custId != null)
+                    {
+                        return BadRequest(new { error = "The e-mail address " + registration.Email + " already exists in our database." });
+                    }
+                    var accountDetails = result.Read().FirstOrDefault();
+                    if (accountDetails != null)
+                    {
+                        strAccountID = Shared.Val(accountDetails.AccountID.ToString());
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(registration.VatNo) && registration.VatNo.ToLower() != "undefined")
+                    strVAT = "N'" + registration.VatNo.Trim() + "'";
+                if (!string.IsNullOrWhiteSpace(registration.Company) && registration.Company.ToLower() != "undefined")
+                    strCompany = registration.Company.Trim();
+
+                string strSQL = "INSERT INTO WEBCustomer (OrgID, FirstName, Surname, Tel, Tel2, " +
+                       "Fax, Email, Company, [Password], Title, AccountID, IdNo, VatNo, SendEmails, DefaultOrgBranchID, Notes,UserType) " +
+                       "OUTPUT Inserted.CustID VALUES (" + strOrgID + ",'" + registration.FirstName.Trim().Replace("\'", "\'\'") + "','" +
+                       registration.Surname.Trim().Replace("\'", "\'\'") + "','" +
+                       Shared.Val(registration.Tel) + "','" + Shared.Val(registration.Tel2) + "','" +
+                       Shared.Val(registration.Fax) + "','" + registration.Email.Trim() + "','" +
+                       strCompany + "','" +
+                       registration.Password.Replace("\'", "\'\'") + "','" + registration.Title + "', " + strAccountID + "," +
+                       strIDNo + "," + strVAT + ", " + strSendEMails + ", " + strBranch + ", N'" + strNotes.Trim() + "','Reseller');";
+                using (var db = new SqlConnection(Shared.connString))
+                {
+                    string strCustID = db.Query<string>(strSQL).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(strCustID))
+                    {
+                        DeliveryAddress dAddress = new()
+                        {
+                            ShippingCountry = registration.ShippingCountry,
+                            ShippingAddress = registration.ShippingAddress,
+                            ShippingDesc = registration.ShippingDesc,
+                            ShippingType = registration.ShippingType,
+                            Town = registration.Town,
+                            Phone = registration.Phone,
+                            PostalCode = registration.PostalCode,
+                            CourierDirectKey = registration.CourierDirectKey,
+                            ShippingddressIEID = registration.ShippingddressIEID,
+                            CustID = Convert.ToInt64(strCustID)
+                        };
+
+                        Shared.SaveDeliveryAddress(dAddress);
+                    }
+                }
+
+                return Ok(new
+                {
+                    message = "Registration competed sucessfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(422, new { error = ex.Message });
+            }
+
+        }
+
+        [HttpPost]
+        [Route("api/UpdateAdmin/{id:long}")]
+        public IActionResult UpdateAdmin([FromBody] Customer customer,long id)
+        {
+            try
+            {
+
+                var oldCustomer = Shared.GetCustomer(id);
+                if (oldCustomer == null)
+                {
+                    return StatusCode(404, new { error = "Profile doesn't exist. Please check and try again." });
+                }
+                customer.UserType = "Reseller";
+                if (customer.DateCreated == null)
+                {
+                    customer.DateCreated = oldCustomer.DateCreated;
+                }
+                if (string.IsNullOrWhiteSpace(customer.Company))
+                {
+                    customer.Company = oldCustomer.Company;
+                }
+                var newCustomer = Shared.UpdateCustomer(id, customer);
+
+                return Ok(new { message = "Admin updated successfully.", ProfileDetails = newCustomer });
+               
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(422, new { error = ex.Message });
+            }
+
+        }
+
         [HttpGet]
         [Route("/api/GetHomepageSetup")]
         public IActionResult GetHomepageSetup()
         {
             List<HomepageSetup> setups = Shared.GetHomepageSetups();
-            List<Banner> banners = Shared.GetBanners([.. setups.Select(x => x.ContentId??0)]);
+            List<Banner> banners = Shared.GetBanners([.. setups.Select(x => x.ContentId ?? 0)]);
             return Ok(new { setups, banners });
         }
 
@@ -533,7 +673,7 @@ namespace EsquireVRN.Controllers
                 emailBody = emailBody.Replace("{0}", contact.AccountNumber).Replace("{1}", contact.FirstName + " " + contact.SurName).Replace("{2}", contact.CompanyName).Replace("{3}", contact.Email).Replace("{4}", contact.Phone).Replace("{5}", contact.Message).Replace("{6}", ipAddress);
                 List<MailAddress> bcc = new() { new MailAddress("test@esquire.co.za"), new MailAddress("info@esquire.co.za") };
 
-                Shared.sendMail(contact.Subject??"Contact Message", HttpUtility.HtmlDecode(emailBody), Shared.splitEMailTo(Shared.GetOrgEmail(), Shared.GetOrgName()),
+                Shared.sendMail(contact.Subject ?? "Contact Message", HttpUtility.HtmlDecode(emailBody), Shared.splitEMailTo(Shared.GetOrgEmail(), Shared.GetOrgName()),
                     Shared.splitEMailFrom(Shared.GetOrgEmail(), "Contact Us"), bcc.ToArray());
                 return Ok(new { message = "Your email has been sent." });
             }
