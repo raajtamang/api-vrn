@@ -23,7 +23,7 @@ namespace EsquireVRN.Models
         public int StockQty { get; set; }
         public double Rating { get; set; }
         public string? ProductName { get; set; }
-        public double? Special_Price { get; set; }
+        public double? SpecialPrice { get; set; }
         public long? ManufID { get; set; }
         public List<BranchStock>? BrancStocks { get; set; }
     }

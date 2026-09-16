@@ -41,7 +41,7 @@ namespace EsquireVRN.Models
         public bool? AdwordExclude { get; set; }
         public int? DataSource { get; set; }
         public string? ProductName { get; set; }
-        public double? Special_Price { get; set; }
+        public double? SpecialPrice { get; set; }
         [SwaggerSchema(ReadOnly = true)]
         public List<BranchStock>? BrancStocks { get; set; }
         public double Rating { get;set; }

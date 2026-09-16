@@ -871,19 +871,71 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/EFTPaymentSetup"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EFTPaymentSetup"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/EFTPaymentSetup"
+                "type": "object",
+                "properties": {
+                  "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "Name": {
+                    "type": "string"
+                  },
+                  "AccountNo": {
+                    "type": "string"
+                  },
+                  "BranchCode": {
+                    "type": "string"
+                  },
+                  "AccountName": {
+                    "type": "string"
+                  },
+                  "LogoUrl": {
+                    "type": "string"
+                  },
+                  "OrgID": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "Position": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "LogoFile": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "Id": {
+                  "style": "form"
+                },
+                "Name": {
+                  "style": "form"
+                },
+                "AccountNo": {
+                  "style": "form"
+                },
+                "BranchCode": {
+                  "style": "form"
+                },
+                "AccountName": {
+                  "style": "form"
+                },
+                "LogoUrl": {
+                  "style": "form"
+                },
+                "OrgID": {
+                  "style": "form"
+                },
+                "Position": {
+                  "style": "form"
+                },
+                "LogoFile": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -934,19 +986,71 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/EFTPaymentSetup"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EFTPaymentSetup"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/EFTPaymentSetup"
+                "type": "object",
+                "properties": {
+                  "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "Name": {
+                    "type": "string"
+                  },
+                  "AccountNo": {
+                    "type": "string"
+                  },
+                  "BranchCode": {
+                    "type": "string"
+                  },
+                  "AccountName": {
+                    "type": "string"
+                  },
+                  "LogoUrl": {
+                    "type": "string"
+                  },
+                  "OrgID": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "Position": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "LogoFile": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "Id": {
+                  "style": "form"
+                },
+                "Name": {
+                  "style": "form"
+                },
+                "AccountNo": {
+                  "style": "form"
+                },
+                "BranchCode": {
+                  "style": "form"
+                },
+                "AccountName": {
+                  "style": "form"
+                },
+                "LogoUrl": {
+                  "style": "form"
+                },
+                "OrgID": {
+                  "style": "form"
+                },
+                "Position": {
+                  "style": "form"
+                },
+                "LogoFile": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -1166,6 +1270,79 @@
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CustomerRegistrationModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/AddAdmin": {
+      "post": {
+        "tags": [
+          "Home"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerRegistrationModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerRegistrationModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerRegistrationModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/UpdateAdmin/{id}": {
+      "post": {
+        "tags": [
+          "Home"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
               }
             }
           }
@@ -5390,44 +5567,6 @@
         },
         "additionalProperties": false
       },
-      "EFTPaymentSetup": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "accountNo": {
-            "type": "string",
-            "nullable": true
-          },
-          "branchCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "accountName": {
-            "type": "string",
-            "nullable": true
-          },
-          "logoUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "orgID": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "position": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
       "EFTPaymentSetupReorderRequest": {
         "type": "object",
         "properties": {
@@ -6130,7 +6269,7 @@
             "type": "string",
             "nullable": true
           },
-          "special_Price": {
+          "specialPrice": {
             "type": "number",
             "format": "double",
             "nullable": true

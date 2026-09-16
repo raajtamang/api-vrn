@@ -8,7 +8,7 @@ namespace EsquireVRN.Models
         public long Id { get; set; }
         public string ProductCode { get; set; }
         public decimal? PublicPrice { get; set; }
-        public decimal Special_Price { get; set; }
+        public decimal SpecialPrice { get; set; }
         public DateTime? Date { get; set; }
         public long PageId { get; set; }
         public decimal? Margin { get; set; }

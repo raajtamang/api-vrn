@@ -26,6 +26,22 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "RegisterAdmin",
+    "RelativePath": "api/AddAdmin",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "registration",
+        "Type": "EsquireVRN.Models.CustomerRegistrationModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EsquireVRN.Controllers.BannerController",
     "Method": "Get",
     "RelativePath": "api/Banner",
@@ -630,9 +646,49 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "model",
-        "Type": "EsquireVRN.Models.EFTPaymentSetup",
-        "IsRequired": true
+        "Name": "Id",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "AccountNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "BranchCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "AccountName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "LogoUrl",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgID",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "Position",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "LogoFile",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -667,9 +723,49 @@
         "IsRequired": true
       },
       {
-        "Name": "model",
-        "Type": "EsquireVRN.Models.EFTPaymentSetup",
-        "IsRequired": true
+        "Name": "Id",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "AccountNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "BranchCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "AccountName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "LogoUrl",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "OrgID",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "Position",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "LogoFile",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -2621,6 +2717,27 @@
       {
         "Name": "dto",
         "Type": "EsquireVRN.Models.DTO.UpdatePageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "UpdateAdmin",
+    "RelativePath": "api/UpdateAdmin/{id}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "customer",
+        "Type": "EsquireVRN.Models.Customer",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "System.Int64",
         "IsRequired": true
       }
     ],
