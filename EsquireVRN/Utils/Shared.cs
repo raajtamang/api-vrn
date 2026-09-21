@@ -1415,12 +1415,12 @@ namespace EsquireVRN.Utils
             if (string.IsNullOrWhiteSpace(SearchText))
             {
 
-                query = "SELECT * FROM PageImage ORDER BY CreatedDate Desc OFFSET " + (pageSize * (pageNum - 1)) + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;Select Count(*) from PageImage;";
+                query = "SELECT * FROM ImageGallery WHERE OrgId=" + GetOrgID() + " ORDER BY CreatedDate Desc OFFSET " + (pageSize * (pageNum - 1)) + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;SELECT COUNT(*) FROM ImageGallery WHERE OrgId="+GetOrgID()+";";
             }
             else
             {
                 SearchText = SearchText.Replace("'", "''");
-                query = "SELECT * FROM PageImage where Title Like '%" + SearchText + "%' ORDER BY CreatedDate Desc OFFSET " + (pageSize * (pageNum - 1)) + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;Select Count(*) from PageImage  where Title Like '%" + SearchText + "%';";
+                query = "SELECT * FROM ImageGallery WHERE OrgId=" + GetOrgID() + " AND Title Like '%" + SearchText + "%' ORDER BY CreatedDate Desc OFFSET " + (pageSize * (pageNum - 1)) + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;SELECT COUNT(*) FROM ImageGallery  WHERE OrgID="+GetOrgID()+" AND Title LIKE '%" + SearchText + "%';";
 
             }
             List<PageImage> images = new();
@@ -1455,12 +1455,12 @@ namespace EsquireVRN.Utils
             if (string.IsNullOrWhiteSpace(SearchText))
             {
 
-                query = "SELECT * FROM PageImage ORDER BY CreatedDate Desc";
+                query = "SELECT * FROM ImageGallery WHERE OrgId=" + GetOrgID() + " ORDER BY CreatedDate Desc";
             }
             else
             {
                 SearchText = SearchText.Replace("'", "''");
-                query = "SELECT * FROM PageImage where Title Like '%" + SearchText + "%' ORDER BY CreatedDate Desc;";
+                query = "SELECT * FROM ImageGallery WHERE OrgID="+GetOrgID()+" AND Title Like '%" + SearchText + "%' ORDER BY CreatedDate Desc;";
 
             }
             List<PageImage> images = new();
@@ -1474,6 +1474,55 @@ namespace EsquireVRN.Utils
 
             }
             return images;
+        }
+
+        public static bool CheckImageExists(string imgname)
+        {
+            string query = "SELECT * FROM ImageGallery WHERE Image=@imgName AND OrgID="+GetOrgID();
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { imgName = imgname };
+                var result = db.Query<PageImage>(query, values).FirstOrDefault();
+                if (result != null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static PageImage SavePageImage(PageImage pImage)
+        {
+            string query = "INSERT INTO [dbo].[ImageGallery]([Title],[Image],[Url],[CreatedDate],[OrgID]) OUTPUT INSERTED.Id VALUES (@Title,@Image,@Url,@CreatedDate,@OrgID)";
+            using (var db = new SqlConnection(connString))
+            {
+                long id = db.Query<long>(query, pImage).FirstOrDefault();
+                pImage.Id = id;
+                return pImage;
+            }
+        }
+
+        public static PageImage GetPageImage(long id)
+        {
+            string query = "SELECT * FROM ImageGallery WHERE id=@id";
+            PageImage pImage = new();
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { id };
+                pImage = db.Query<PageImage>(query, values).FirstOrDefault();
+
+            }
+            return pImage;
+        }
+
+        public static void DeletePageImage(long id)
+        {
+            string query = "DELETE FROM [dbo].[ImageGallery] Where Id=@id";
+            using (var db = new SqlConnection(connString))
+            {
+                var values = new { id };
+                db.Execute(query, values);
+            }
         }
 
         public static string GetWebConfigKeyValue(string key)
@@ -6017,6 +6066,19 @@ namespace EsquireVRN.Utils
             string query = "SELECT * FROM [dbo].[WEBCustomer] where [UserType]='Reseller' AND OrgId=" + GetOrgID() + " ORDER BY DateCreated";
             using var db = new SqlConnection(connString);
             return [.. db.Query<Admin>(query)];
+        }
+
+        public static string GenerateSlug(string phrase)
+        {
+            string str = phrase.ToLower();
+            // invalid chars           
+            str = Regex.Replace(str, @"[^a-z0-9\s-]", "");
+            // convert multiple spaces into one space   
+            str = Regex.Replace(str, @"\s+", " ").Trim();
+            // cut and trim 
+            str = str.Substring(0, str.Length <= 45 ? str.Length : 45).Trim();
+            str = Regex.Replace(str, @"\s", "-"); // hyphens   
+            return str;
         }
     }
 }

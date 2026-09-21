@@ -1,5 +1,6 @@
 ﻿using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EsquireVRN.Models
 {
@@ -15,5 +16,7 @@ namespace EsquireVRN.Models
         [MaxLength(350)]
         public string Url { get; set; }
         public DateTime CreatedDate { get; set; }
-    } 
+        [NotMapped]
+        public long OrgID { get; set; }
+    }
 }
