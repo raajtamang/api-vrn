@@ -5105,7 +5105,7 @@ namespace EsquireVRN.Utils
 
         public static DashboardCard GetDashboardCards()
         {
-            string query = @"Select Count(ManufID) as Brands from Manufacturers;Select Count(1) as Categories from ProductGroupHead WHERE OrgID IN (" + GetOrgCategoryId() + ");Select Count(ResellerOrderID) as Orders from ResellerOrders where OrgID IN (" + GetOrgID() + ");Select Count(DISTINCT Email) from WebCustomer Where UserType='Customer' AND OrgID IN (" + GetOrgCategoryId() + ");Select Sum(wI.Price*wI.ProdQty)-SUM(wO.Discount) as Sales from ResellerOrderItems wI join ResellerOrders wO on wI.ResellerOrderID=wo.ResellerOrderID  where (wO.OrgID IN (" + GetOrgCategoryId() + "));SELECT Count(1) FROM ProductGroups sCategory JOIN ProdGroupLInk link ON sCategory.GroupName = link.ProdGroupName JOIN ProductGroupHead Category ON link.GroupHeadID = Category.GroupHeadID WHERE Category.OrgID IN (" + GetOrgCategoryId() + ")";
+            string query = @"Select Count(ManufID) as Brands from Manufacturers;Select Count(1) as Categories from ProductGroupHead WHERE OrgID IN (" + GetOrgCategoryId() + ");Select Count(ResellerOrderID) as Orders from ResellerOrders where OrgID IN (" + GetOrgID() + ");Select Count(DISTINCT Email) from WebCustomer Where UserType='Customer' AND OrgID IN (" + GetOrgCategoryId() + ");Select Sum(wI.Price*wI.ProdQty)-SUM(wO.Discount) as Sales from ResellerOrderItems wI join ResellerOrders wO on wI.ResellerOrderID=wo.ResellerOrderID  where (wO.OrgID IN (" + GetOrgCategoryId() + "));SELECT Count(1) FROM ProductGroups sCategory JOIN ProdGroupLInk link ON sCategory.GroupName = link.ProdGroupName JOIN ProductGroupHead Category ON link.GroupHeadID = Category.GroupHeadID WHERE Category.OrgID IN (" + GetOrgCategoryId() + ");Select Count(1) from WebCustomer Where UserType=N'Reseller' AND OrgID=" + GetOrgID() + ";";
             DashboardCard dCard = new();
             using (var db = new SqlConnection(connString))
             {
@@ -5116,6 +5116,7 @@ namespace EsquireVRN.Utils
                 dCard.Customers = Cards.Read<long>().FirstOrDefault();
                 dCard.Sales = Math.Round(Cards.Read<decimal>().FirstOrDefault(), 2);
                 dCard.SubCategories = Cards.Read<long>().FirstOrDefault();
+                dCard.UsersCount = Cards.Read<long>().FirstOrDefault();
             }
             return dCard;
         }

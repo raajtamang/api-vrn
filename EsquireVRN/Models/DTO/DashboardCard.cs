@@ -8,5 +8,6 @@
         public long Customers { get; set; } = 0;
         public decimal Sales { get; set; } = 0;
         public long SubCategories { get; set; } = 0;
+        public long UsersCount { get; set; } = 0;
     }
 }
