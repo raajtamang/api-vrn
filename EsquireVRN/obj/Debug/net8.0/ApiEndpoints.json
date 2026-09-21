@@ -888,6 +888,16 @@
   },
   {
     "ContainingType": "EsquireVRN.Controllers.HomeController",
+    "Method": "GetAdmins",
+    "RelativePath": "api/GetAdmins",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EsquireVRN.Controllers.HomeController",
     "Method": "GetDashBoardCards",
     "RelativePath": "api/GetDashboardCards",
     "HttpMethod": "GET",

@@ -81,6 +81,14 @@ namespace EsquireVRN.Controllers
             return Ok(new { token, name = lDetails.FirstName, HasDeliveryAddress = hasDeliveryAddress, UserID = lDetails.CustID });
         }
 
+        [HttpGet]
+        [Route("api/GetAdmins")]
+        [Authorize(Roles = "Reseller")]
+        public IActionResult GetAdmins()
+        {
+            return Ok(Shared.GetAdmins());
+        }
+
         [HttpPost]
         [Route("api/customerRegistration")]
         public IActionResult RegisterCustomer([FromBody] CustomerRegistrationModel registration)
@@ -330,7 +338,7 @@ namespace EsquireVRN.Controllers
 
         [HttpPost]
         [Route("api/UpdateAdmin/{id:long}")]
-        public IActionResult UpdateAdmin([FromBody] Customer customer,long id)
+        public IActionResult UpdateAdmin([FromBody] Customer customer, long id)
         {
             try
             {
@@ -352,7 +360,7 @@ namespace EsquireVRN.Controllers
                 var newCustomer = Shared.UpdateCustomer(id, customer);
 
                 return Ok(new { message = "Admin updated successfully.", ProfileDetails = newCustomer });
-               
+
             }
             catch (Exception ex)
             {

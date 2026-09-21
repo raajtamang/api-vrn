@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using EsquireVRN.Models;
 using EsquireVRN.Models.DTO;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -6008,6 +6010,13 @@ namespace EsquireVRN.Utils
             {
             }
             return false;
+        }
+
+        internal static List<Admin>? GetAdmins()
+        {
+            string query = "SELECT * FROM [dbo].[WEBCustomer] where [UserType]='Reseller' AND OrgId=" + GetOrgID() + " ORDER BY DateCreated";
+            using var db = new SqlConnection(connString);
+            return [.. db.Query<Admin>(query)];
         }
     }
 }
