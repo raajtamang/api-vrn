@@ -335,7 +335,7 @@
               "RelativeDocumentMoniker": "EsquireVRN\\Utils\\Shared.cs",
               "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Utils\\Shared.cs",
               "RelativeToolTip": "EsquireVRN\\Utils\\Shared.cs",
-              "ViewState": "AgIAAKsXAAAAAAAAAAAgwMEXAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAHEFAAAAAAAAAAAnwIIFAAA9AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-24T08:58:15.102Z",
               "IsPinned": true,
@@ -349,7 +349,7 @@
               "RelativeDocumentMoniker": "EsquireVRN\\Controllers\\PageImageController.cs",
               "ToolTip": "D:\\dashboard\\VRN\\EsquireVRN\\EsquireVRN\\Controllers\\PageImageController.cs",
               "RelativeToolTip": "EsquireVRN\\Controllers\\PageImageController.cs",
-              "ViewState": "AgIAAEcAAAAAAAAAAAArwFIAAABYAAAAAAAAAA==",
+              "ViewState": "AgIAAE0AAAAAAAAAAAArwGoAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-21T09:34:34.292Z",
               "IsPinned": true,
@@ -365,8 +365,7 @@
               "RelativeToolTip": "EsquireVRN\\appsettings.Development.json",
               "ViewState": "AgIAACQAAAAAAAAAAAAAADMAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-09-21T10:02:08.454Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-21T10:02:08.454Z"
             },
             {
               "$type": "Document",

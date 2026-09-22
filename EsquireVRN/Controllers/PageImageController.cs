@@ -11,11 +11,11 @@ namespace EsquireVRN.Controllers
     {
         // GET: api/<PageImageController>
         [HttpGet]
-        public IActionResult Get(int? pageSize, int? pageNum)
+        public IActionResult Get(int? pageSize, int? pageNum, string? searchText)
         {
             pageSize ??= 12;
             pageNum ??= 1;
-            return Ok(Shared.GetProductImages("", pageSize, pageNum));
+            return Ok(Shared.GetProductImages(searchText, pageSize, pageNum));
         }
 
         // GET api/<PageImageController>/5
@@ -28,7 +28,7 @@ namespace EsquireVRN.Controllers
 
         // POST api/<PageImageController>
         [HttpPost]
-        //[Authorize(Roles = "Reseller")]
+        [Authorize(Roles = "Reseller")]
         public IActionResult Post([FromForm] List<IFormFile> Images)
         {
             var requestUrl = $"{Request.Scheme}://{Request.Host.Value}/";
@@ -104,7 +104,7 @@ namespace EsquireVRN.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Reseller")]
+        [Authorize(Roles = "Reseller")]
         public IActionResult Delete(long id)
         {
             PageImage pImage = Shared.GetPageImage(id);

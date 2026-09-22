@@ -1408,7 +1408,7 @@ namespace EsquireVRN.Utils
             return returnProducts;
         }
 
-        public static PagedPageImage GetProductImages(string SearchText, int? pageSize, int? pageNum)
+        public static PagedPageImage GetProductImages(string? SearchText, int? pageSize, int? pageNum)
         {
             string query = "";
             long ImageCount = 0;
