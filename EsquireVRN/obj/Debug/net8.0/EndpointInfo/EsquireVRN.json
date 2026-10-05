@@ -306,7 +306,7 @@
             }
           },
           {
-            "name": "searchText",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
@@ -4241,6 +4241,13 @@
             "schema": {
               "type": "integer",
               "format": "int64"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
         ],

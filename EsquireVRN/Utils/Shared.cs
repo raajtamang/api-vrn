@@ -663,16 +663,21 @@ namespace EsquireVRN.Utils
         }
 
         //Sub Categories Section
-        public static PagedSubCategories GetSubCategories(long? pageNumber, long? pageSize)
+        public static PagedSubCategories GetSubCategories(long? pageNumber, long? pageSize, string? searchText)
         {
             long pNum = (pageNumber ?? 1);
             long pSize = (pageSize ?? 12);
             long pCount = 1;
+            string where = "";
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                where = " AND sCategory.GroupName LIKE '%' + @Search + '%'";
+            }
             List<SubCategory> categories = [];
             using (var db = new SqlConnection(connString))
             {
-                string strQuery = "SELECT sCategory.ProdGroupID AS Id,sCategory.GroupName AS Title,link.GroupHeadID AS Category_Id,sCategory.MetaTitle,sCategory.MetaDescription,sCategory.ImageUrl,sCategory.[Description] FROM ProductGroups sCategory JOIN ProdGroupLInk link ON sCategory.GroupName = link.ProdGroupName JOIN ProductGroupHead Category ON link.GroupHeadID = Category.GroupHeadID WHERE Category.OrgID IN (" + GetOrgCategoryId() + ") AND (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.GroupName = sCategory.GroupName AND p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (" + GetOrgCategory() + ") AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 ORDER BY sCategory.ProdGroupID OFFSET (" + pNum + " - 1) * " + pSize + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;SELECT Count(1) FROM ProductGroups sCategory JOIN ProdGroupLInk link ON sCategory.GroupName = link.ProdGroupName JOIN ProductGroupHead Category ON link.GroupHeadID = Category.GroupHeadID WHERE Category.OrgID IN (" + GetOrgCategoryId() + ");";
-                var result = db.QueryMultiple(strQuery);
+                string strQuery = "SELECT sCategory.ProdGroupID AS Id,sCategory.GroupName AS Title,link.GroupHeadID AS Category_Id,sCategory.MetaTitle,sCategory.MetaDescription,sCategory.ImageUrl,sCategory.[Description] FROM ProductGroups sCategory JOIN ProdGroupLInk link ON sCategory.GroupName = link.ProdGroupName JOIN ProductGroupHead Category ON link.GroupHeadID = Category.GroupHeadID WHERE Category.OrgID IN (" + GetOrgCategoryId() + ") AND (SELECT COUNT(p.ProdID) FROM Products p WHERE dbo.GetProductStockCount(p.ProdID, p.Status, N'A') > 0 AND p.GroupName = sCategory.GroupName AND p.OutputMe = 1 AND p.Active = 1 AND p.OrgCategory IN (" + GetOrgCategory() + ") AND p.ImgURL IS NOT NULL AND p.ImgURL != '' ) > 0 " + where + " ORDER BY sCategory.ProdGroupID OFFSET (" + pNum + " - 1) * " + pSize + " ROWS FETCH NEXT " + pSize + " ROWS ONLY;SELECT Count(1) FROM ProductGroups sCategory JOIN ProdGroupLInk link ON sCategory.GroupName = link.ProdGroupName JOIN ProductGroupHead Category ON link.GroupHeadID = Category.GroupHeadID WHERE Category.OrgID IN (" + GetOrgCategoryId() + ") " + where + ";";
+                var result = db.QueryMultiple(strQuery, new { Search = searchText });
                 categories = [.. result.Read<SubCategory>().DistinctBy(x => x.Title)];
                 long counts = result.Read<long>().FirstOrDefault();
                 if (counts > 0)
@@ -1415,12 +1420,12 @@ namespace EsquireVRN.Utils
             if (string.IsNullOrWhiteSpace(SearchText))
             {
 
-                query = "SELECT * FROM ImageGallery WHERE OrgId=" + GetOrgID() + " ORDER BY CreatedDate Desc OFFSET " + (pageSize * (pageNum - 1)) + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;SELECT COUNT(*) FROM ImageGallery WHERE OrgId="+GetOrgID()+";";
+                query = "SELECT * FROM ImageGallery WHERE OrgId=" + GetOrgID() + " ORDER BY CreatedDate Desc OFFSET " + (pageSize * (pageNum - 1)) + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;SELECT COUNT(*) FROM ImageGallery WHERE OrgId=" + GetOrgID() + ";";
             }
             else
             {
                 SearchText = SearchText.Replace("'", "''");
-                query = "SELECT * FROM ImageGallery WHERE OrgId=" + GetOrgID() + " AND Title Like '%" + SearchText + "%' ORDER BY CreatedDate Desc OFFSET " + (pageSize * (pageNum - 1)) + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;SELECT COUNT(*) FROM ImageGallery  WHERE OrgID="+GetOrgID()+" AND Title LIKE '%" + SearchText + "%';";
+                query = "SELECT * FROM ImageGallery WHERE OrgId=" + GetOrgID() + " AND Title Like '%" + SearchText + "%' ORDER BY CreatedDate Desc OFFSET " + (pageSize * (pageNum - 1)) + " ROWS FETCH NEXT " + pageSize + " ROWS ONLY;SELECT COUNT(*) FROM ImageGallery  WHERE OrgID=" + GetOrgID() + " AND Title LIKE '%" + SearchText + "%';";
 
             }
             List<PageImage> images = new();
@@ -1460,7 +1465,7 @@ namespace EsquireVRN.Utils
             else
             {
                 SearchText = SearchText.Replace("'", "''");
-                query = "SELECT * FROM ImageGallery WHERE OrgID="+GetOrgID()+" AND Title Like '%" + SearchText + "%' ORDER BY CreatedDate Desc;";
+                query = "SELECT * FROM ImageGallery WHERE OrgID=" + GetOrgID() + " AND Title Like '%" + SearchText + "%' ORDER BY CreatedDate Desc;";
 
             }
             List<PageImage> images = new();
@@ -1478,7 +1483,7 @@ namespace EsquireVRN.Utils
 
         public static bool CheckImageExists(string imgname)
         {
-            string query = "SELECT * FROM ImageGallery WHERE Image=@imgName AND OrgID="+GetOrgID();
+            string query = "SELECT * FROM ImageGallery WHERE Image=@imgName AND OrgID=" + GetOrgID();
             using (var db = new SqlConnection(connString))
             {
                 var values = new { imgName = imgname };
